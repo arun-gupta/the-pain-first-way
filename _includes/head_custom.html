@@ -1,19 +1,35 @@
 <!-- Mermaid support for the landscape diagram and any other mermaid blocks -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: 'default',
-    securityLevel: 'loose'
-  });
   document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('code.language-mermaid').forEach(function(code) {
+    if (typeof mermaid === 'undefined') {
+      console.error('Mermaid failed to load from CDN');
+      return;
+    }
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose'
+    });
+    // Jekyll/Kramdown with Rouge wraps ```mermaid blocks as:
+    //   <div class="language-mermaid highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...</code></pre></div></div>
+    // Find any element with the language-mermaid class and replace the outermost wrapper.
+    var blocks = document.querySelectorAll('.language-mermaid');
+    blocks.forEach(function(block) {
+      var codeEl = block.tagName === 'CODE' ? block : block.querySelector('code');
+      var sourceText = (codeEl || block).textContent;
+      var wrapper = block.tagName === 'CODE'
+        ? (block.closest('div.language-mermaid') || block.closest('pre') || block)
+        : block;
       var div = document.createElement('div');
       div.className = 'mermaid';
-      div.textContent = code.textContent;
-      var wrapper = code.closest('pre, div.highlighter-rouge') || code;
+      div.textContent = sourceText;
       wrapper.replaceWith(div);
     });
-    mermaid.run();
+    if (blocks.length > 0) {
+      mermaid.run().catch(function(err) {
+        console.error('Mermaid render error:', err);
+      });
+    }
   });
 </script>
