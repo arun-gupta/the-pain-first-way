@@ -1,4 +1,4 @@
-# Cold start for my 70B model takes 4 minutes
+# Pain 5: Cold start for my 70B model takes 4 minutes
 
 > *A new replica needs to scale up. It pulls a 30GB image, downloads model weights from object storage, loads them into GPU memory, and warms the inference engine. Your users wait 4 minutes for the first response after a scale event.*
 
@@ -31,4 +31,4 @@ Cold start is real cost in AI workloads, and the answer isn't "make the model sm
 
 ---
 
-[← Previous: Multi-node training](04-multi-node-training.md) · [Landscape](../README.md) · [Next: GPU underutilization →](06-gpu-underutilized.md)
+[← Pain 4: Multi-node training](04-multi-node-training.md) · [Landscape](../README.md) · [Pain 6: GPU underutilization →](06-gpu-underutilized.md)

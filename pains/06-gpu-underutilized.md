@@ -1,4 +1,4 @@
-# My GPU sits at 30% but my bill says 100%
+# Pain 6: My GPU sits at 30% but my bill says 100%
 
 > *Your inference server runs on an H100. `nvidia-smi` shows 30% utilization at p50 load. You're paying for the whole GPU every hour. Latency is fine, efficiency is awful.*
 
@@ -21,4 +21,4 @@ GPU utilization comes from feeding the GPU enough work per unit time. That's mos
 
 ---
 
-[← Previous: Cold start](05-cold-start.md) · [Landscape](../README.md) · [Next: Can't roll back →](07-cant-roll-back.md)
+[← Pain 5: Cold start](05-cold-start.md) · [Landscape](../README.md) · [Pain 7: Can't roll back →](07-cant-roll-back.md)

@@ -1,4 +1,4 @@
-# My GPU job crashed at hour 14 and I lost everything
+# Pain 2: My GPU job crashed at hour 14 and I lost everything
 
 > *You ran `python train.py` on a rented GPU box. Process died. No checkpoint policy, no auto-restart, no record of which step you were on. The box is fine. Your run isn't.*
 
@@ -20,4 +20,4 @@ Long-running compute should be declared, not invoked. You describe what you want
 
 ---
 
-[← Previous: Model works locally](01-model-works-locally.md) · [Landscape](../README.md) · [Next: Can't get a GPU →](03-cant-get-a-gpu.md)
+[← Pain 1: Model works locally](01-model-works-locally.md) · [Landscape](../README.md) · [Pain 3: Can't get a GPU →](03-cant-get-a-gpu.md)

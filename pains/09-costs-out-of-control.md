@@ -1,4 +1,4 @@
-# Costs are out of control
+# Pain 9: Costs are out of control
 
 > *Your AI app's GPU bill tripled. Half your replicas are idle at 3am, the other half OOM'd at peak yesterday, and nobody capped how many GPUs the new fine-tuning experiment can grab.*
 
@@ -21,4 +21,4 @@ Capacity follows demand, not the other way around. Workloads scale based on sign
 
 ---
 
-[← Previous: Latency spiked](08-latency-spiked.md) · [Landscape](../README.md) · [Next: Prompt version in prod →](10-prompt-version.md)
+[← Pain 8: Latency spiked](08-latency-spiked.md) · [Landscape](../README.md) · [Pain 10: Prompt version in prod →](10-prompt-version.md)

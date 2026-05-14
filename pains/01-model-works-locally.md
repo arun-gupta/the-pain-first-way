@@ -1,4 +1,4 @@
-# Model works locally, breaks in prod
+# Pain 1: Model works locally, breaks in prod
 
 > *Your model serves perfectly on your laptop. On the prod VM, it crashes on import. Different Python, different CUDA, missing system lib, drift in `transformers` minor version. Nobody can reproduce your environment because nobody captured it.*
 
@@ -20,4 +20,4 @@ The unit of deployment is not your code, it's your code plus everything it depen
 
 ---
 
-[Landscape](../README.md) · [Next: GPU job crashed at hour 14 →](02-gpu-job-crashed.md)
+[Landscape](../README.md) · [Pain 2: GPU job crashed →](02-gpu-job-crashed.md)

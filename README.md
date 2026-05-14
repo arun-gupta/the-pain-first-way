@@ -12,39 +12,39 @@ Eleven pains, sequenced from foundation to compliance. Click any pain to jump to
 
 ```mermaid
 flowchart LR
-    subgraph S1[1 Foundation]
+    subgraph S1[Foundation]
         direction TB
-        N1[Model breaks in prod]
+        N1[1. Model breaks in prod]
     end
-    subgraph S2[2 Compute]
+    subgraph S2[Compute]
         direction TB
-        N2[GPU job crashed]
-        N3[Can't get a GPU]
-        N4[Multi-node falling over]
+        N2[2. GPU job crashed]
+        N3[3. Can't get a GPU]
+        N4[4. Multi-node falling over]
         N2 ~~~ N3
         N3 ~~~ N4
     end
-    subgraph S3[3 Serving]
+    subgraph S3[Serving]
         direction TB
-        N5[Cold start]
-        N6[GPU at 30 percent]
-        N7[Can't roll back]
-        N8[Latency spiked]
+        N5[5. Cold start]
+        N6[6. GPU at 30 percent]
+        N7[7. Can't roll back]
+        N8[8. Latency spiked]
         N5 ~~~ N6
         N6 ~~~ N7
         N7 ~~~ N8
     end
-    subgraph S4[4 Operations]
+    subgraph S4[Operations]
         direction TB
-        N9[Costs out of control]
+        N9[9. Costs out of control]
     end
-    subgraph S5[5 Governance]
+    subgraph S5[Governance]
         direction TB
-        N10[Prompt version in prod]
+        N10[10. Prompt version in prod]
     end
-    subgraph S6[6 Compliance]
+    subgraph S6[Compliance]
         direction TB
-        N11[Data residency]
+        N11[11. Data residency]
     end
     S1 --> S2 --> S3 --> S4 --> S5 --> S6
     click N1 "https://github.com/arun-gupta/cloudnative-for-ai-developers/blob/main/pains/01-model-works-locally.md"

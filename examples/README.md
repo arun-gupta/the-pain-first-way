@@ -6,19 +6,19 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 
 ## Status
 
-| Pain | Folder | Status |
-|------|--------|--------|
-| 01. Model works locally, breaks in prod | `01-image/` | Planned |
-| 02. GPU job crashed at hour 14 | `02-jobs/` | Planned |
-| 03. Can't get a GPU | `03-queueing/` | Planned |
-| 04. Multi-node training | `04-multi-node/` | Planned |
-| 05. Cold start | `05-cold-start/` | Planned |
-| 06. GPU underutilization | `06-utilization/` | Planned |
-| 07. Can't roll back | `07-rollouts/` | Planned |
-| 08. Latency spiked | `08-observability/` | Planned |
-| 09. Costs out of control | `09-autoscaling/` | Planned |
-| 10. Prompt version in prod | `10-config/` | Planned |
-| 11. Data residency | `11-multi-cluster/` | Planned |
+| # | Pain | Folder | Status |
+|---|------|--------|--------|
+| 1 | Model works locally, breaks in prod | `01-image/` | Planned |
+| 2 | GPU job crashed at hour 14 | `02-jobs/` | Planned |
+| 3 | Can't get a GPU | `03-queueing/` | Planned |
+| 4 | Multi-node training | `04-multi-node/` | Planned |
+| 5 | Cold start | `05-cold-start/` | Planned |
+| 6 | GPU underutilization | `06-utilization/` | Planned |
+| 7 | Can't roll back | `07-rollouts/` | Planned |
+| 8 | Latency spiked | `08-observability/` | Planned |
+| 9 | Costs out of control | `09-autoscaling/` | Planned |
+| 10 | Prompt version in prod | `10-config/` | Planned |
+| 11 | Data residency | `11-multi-cluster/` | Planned |
 
 ## Contributing an example
 

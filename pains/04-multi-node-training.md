@@ -1,4 +1,4 @@
-# Multi-node training keeps falling over
+# Pain 4: Multi-node training keeps falling over
 
 > *Your distributed training job needs 32 GPUs across 4 nodes. One node hiccups at hour 6, NCCL hangs, the whole run dies. Or three workers come up, the fourth is still pulling the image, and the others time out waiting.*
 
@@ -21,4 +21,4 @@ Distributed training is all-or-nothing. The platform either gives you every node
 
 ---
 
-[← Previous: Can't get a GPU](03-cant-get-a-gpu.md) · [Landscape](../README.md) · [Next: Cold start →](05-cold-start.md)
+[← Pain 3: Can't get a GPU](03-cant-get-a-gpu.md) · [Landscape](../README.md) · [Pain 5: Cold start →](05-cold-start.md)

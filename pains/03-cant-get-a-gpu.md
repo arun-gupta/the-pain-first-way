@@ -1,4 +1,4 @@
-# I can't get a GPU when I need one
+# Pain 3: I can't get a GPU when I need one
 
 > *You submit a training job. It sits `Pending` for hours. The cluster has GPUs but they're all claimed. You don't know who's using them, when they'll free up, or whether your job will ever schedule.*
 
@@ -21,4 +21,4 @@ GPUs are a constrained resource, and constrained resources need a queue, a prior
 
 ---
 
-[← Previous: GPU job crashed](02-gpu-job-crashed.md) · [Landscape](../README.md) · [Next: Multi-node training →](04-multi-node-training.md)
+[← Pain 2: GPU job crashed](02-gpu-job-crashed.md) · [Landscape](../README.md) · [Pain 4: Multi-node training →](04-multi-node-training.md)
