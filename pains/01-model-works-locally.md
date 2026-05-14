@@ -34,6 +34,10 @@ The primitives that make this work:
 
 **What you give up**: "it works on my machine" as a defense. The image either runs or doesn't, identically, everywhere.
 
+## Try it
+
+A working demonstration lives in [`examples/01-image/`](../examples/01-image/). Same Python code shipped two ways (with and without a Dockerfile), plus a diagnostic command that surfaces your own laptop's accumulated state before you read the Dockerfile section.
+
 ---
 
 [Landscape](../README.md) · [Pain 2: GPU job crashed →](02-gpu-job-crashed.md)

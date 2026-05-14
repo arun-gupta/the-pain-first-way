@@ -8,7 +8,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 
 | # | Pain | Folder | Status |
 |---|------|--------|--------|
-| 1 | Model works locally, breaks in prod | `01-image/` | Planned |
+| 1 | Model works locally, breaks in prod | [`01-image/`](01-image/) | Available |
 | 2 | GPU job crashed at hour 14 | `02-jobs/` | Planned |
 | 3 | Can't get a GPU | `03-queueing/` | Planned |
 | 4 | Multi-node training | `04-multi-node/` | Planned |
