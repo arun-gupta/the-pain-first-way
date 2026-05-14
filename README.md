@@ -2,9 +2,19 @@
 
 Cloud native is the operating system for production software. AI development grew up parallel to it, mostly in notebooks and on rented GPU boxes. That's changed. Inference at scale, multi-agent systems, enterprise rollouts. The walls between an experiment and a system are coming down, and on the other side of those walls is a vocabulary AI developers haven't had to learn yet.
 
-This guide is that vocabulary, pain-first, for AI developers whose work has outgrown a notebook. ML engineers shipping models from training to production. LLM app developers serving inference at scale. Agent builders running multi-step systems that fail in ways the notebook never did. Each pain starts with a problem you've hit or are about to, names what's actually happening, and points at the cloud native primitive that solves it. Read in order, or jump to the one biting you this week.
+This guide is that vocabulary, pain-first. Each pain starts with a problem you've hit or are about to, names what's actually happening, and points at the cloud native primitive that solves it. Read in order, or jump to the one biting you this week.
 
 What this guide is not: a Kubernetes tutorial. There are 500 of those. This is a translation between two worlds that increasingly need each other, with an honest accounting of where the translation runs out.
+
+## Who this guide is for
+
+AI developers whose work has outgrown a notebook:
+
+- **ML engineers** shipping models from training to production
+- **LLM app developers** serving inference at scale
+- **Agent builders** running multi-step systems that fail in ways the notebook never did
+
+Not the target audience: researchers who live in notebooks, data analysts, or MLOps engineers who already speak Kubernetes. You might still find parts of this useful sideways, but the guide assumes you're crossing from "trained a model" toward "operating a system," not coming the other direction.
 
 ## The pains
 
