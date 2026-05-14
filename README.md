@@ -60,6 +60,16 @@ flowchart LR
     click N11 "https://github.com/arun-gupta/cloudnative-for-ai-developers/blob/main/pains/11-data-residency.md"
 ```
 
+## How to use this guide
+
+Each pain is meant to be worked through end-to-end:
+
+1. **Pick a pain.** The landscape diagram above links to each pain's page.
+2. **Read the pattern and primitives.** What's actually happening, and the cloud native pieces that solve it.
+3. **Try the example.** A runnable manifest demonstrating the primitives in action.
+
+Examples live in [`examples/`](examples/) and are filled in pain-by-pain as the guide evolves. When a pain's example ships, the pain page links to it directly. See [examples/README.md](examples/README.md) for current status and to contribute one.
+
 ## The mental model shift
 
 Before reading a pain, the reframe:
@@ -80,10 +90,6 @@ The shift, in one line: invoke less, declare more.
 - [Where cloud native doesn't help](reference/where-cn-doesnt-help.md): honest scope statement on what this guide doesn't cover
 - [What not to translate](reference/what-not-to-translate.md): cloud native dogma that bends or breaks for AI workloads
 - [Reading path](reference/reading-path.md): five things to actually touch, in order
-
-## Examples
-
-Runnable manifests, scripts, and starter code per pain. See [examples/](examples/). Filled in pain-by-pain as the guide evolves.
 
 ## Contributing
 
