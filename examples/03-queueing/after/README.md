@@ -127,6 +127,22 @@ kubectl delete --server-side \
   -f https://github.com/kubernetes-sigs/kueue/releases/download/v0.9.1/manifests.yaml
 ```
 
+## How the pieces fit together
+
+```mermaid
+flowchart LR
+    WPC["WorkloadPriorityClass\nproduction · 1000\nexperiment · 100"]
+
+    Job["Job\nqueue-name: ml-team\npriority-class: production"] --> LQ
+    LQ["LocalQueue\nml-team"] --> CQ
+    CQ["ClusterQueue\nml-cluster-queue\nquota: 2 CPU slots\npreemption: LowerPriority"] --> RF
+    RF["ResourceFlavor\ndefault-flavor"] --> N["Cluster Nodes"]
+
+    WPC -.->|controls admission order| CQ
+```
+
+The job carries two labels. Everything else is cluster-side configuration your training code never sees.
+
 ## What the manifests declare
 
 | Manifest | What it does |

@@ -8,6 +8,25 @@ GPUs aren't always scarce. They're often just invisible. You can't see who has t
 
 A queue makes allocation declared, ordered, and observable. It doesn't conjure more GPUs; it gives every job a visible position, a priority, and a clear answer to "when will mine run?"
 
+A queue makes allocation visible and ordered. It doesn't conjure more GPUs; it gives every job a position and a priority.
+
+```mermaid
+flowchart TB
+    J1[experiment-a] & J2[experiment-b] & J3[experiment-c] & J4[production-finetune] --> LQ
+
+    LQ[LocalQueue: ml-team] --> CQ
+
+    subgraph CQ[ClusterQueue — 2 slots]
+        direction TB
+        R1([production-finetune · priority 1000 · admitted])
+        R2([experiment-a · priority 100 · admitted])
+        W1([experiment-b · priority 100 · waiting · position 1])
+        W2([experiment-c · priority 100 · waiting · position 2])
+    end
+```
+
+The production job jumped the queue. The waiting jobs have a known position. Everyone can see the state with `kubectl get workloads`.
+
 ## The primitives
 
 - **[Kueue](https://kueue.sigs.k8s.io/)**: native Kubernetes job queueing with quotas, priorities, and fair sharing per team
