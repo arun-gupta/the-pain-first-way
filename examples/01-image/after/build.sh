@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Build the image. With --push, also tag and push to GHCR.
+# Build the image. With --push, also tag and push to Docker Hub.
 #
 # Usage:
 #   bash build.sh           Build locally as embedder:latest
-#   bash build.sh --push    Build, tag as ghcr.io/<GHCR_USERNAME>/embedder:latest, and push
+#   bash build.sh --push    Build, tag as <DOCKER_USERNAME>/embedder:latest, and push
 #
 # Push requires:
-#   docker login ghcr.io -u <user> -p <GitHub PAT with write:packages>
+#   docker login -u <your-dockerhub-username>
 
 set -euo pipefail
 
-GHCR_USERNAME="${GHCR_USERNAME:-arun-gupta}"
+DOCKER_USERNAME="${DOCKER_USERNAME:-arun-gupta}"
 IMAGE_NAME="${IMAGE_NAME:-embedder}"
 TAG="${TAG:-latest}"
 
@@ -19,7 +19,7 @@ echo
 echo "Built ${IMAGE_NAME}:${TAG}"
 
 if [[ "${1:-}" == "--push" ]]; then
-    REMOTE="ghcr.io/${GHCR_USERNAME}/${IMAGE_NAME}:${TAG}"
+    REMOTE="${DOCKER_USERNAME}/${IMAGE_NAME}:${TAG}"
     docker tag "${IMAGE_NAME}:${TAG}" "${REMOTE}"
     docker push "${REMOTE}"
     echo

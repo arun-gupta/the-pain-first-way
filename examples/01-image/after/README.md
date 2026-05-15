@@ -25,14 +25,14 @@ Three things, mapping to Pain 1's three layers of "what's actually happening":
 
 The image is the boundary. Inside, everything is declared. Outside no longer affects the runtime.
 
-## Push to GHCR
+## Push to Docker Hub
 
 ```bash
-docker login ghcr.io -u <your-github-username> -p <PAT-with-write-packages>
+docker login -u <your-dockerhub-username>
 bash build.sh --push
 ```
 
-`build.sh --push` tags as `ghcr.io/<GHCR_USERNAME>/embedder:latest` and pushes. Set `GHCR_USERNAME` if you're not the default.
+`build.sh --push` tags as `<DOCKER_USERNAME>/embedder:latest` and pushes. Set `DOCKER_USERNAME` if you're not the default.
 
 ## Why bake the model at build time
 
