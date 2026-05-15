@@ -16,7 +16,7 @@ The unit of deployment is not your code, it's your code plus everything it depen
 
 ## How cloud native helps
 
-The Dockerfile draws a boundary around the chaos. Whatever your laptop has stops mattering; what matters is what the file declares.
+The Dockerfile makes each layer explicit. Instead of inheriting from the host system, the runtime inherits from the file.
 
 - **Layer 1 → one Python, declared.** `FROM python:3.11-slim` pins the runtime version and base image. There's one interpreter inside the container, no env managers. `pip install -r requirements.txt` runs against that one Python, from a pinned index (and `--index-url` if you need a specific PyTorch wheel).
 - **Layer 2 → system libs, declared.** `RUN apt-get install -y libomp1 ffmpeg` makes the native layer part of the artifact. Same for CUDA: the base image either ships it or doesn't, and the answer is in the Dockerfile.
@@ -27,6 +27,15 @@ The primitives that make this work:
 - **Container image**: your code, runtime, system libs, model weights (optionally), built from a Dockerfile, stored in a registry, addressable by digest
 - **Dockerfile**: the declarative recipe for how that image gets built
 - **Image registry** (GHCR, ECR, Harbor): the place every environment pulls from
+
+## What this gets you
+
+When the Dockerfile pattern is applied to a model server:
+
+- **Same artifact, every environment.** The image that ran on your laptop runs identically on a teammate's machine, on CI, on staging, and on prod.
+- **No host-state inheritance.** What's on the host (Python versions, system libs, env vars, cached models) doesn't affect the runtime.
+- **The model travels with the code.** Inference doesn't depend on whether `~/.cache/huggingface` is populated or whether the host has internet access for the first call.
+- **Reproducible at a digest.** "What was running in prod on August 12?" answers as `ghcr.io/.../embedder@sha256:abc123` rather than "a venv on a box that may have been updated since."
 
 ## Trade-offs
 

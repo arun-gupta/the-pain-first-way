@@ -20,10 +20,10 @@ curl -X POST http://localhost:8000/embed \
 Three things, mapping to Pain 1's three layers of "what's actually happening":
 
 1. **Python and OS.** `FROM python:3.11-slim` pins the runtime. There is one Python in this container.
-2. **System libraries.** `RUN apt-get install -y libgomp1` makes the OpenMP shared object part of the image. PyTorch's `dlopen` finds it because we said so.
+2. **System libraries.** `RUN apt-get install -y libgomp1` makes the OpenMP shared object part of the image. PyTorch's `dlopen` finds it because the file declared it.
 3. **Python packages and model weights.** `pip install -r requirements.txt` runs inside the image with that pinned Python. The `RUN python -c "...SentenceTransformer(...)"` step downloads the model at build time so the runtime container doesn't need network access for it.
 
-The image is the boundary. Inside, everything is declared. Outside stops mattering.
+The image is the boundary. Inside, everything is declared. Outside no longer affects the runtime.
 
 ## Push to GHCR
 
