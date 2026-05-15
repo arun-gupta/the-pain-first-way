@@ -4,7 +4,7 @@
 
 ## The pattern
 
-Distributed training is all-or-nothing. The platform either gives you every node you asked for at the same time, with the right network and the ability to recover, or it shouldn't start the job at all.
+Distributed training is all-or-nothing. The platform either gives you every node you asked for at the same time, with the right network and the ability to recover, or it doesn't start the job at all.
 
 ## The primitives
 

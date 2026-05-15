@@ -4,7 +4,7 @@
 
 ## The pattern
 
-Deployment is a controlled state transition, not a script. Old replicas keep serving until new ones prove healthy. Rollback is reverting the declared state, not re-running install.
+In cloud native, deployment is a controlled state transition rather than an imperative script. Old replicas keep serving until new ones prove healthy. Rollback is reverting the declared state rather than re-running the install script.
 
 ## The primitives
 

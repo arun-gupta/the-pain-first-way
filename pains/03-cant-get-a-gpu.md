@@ -4,7 +4,7 @@
 
 ## The pattern
 
-GPUs are a constrained resource, and constrained resources need a queue, a priority order, and a clear answer to "when will my job run?" The scheduler enforces this, not human luck or Slack messages.
+GPUs are a constrained resource, and constrained resources benefit from a queue, a priority order, and a clear answer to "when will my job run?" In cloud native, the scheduler handles this; without it, the equivalent is team coordination.
 
 ## The primitives
 

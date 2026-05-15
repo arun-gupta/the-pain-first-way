@@ -13,7 +13,7 @@ flowchart LR
 
 ## The pattern
 
-Cold start is real cost in AI workloads, and the answer isn't "make the model smaller." It's keeping ready capacity, splitting what loads when, and caching aggressively at every layer.
+Cold start is real cost in AI workloads. Model-side answers (distillation, quantization, smaller architectures) help; cloud-native answers focus on the infrastructure side: keeping ready capacity, splitting what loads when, and caching aggressively at every layer.
 
 ## The primitives
 

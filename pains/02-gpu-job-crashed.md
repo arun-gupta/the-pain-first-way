@@ -4,7 +4,7 @@
 
 ## The pattern
 
-Long-running compute should be declared, not invoked. You describe what you want (image, command, resources, retry policy, where state lives) and the platform owns running it to completion.
+In cloud native, long-running compute is declared rather than invoked. You describe what you want (image, command, resources, retry policy, where state lives) and the platform owns running it to completion.
 
 ## The primitives
 
