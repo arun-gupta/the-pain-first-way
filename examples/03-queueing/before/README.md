@@ -42,24 +42,53 @@ Watch what happens:
 kubectl get pods -w
 ```
 
-You'll see two pods reach `Running` and one sit `Pending`:
+You'll see two pods reach `Running`. `experiment-c` never appears:
 
 ```
-experiment-a-xxxxx   0/1   Pending   0          0s
-experiment-b-xxxxx   0/1   Pending   0          0s
-experiment-c-xxxxx   0/1   Pending   0          0s
-experiment-a-xxxxx   1/1   Running   0          2s
+experiment-a-xxxxx   1/1   Running   0          3s
 experiment-b-xxxxx   1/1   Running   0          3s
 ```
 
-`experiment-c` never moves. You don't know when it will.
+`experiment-c`'s pod was never created — the quota rejected it before Kubernetes could schedule anything. You won't see it in `get pods` at all.
+
+To find it:
+
+```bash
+kubectl get jobs
+```
+
+```
+NAME           COMPLETIONS   DURATION   AGE
+experiment-a   0/1           10s        10s
+experiment-b   0/1           10s        10s
+experiment-c   0/1                      10s
+```
+
+`experiment-c` has no duration — it has never run. To find out why:
+
+```bash
+kubectl describe job experiment-c
+```
+
+The answer is buried in the Events section at the bottom:
+
+```
+Warning  FailedCreate  ... pods "experiment-c-xxxxx" is forbidden: exceeded quota: team-gpu-quota
+```
+
+Not obvious. Not actionable. That's the pain.
 
 ## The questions you can't answer
 
 ```bash
-# How many jobs are waiting?
+# Where is experiment-c?
 kubectl get pods --field-selector=status.phase=Pending
-# Tells you count. Tells you nothing about order or estimated start time.
+# No resources found in default namespace.
+# The pod doesn't exist. The job is blocked but there's nothing to observe.
+
+# Why is it blocked?
+kubectl describe job experiment-c
+# FailedCreate buried in Events. No ETA. No position in a queue.
 
 # Which team is using all the resources?
 kubectl get pods -A --field-selector=status.phase=Running
