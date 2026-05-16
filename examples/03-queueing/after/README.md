@@ -95,8 +95,8 @@ kubectl get workloads
 
 ```
 NAME                           QUEUE     RESERVED IN        ADMITTED   FINISHED   AGE
-job-experiment-a-c73d6         ml-team   ml-cluster-queue   True                  15s
-job-experiment-b-562fd         ml-team                      False                 15s
+job-experiment-a-c73d6         ml-team                      False                 15s
+job-experiment-b-562fd         ml-team   ml-cluster-queue   True                  15s
 job-experiment-c-7b3c1         ml-team                                            15s
 job-production-finetune-9d71a  ml-team   ml-cluster-queue   True                  6s
 ```
