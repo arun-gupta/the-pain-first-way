@@ -2,13 +2,6 @@
 
 Same training job, submitted through [Kueue](https://kueue.sigs.k8s.io/). The queue admits two jobs at a time. A third waits with a visible position. A high-priority production job preempts a waiting experiment so it can start immediately.
 
-## Prerequisites
-
-- [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- A running Kind cluster (`kind create cluster` if you don't have one)
-- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-
 ## 1. Install Kueue
 
 ```bash
