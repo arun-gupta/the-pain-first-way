@@ -1,0 +1,16 @@
+# ResourceQuota: cap the namespace at 2 CPUs total.
+#
+# Without this, a well-resourced machine (M4, 32-core workstation) schedules
+# all three jobs immediately and the pain never lands.
+#
+# This quota simulates a shared GPU cluster where the team allocation is 2 GPUs.
+# On a real cluster you'd set nvidia.com/gpu: "2" instead of cpu: "2".
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-gpu-quota
+  namespace: default
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "512Mi"

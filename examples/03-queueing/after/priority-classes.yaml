@@ -1,0 +1,20 @@
+# Two PriorityClasses: production work outranks experiments.
+#
+# In Kueue, WorkloadPriorityClasses (not PodPriorityClasses) control admission order.
+# These are used in the job manifests via kueue.x-k8s.io/priority-class annotation.
+#
+# On a real GPU cluster, the same classes apply: a production inference fine-tune
+# should never sit behind a weekend experiment run.
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: production
+value: 1000
+description: "Production workloads: inference fine-tunes, release-critical jobs."
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: experiment
+value: 100
+description: "Exploratory experiments: can wait, can be preempted."

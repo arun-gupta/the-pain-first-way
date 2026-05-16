@@ -1,0 +1,29 @@
+# ClusterQueue: the cluster-wide quota and admission policy.
+#
+# This queue allows at most 2 CPUs (and 512Mi memory) to run simultaneously.
+# On a real GPU cluster, replace "cpu" with "nvidia.com/gpu" and set the
+# count to however many GPUs are in your pool.
+#
+# preemption policy: production workloads can preempt experiment workloads
+# that are already running if no quota is available.
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ClusterQueue
+metadata:
+  name: ml-cluster-queue
+spec:
+  namespaceSelector: {}  # match all namespaces
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+    - coveredResources: ["cpu", "memory"]
+      flavors:
+        - name: default-flavor
+          resources:
+            - name: "cpu"
+              nominalQuota: "2"    # 2 CPUs max running at once (= 2 GPU slots on a real cluster)
+            - name: "memory"
+              nominalQuota: "512Mi"
+  preemption:
+    reclaimWithinCohort: Never
+    borrowWithinCohort:
+      policy: Never
+    withinClusterQueue: LowerPriority  # production can preempt experiment jobs

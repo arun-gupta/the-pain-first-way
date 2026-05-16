@@ -1,0 +1,18 @@
+# LocalQueue: the per-namespace submission target for the ml-team.
+#
+# Researchers submit jobs by setting:
+#   labels:
+#     kueue.x-k8s.io/queue-name: ml-team
+#
+# The LocalQueue routes those jobs into the ClusterQueue where quotas
+# and priorities are enforced.
+#
+# Multiple teams can have separate LocalQueues pointing at the same
+# ClusterQueue with different quota allocations -- fair sharing at the team level.
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: LocalQueue
+metadata:
+  namespace: default
+  name: ml-team
+spec:
+  clusterQueue: ml-cluster-queue

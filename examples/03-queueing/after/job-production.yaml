@@ -1,0 +1,41 @@
+# A production job submitted to the same LocalQueue.
+#
+# Priority 1000 vs experiment's 100. When the ClusterQueue is full (2 CPUs in use),
+# submitting this job triggers preemption of one experiment workload so the
+# production job can be admitted immediately.
+#
+# Observe with:
+#   kubectl get workloads -o wide
+#
+# The preempted experiment job re-queues automatically and resumes
+# when the production job completes (or frees its quota).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: production-finetune
+  namespace: default
+  labels:
+    kueue.x-k8s.io/queue-name: ml-team
+    kueue.x-k8s.io/priority-class: production
+spec:
+  suspend: true  # Kueue controls admission
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: training-job:latest
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: "1"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "128Mi"
+          volumeMounts:
+            - name: checkpoints
+              mountPath: /checkpoints
+      volumes:
+        - name: checkpoints
+          emptyDir: {}

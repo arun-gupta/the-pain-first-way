@@ -1,0 +1,67 @@
+# Three training jobs submitted at the same time.
+#
+# Each requests 1 CPU. The cluster quota in this demo allows only 2 to run at once.
+# One sits Pending with no ordering guarantee, no priority mechanism, and no ETA.
+#
+# In a real GPU cluster, replace "cpu: 1" with "nvidia.com/gpu: 1" -- the behavior is identical.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: experiment-a
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          # Inline workload: 10s per epoch, 20 epochs = ~200s total.
+          # No image build required for the before case.
+          image: python:3.11-slim
+          command: ["python", "-c", "import time, sys; [print(f'epoch {i}/20', flush=True) or time.sleep(10) for i in range(20)]; print('done')"]
+          resources:
+            requests:
+              cpu: "1"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "128Mi"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: experiment-b
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: python:3.11-slim
+          command: ["python", "-c", "import time, sys; [print(f'epoch {i}/20', flush=True) or time.sleep(10) for i in range(20)]; print('done')"]
+          resources:
+            requests:
+              cpu: "1"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "128Mi"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: experiment-c
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: python:3.11-slim
+          command: ["python", "-c", "import time, sys; [print(f'epoch {i}/20', flush=True) or time.sleep(10) for i in range(20)]; print('done')"]
+          resources:
+            requests:
+              cpu: "1"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "128Mi"

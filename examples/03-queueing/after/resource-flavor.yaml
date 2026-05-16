@@ -1,0 +1,18 @@
+# ResourceFlavor: describes a class of hardware available in the cluster.
+#
+# The "no-label" flavor matches any node -- correct for a CPU-only Kind cluster.
+#
+# On a real GPU cluster you'd use node labels to distinguish hardware:
+#   labels:
+#     cloud.google.com/gke-accelerator: nvidia-tesla-a100
+# or:
+#   labels:
+#     nvidia.com/gpu.product: A100-SXM4-80GB
+#
+# Multiple flavors let you model mixed fleets (A100s vs H100s vs T4s) and
+# let Kueue pick the cheapest flavor that fits the job's request.
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ResourceFlavor
+metadata:
+  name: default-flavor
+spec: {}
