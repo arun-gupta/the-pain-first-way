@@ -41,8 +41,8 @@ kubectl get clusterqueue ml-cluster-queue
 ```
 
 ```
-NAME               COHORT   PENDING WORKLOADS   ADMITTED WORKLOADS
-ml-cluster-queue            0                   0
+NAME               COHORT   PENDING WORKLOADS
+ml-cluster-queue            0
 ```
 
 ## 4. Submit three experiment jobs
