@@ -65,6 +65,8 @@ kubectl rollout status deployment/training-operator -n kubeflow
 ./build.sh
 ```
 
+> **Already ran the before/ example?** The image is already loaded. Skip this step.
+
 This builds `dist-training:latest` and loads it into all nodes of the Kind cluster.
 No registry needed.
 

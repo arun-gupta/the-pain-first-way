@@ -17,13 +17,16 @@ NCCL hang: one peer is missing, so the whole run dies.
 
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - A running Kind cluster (`kind create cluster` if you don't have one)
-- The `dist-training:latest` image loaded into the cluster — build it first:
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+
+## Build the image
 
 ```bash
-cd ../after
 ./build.sh
-cd ../before
 ```
+
+This builds `dist-training:latest` and loads it into your Kind cluster. The
+`after/` example uses the same image — no rebuild needed when you move there.
 
 ## Run it
 

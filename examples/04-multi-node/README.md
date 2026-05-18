@@ -7,7 +7,11 @@ A working demonstration of [Pain 4: Multi-node training keeps falling over](../.
 ```
 04-multi-node/
 ├── before/        # the naive way: two bare Jobs racing to find each other
-│   ├── dist-job.yaml   # Service + master Job + worker Job (no gang scheduling)
+│   ├── train.py
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── build.sh              # build dist-training:latest here first
+│   ├── dist-job.yaml         # Service + master Job + worker Job (no gang scheduling)
 │   └── README.md
 └── after/          # the cloud native way
     ├── train.py              # distributed training simulator (socket rendezvous)
