@@ -56,7 +56,7 @@ A working demonstration lives in [`examples/04-multi-node/`](../examples/04-mult
 ## The primitives
 
 - **Gang scheduling** (Volcano, Kueue): the job starts when all N pods can run together, not pod-by-pod. The scheduler holds every pod in a pending state until the full set can be admitted simultaneously. If the cluster doesn't have room for all N pods right now, none start. This eliminates the partial-start race where some ranks are running while others are still waiting to be scheduled.
-- **Training operators** (KubeRay, PyTorchJob, MPIJob, TorchX): primitives that understand distributed training semantics, including elastic recovery
+- **Training operators** (KubeRay, PyTorchJob, MPIJob, TorchX): primitives that understand distributed training semantics, including elastic recovery. PyTorchJob is demonstrated in the example; KubeRay serves Ray-based workloads, MPIJob covers MPI-based training (Horovod), and TorchX is a launcher abstraction that can target any of them.
 - **High-performance networking**: RDMA, GPUDirect, configured at the node and CNI layer so NCCL isn't going over a slow path
 - **Topology-aware scheduling**: pods land on nodes connected to the same fast switch, not scattered across the rack
 
