@@ -1,0 +1,9 @@
+# Kind cluster with 1 control-plane node and 2 worker nodes.
+# This lets the Training Operator place the master pod on one node
+# and the worker pod on the other, demonstrating true multi-node training.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker

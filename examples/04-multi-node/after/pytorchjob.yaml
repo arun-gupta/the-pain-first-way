@@ -1,0 +1,50 @@
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: dist-training
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          # Force the master onto a different node than the worker so the demo
+          # shows genuine cross-node communication, not loopback on the same host.
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: training.kubeflow.org/job-name
+                        operator: In
+                        values:
+                          - dist-training
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: pytorch
+              image: dist-training:latest
+              imagePullPolicy: Never
+              # The Training Operator injects MASTER_ADDR, MASTER_PORT, RANK,
+              # and WORLD_SIZE automatically. train.py reads them at startup.
+    Worker:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: training.kubeflow.org/job-name
+                        operator: In
+                        values:
+                          - dist-training
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: pytorch
+              image: dist-training:latest
+              imagePullPolicy: Never
+              # No WORKER_STARTUP_DELAY here. The operator creates all pods
+              # together and the worker connects once it's ready — no race.
