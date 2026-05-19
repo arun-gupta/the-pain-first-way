@@ -1,8 +1,8 @@
-# Before: weight download baked into the server
+# Before: weights downloaded on every cold start
 
-`server.py` downloads the "model weights" file from a hardcoded URL on startup. The source URL and all download logic live inside the server code.
+`server.py` downloads the weights file on startup, before serving any requests. Every new server instance pays the full download cost before it can respond.
 
-This is the natural starting point. Most model servers begin this way: a startup script that downloads weights from a hardcoded URL (an S3 bucket, a GCS path, a HuggingFace repo ID) before launching the server. It works fine until you need to change the source. Switch from S3 to GCS, move to a different bucket, or pull from HuggingFace instead. You are rebuilding and re-pushing the entire server image.
+This is the natural starting point. The server downloads the weights file every time it starts up. In this demo the file is tiny and the download takes under a second. In production, a 70B FP16 model is ~140 GB; the same pattern means every new server instance waits 2-3 minutes just on the download before it can serve a single request.
 
 ## Run it
 
@@ -35,4 +35,4 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## The problem
 
-To change the weights source (switch from this URL to an S3 bucket, a GCS path, or HuggingFace), you edit `WEIGHTS_URL` in `server.py` and rebuild the image. The download source and the serving logic are coupled in the same file and the same container image. That coupling is what the [`after/`](../after/) example eliminates.
+Every time a new server instance starts, users wait for the download to complete before the first request can be served. In this demo the wait is milliseconds. In production it is minutes. The [`after/`](../after/) example shows how an init container stages weights into a shared volume before the server starts, so the server is ready as soon as the volume is mounted.
