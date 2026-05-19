@@ -33,14 +33,14 @@ flowchart LR
 - **PVCs and node-local caches**: Store model weights on a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) (PVC — a Kubernetes abstraction for durable storage that survives pod restarts) backed by fast local NVMe, or a shared ReadWriteMany volume (EFS, Filestore, Weka). Pods mount the volume instead of downloading weights at startup. The first pod on a node pays the download cost; every subsequent pod reads from local disk.
 - **Init containers for weight staging**:
 
-  **Without an init container**, the server image bundles everything: the serving code, the download tool (aws-cli, gcsfuse, HuggingFace hub), and the credentials to reach your model store. Change the storage backend and you rebuild the entire server image.
+  **Without an init container**, the server image bundles everything: the serving code, the download tool (aws-cli, gcsfuse, HuggingFace hub), and the credentials to reach your model store. Every time a new server instance starts, it pays the full weight download cost before it can serve a single request.
 
   ```mermaid
   flowchart LR
       S1[Server image<br/>serving code<br/>+ aws-cli<br/>+ S3 credentials<br/>+ download logic]
   ```
 
-  **With an [init container](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)** (a setup step that must complete before your model server starts), the download runs in a separate container that stages weights into a shared volume. The server starts only after the volume is ready. This gives you three things: guaranteed sequencing (the server never starts with a partial model load), failure isolation (a bad download stops the pod before it serves a single request), and a clean separation between fetching and serving. Your server image has no idea where the weights came from. Swap from S3 to GCS, or from your private bucket to HuggingFace Hub, by changing the init container only. The server image never changes and never needs cloud credentials embedded in it.
+  **With an [init container](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)** (a setup step that must complete before your model server starts), the download runs in a separate container that stages weights into a shared volume. The server starts only after the volume is ready. This gives you two things: guaranteed sequencing (the server never starts with a partial model load) and failure isolation (a bad download stops the pod before it serves a single request). Because weights are already staged when the server process starts, the server skips the download entirely and is ready to serve in seconds instead of minutes.
 
   ```mermaid
   flowchart LR
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Try it
 
-A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold-start/). The before case shows a simulated model server that bakes its weight download into the startup script. Change the source URL and you rebuild the image. The after case uses an init container to stage weights into a shared volume; the server image is untouched. Runnable on a Mac with a local Kind cluster and no GPU required.
+A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold-start/). The before case shows a simulated model server that downloads weights on startup, blocking the server from accepting requests until the download finishes. The after case uses an init container to stage weights into a shared volume before the server process starts; the server is ready to serve as soon as it launches. Runnable on a Mac with a local Kind cluster and no GPU required.
 
 ---
 
