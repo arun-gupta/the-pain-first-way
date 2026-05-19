@@ -1,29 +1,30 @@
 """Naive inference server -- weight download baked into startup.
 
-On startup this server downloads a "model weights" file from a hardcoded URL.
-The download source, credentials, and download logic all live here.
+On startup this server downloads a "model weights" file from a hardcoded source.
+The download source and download logic all live here.
 Change the source and you change this file and rebuild the image.
 
 Simulates a model inference endpoint. The "model" is a small text file.
 """
 import http.server
 import socketserver
-import urllib.request
+import shutil
 import os
 import time
 
 # The weights source is hardcoded here.
-# On a real server this might be an S3 URL, a GCS path, or a HuggingFace repo.
+# On a real server this would be an S3 URL, a GCS path, or a HuggingFace repo ID.
 # Changing it means editing this file and rebuilding the image.
-WEIGHTS_URL = "https://raw.githubusercontent.com/arun-gupta/the-pain-first-way/main/examples/05-cold-start/after/weights.txt"
+# (This demo uses a local file to simulate a remote source — no network required.)
+WEIGHTS_SOURCE = os.path.join(os.path.dirname(__file__), "../after/weights.txt")
 WEIGHTS_PATH = "/tmp/weights.txt"
 PORT = 8080
 
 
 def download_weights():
-    print(f"[startup] Downloading weights from {WEIGHTS_URL} ...")
+    print(f"[startup] Downloading weights from {WEIGHTS_SOURCE} ...")
     start = time.time()
-    urllib.request.urlretrieve(WEIGHTS_URL, WEIGHTS_PATH)
+    shutil.copy(WEIGHTS_SOURCE, WEIGHTS_PATH)
     elapsed = time.time() - start
     print(f"[startup] Weights downloaded in {elapsed:.2f}s -> {WEIGHTS_PATH}")
 

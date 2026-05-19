@@ -4,6 +4,8 @@
 
 This is the natural starting point. The server downloads the weights file every time it starts up. In this demo the file is tiny and the download takes under a second. In production, a 70B FP16 model is ~140 GB; the same pattern means every new server instance waits 2-3 minutes just on the download before it can serve a single request.
 
+The demo uses a local file copy to simulate the download (no network required). In production the source would be an S3 URL, a GCS path, or a HuggingFace repo ID — hardcoded in the server.
+
 ## Run it
 
 No dependencies beyond the standard library.
@@ -17,8 +19,8 @@ python3 server.py
 Startup:
 
 ```
-[startup] Downloading weights from https://raw.githubusercontent.com/arun-gupta/the-pain-first-way/main/examples/05-cold-start/after/weights.txt ...
-[startup] Weights downloaded in 0.45s -> /tmp/weights.txt
+[startup] Downloading weights from .../examples/05-cold-start/after/weights.txt ...
+[startup] Weights downloaded in 0.00s -> /tmp/weights.txt
 [startup] Model loaded. Weights preview: these are fake model weights...
 [ready] Inference server listening on port 8080
 [ready]   GET /health  -> liveness check
