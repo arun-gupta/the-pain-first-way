@@ -97,6 +97,13 @@ for node in kind-worker kind-worker2; do
 done
 ```
 
+```
+==> kind-worker
+docker.io/library/dist-training   latest   30cedfd437114   45.7MB
+==> kind-worker2
+docker.io/library/dist-training   latest   30cedfd437114   45.7MB
+```
+
 ## 4. Submit the PyTorchJob
 
 ```bash
