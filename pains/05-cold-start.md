@@ -10,21 +10,23 @@ Cold start hurts most when a traffic spike hits your model endpoint and capacity
 
 There are two axes of attack. On the model side: smaller models, quantized weights (INT8/INT4), and distilled variants all load faster because there is simply less data to move. A 7B INT4 model fits in ~4 GB; a 70B FP16 model needs ~140 GB. That is a 35x difference in load time before you change a single line of infra config. On the infrastructure side: keep ready capacity pre-warmed, split weight loading from image loading, and cache aggressively at every layer so subsequent scale events pay much less.
 
+```mermaid
+flowchart LR
+    A[Server starts] --> B[Pull 30GB image<br/>~90s]
+    B --> C[Download weights<br/>~120s]
+    C --> D[Load to GPU<br/>~20s]
+    D --> E[Engine warmup<br/>~10s]
+    E --> F[Ready<br/>~4 min total]
+```
+
 ## The primitives
 
 ```mermaid
 flowchart LR
-    subgraph cold["Without primitives (~4 min)"]
-        A1[Pull 30GB image<br/>~90s] --> B1[Download weights<br/>~120s] --> C1[Load to GPU<br/>~20s] --> D1[Engine warmup<br/>~10s]
-    end
-
-    subgraph warm["With primitives (seconds to ready)"]
-        A2[Image cached on node<br/>~0s] --> B2[Weights on local volume<br/>~5s] --> C2[Load to GPU<br/>~20s] --> D2[Engine warmup<br/>~10s]
-    end
-
-    P1[Pre-pulled images] -.eliminates.-> A2
-    P2[Node-local weight cache] -.eliminates.-> B2
-    P3[Warm pool] -.skips all steps.-> E[Request served instantly]
+    A2[Image cached on node<br/>~0s] --> B2[Weights on local volume<br/>~5s] --> C2[Load to GPU<br/>~20s] --> D2[Engine warmup<br/>~10s] --> E2[Ready<br/>~35s]
+    P1[Pre-pulled images] -.eliminates pull cost.-> A2
+    P2[Node-local weight cache] -.eliminates download.-> B2
+    P3[Warm pool] -.skips all steps.-> F[Request served instantly]
 ```
 
 - **Pre-pulled images on nodes**: A [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) that references your model server image forces the kubelet to cache its layers on every GPU node before a pod is scheduled there. The next scale event finds the image already local and skips the 30 GB pull entirely.
