@@ -49,15 +49,15 @@ flowchart LR
 - **Warm pools and minimum replicas**: Setting `minReplicas` above zero on an [HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) (Horizontal Pod Autoscaler — Kubernetes' built-in scale-out controller) keeps at least one ready instance of your model server alive at all times. For predictable traffic patterns, pair it with [KEDA's CronScaler](https://keda.sh/docs/2.13/scalers/cron/) (a scheduled autoscaler that adds capacity on a time-based schedule, before traffic arrives) to pre-scale before known peak hours. The key is headroom: keep `minReplicas` one or two above your steady-state need so a traffic spike is absorbed while a cold instance is still initializing.
 - **[KServe](https://kserve.github.io/website/) and serving-aware autoscalers** ([KEDA HTTP](https://github.com/kedacore/http-add-on), [Knative](https://knative.dev/docs/serving/)): these frameworks understand load-once, serve-many semantics. KServe's `InferenceService` supports a warm floor via `minReplicas` alongside optional scale-to-zero for cheaper models. It also holds incoming requests in a queue while a new pod initializes, so callers see latency rather than errors during a scale event.
 
-## Try it
-
-A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold-start/). The before case shows a simulated model server that bakes its weight download into the startup script. Change the source URL and you rebuild the image. The after case uses an init container to stage weights into a shared volume; the server image is untouched. Runnable on a Mac with a local Kind cluster and no GPU required.
-
 ## Trade-offs
 
 **What you keep**: your model and your model server.
 
 **What you give up**: scale-to-zero as a default. For big models, a 4-minute cold start is long enough to break SLAs and lose users; the math usually favors a warm floor. For small or quantized models (7B INT4 loads in under 30 seconds on NVMe), scale-to-zero is still viable and worth considering.
+
+## Try it
+
+A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold-start/). The before case shows a simulated model server that bakes its weight download into the startup script. Change the source URL and you rebuild the image. The after case uses an init container to stage weights into a shared volume; the server image is untouched. Runnable on a Mac with a local Kind cluster and no GPU required.
 
 ---
 
