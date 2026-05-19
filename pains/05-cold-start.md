@@ -19,6 +19,10 @@ Cold start hurts most when a traffic spike hits your model endpoint and capacity
 
 There are two axes of attack. On the model side: smaller models, quantized weights (INT8/INT4), and distilled variants all load faster because there is simply less data to move. A 7B INT4 model fits in ~4 GB; a 70B FP16 model needs ~140 GB. That is a 35x difference in load time before you change a single line of infra config. On the infrastructure side: keep ready capacity pre-warmed, split weight loading from image loading, and cache aggressively at every layer so subsequent scale events pay much less.
 
+## Try it
+
+A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold-start/). The before case shows a simulated model server that bakes its weight download into the startup script. Change the source URL and you rebuild the image. The after case uses an init container to stage weights into a shared volume; the server image is untouched. Runnable on a Mac with a local Kind cluster and no GPU required.
+
 ## The primitives
 
 ```mermaid

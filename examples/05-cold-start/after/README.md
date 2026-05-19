@@ -1,0 +1,115 @@
+# After: init container stages weights, server is unaware
+
+`server.py` reads weights from `/model/weights.txt` and has no idea where they came from. `downloader.py` is the init container entrypoint: it stages the weights before the server starts. The server image contains serving code only.
+
+Swap `downloader.py` to change the source (S3, GCS, HuggingFace Hub). The server image never changes.
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+
+## 1. Create a Kind cluster
+
+```bash
+kind create cluster --name kind
+```
+
+## 2. Build and load the image
+
+```bash
+./build.sh
+```
+
+This builds the Docker image (which contains both `server.py` and `downloader.py`) and loads it directly into your Kind cluster. No registry needed.
+
+## 3. Apply the manifest
+
+```bash
+kubectl apply -f init-container.yaml
+```
+
+## 4. Watch the init container run first
+
+```bash
+kubectl get pod inference-server -w
+```
+
+You'll see the pod move through `Init:0/1` before reaching `Running`:
+
+```
+NAME               READY   STATUS     RESTARTS   AGE
+inference-server   0/1     Init:0/1   0          2s
+inference-server   0/1     PodInitializing   0   4s
+inference-server   1/1     Running    0          5s
+```
+
+The init container ran `downloader.py`, staged the weights to the shared volume, and exited. Only then did the server container start.
+
+## 5. Check the init container logs
+
+```bash
+kubectl logs inference-server -c weight-downloader
+```
+
+```
+[downloader] Staging weights from /weights-source/weights.txt to /model/weights.txt ...
+[downloader] Done in 0.001s (142 bytes). Weights ready at /model/weights.txt.
+```
+
+## 6. Check the server logs
+
+```bash
+kubectl logs inference-server
+```
+
+```
+[startup] Weights loaded from /model/weights.txt. Preview: these are fake model weights...
+[startup] (No download happened here. The init container staged these weights.)
+[ready] Inference server listening on port 8080
+```
+
+The server never downloaded anything. It just read from the volume the init container prepared.
+
+## 7. Test the endpoint
+
+```bash
+kubectl port-forward pod/inference-server 8080:8080
+```
+
+In another terminal:
+
+```bash
+curl http://localhost:8080/health
+curl http://localhost:8080/predict
+```
+
+## 8. Clean up
+
+```bash
+kubectl delete pod inference-server
+kind delete cluster --name kind
+```
+
+## What the manifest demonstrates
+
+The key is the shared `emptyDir` volume and the ordering guarantee:
+
+- `initContainers` run to completion before any container in `containers` starts.
+- Both containers mount the same `emptyDir` at `/model`.
+- The server starts with weights already present. It does not wait, poll, or retry.
+
+## What this maps to on a real GPU cluster
+
+| This demo | Real inference server |
+|---|---|
+| `python:3.11-slim` base | vLLM or TGI base image |
+| `weights.txt` (142 bytes) | 70B FP16 weights (~140 GB) |
+| `shutil.copy2` | `aws s3 sync`, `gsutil cp`, or HuggingFace hub download |
+| `emptyDir` | PVC backed by local NVMe or shared storage (EFS, Filestore) |
+| Swap `downloader.py` | Swap init container image or entrypoint args |
+
+---
+
+[← Back to Pain 5](../../pains/05-cold-start.md) · [Landscape](../../README.md) · [Examples index](../README.md)
