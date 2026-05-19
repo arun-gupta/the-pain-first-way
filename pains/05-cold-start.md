@@ -41,14 +41,14 @@ flowchart LR
 
   ```mermaid
   flowchart LR
-      subgraph before["Without init container"]
-          direction TB
-          S1[Server image<br/>serving code<br/>+ aws-cli<br/>+ S3 credentials<br/>+ download logic]
-      end
-
       subgraph after["With init container"]
           direction TB
           I[Init container<br/>aws-cli / gcsfuse /<br/>HuggingFace hub] -->|weights staged to<br/>shared volume| S2[Server image<br/>serving code only]
+      end
+
+      subgraph before["Without init container"]
+          direction TB
+          S1[Server image<br/>serving code<br/>+ aws-cli<br/>+ S3 credentials<br/>+ download logic]
       end
   ```
 
