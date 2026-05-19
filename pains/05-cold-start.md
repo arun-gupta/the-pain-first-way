@@ -13,7 +13,7 @@ flowchart LR
 
 ## The pattern
 
-Each step in the startup sequence is sequential and slow. On a cold node with no cache, pulling a 30 GB image is slow even on high-speed networks; pull-through registries and node-local image caches reduce this, but without pre-warming, a new node still pays the full pull cost at the worst possible time: during a scale event under load. Downloading 140 GB of FP16 weights from S3 or GCS adds another 2-3 minutes. Loading those weights into GPU memory is another 20-30 seconds. Engine warmup (JIT compilation, KV cache allocation) adds more on top. None of these steps overlap by default.
+Each step in the startup sequence is sequential and slow. On a cold node with no cache, pulling a 30 GB image is slow even on high-speed networks; pull-through registries and node-local image caches reduce this, but without pre-warming, a new node still pays the full pull cost during a scale event, exactly when you need replicas up fast. Downloading 140 GB of FP16 weights from S3 or GCS adds another 2-3 minutes. Loading those weights into GPU memory is another 20-30 seconds. Engine warmup (JIT compilation, KV cache allocation) adds more on top. None of these steps overlap by default.
 
 Cold start hurts most in three situations: bursty traffic where new replicas must come up fast, scale-to-zero deployments where there are no warm replicas at all, and rolling updates where old pods terminate before new ones are ready.
 
