@@ -21,6 +21,21 @@ There are two axes of attack. On the model side: smaller models, quantized weigh
 
 ## The primitives
 
+```mermaid
+flowchart LR
+    subgraph cold["Without primitives (~4 min)"]
+        A1[Pull 30GB image<br/>~90s] --> B1[Download weights<br/>~120s] --> C1[Load to GPU<br/>~20s] --> D1[Engine warmup<br/>~10s]
+    end
+
+    subgraph warm["With primitives (seconds to ready)"]
+        A2[Image cached on node<br/>~0s] --> B2[Weights on local volume<br/>~5s] --> C2[Load to GPU<br/>~20s] --> D2[Engine warmup<br/>~10s]
+    end
+
+    P1[Pre-pulled images] -.eliminates.-> A2
+    P2[Node-local weight cache] -.eliminates.-> B2
+    P3[Warm pool] -.skips all steps.-> E[Request served instantly]
+```
+
 - **Pre-pulled images on nodes**: A [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) that references your model server image forces the kubelet to cache its layers on every GPU node before a pod is scheduled there. The next scale event finds the image already local and skips the 30 GB pull entirely.
 - **PVCs and node-local caches**: Store model weights on a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) backed by fast local NVMe, or a shared ReadWriteMany volume (EFS, Filestore, Weka). Pods mount the volume instead of downloading weights at startup. The first pod on a node pays the download cost; every subsequent pod reads from local disk.
 - **Init containers for weight staging**: An [init container](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/) runs before the main inference container starts and downloads weights into a shared volume. This decouples weight fetching from model serving, so you can swap downloaders (aws-cli, gcsfuse, HuggingFace hub) without rebuilding the server image.
