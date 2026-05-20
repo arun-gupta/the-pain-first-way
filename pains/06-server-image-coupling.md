@@ -1,6 +1,8 @@
-# Pain 6: My server image bakes in config and secrets
+# Pain 6: My server image is coupled to its config and secrets
 
-> *Every time the weights bucket changes, the team rebuilds the server image. The image carries the S3 URL, the download tool, and the credentials. Change any one of those -- a new bucket, a new region, a rotation of the access key -- and the server image version bumps. The same thing happens when the model name changes, when a downstream API key rotates, or when staging needs different parameters than prod. None of that is a code change, but the image rebuilds anyway.*
+> *The server image carries more than serving code. It carries the weights source URL, the credentials to fetch them, the model name, the server parameters, and anything else that differs between environments. That coupling means every operational change flows through the image build pipeline -- even when not a single line of serving logic changed.*
+>
+> *Rotating a credential: rebuild. Moving weights to a new bucket: rebuild. Switching from S3 to GCS: rebuild. Changing a server parameter for staging: rebuild. Deploying to prod with different settings than dev: a different image tag per environment, each one a fork that has to be tracked and promoted separately.*
 
 ## The pattern
 
@@ -19,10 +21,16 @@ flowchart LR
     Coupled -->|starts| F[Downloads weights<br/>then serves]
 ```
 
-The coupling shows up as pain in two ways:
+The coupling surfaces in every operational change that has nothing to do with serving logic:
 
-- **Operationally**: you want to move weights to a new bucket, rotate an access key, switch from S3 to GCS, change the model name, or tune a server parameter for a specific environment. None of that is a code change, but you rebuild the image anyway. Dev, staging, and prod end up as separate image tags that differ only in config values.
-- **As a security smell**: credentials inside an image get cached in your registry, your CI system, and on every node that ever pulled the image.
+- Rotating a credential or API token
+- Moving weights to a new bucket or region
+- Switching storage backends (S3 to GCS, GCS to Azure Blob)
+- Changing the model name or version
+- Tuning a server parameter (max batch size, quantization, sequence length) per environment
+- Promoting from dev to staging to prod -- each environment needs different values, so each gets a different image tag
+
+And a security consequence that compounds all of the above: credentials inside an image get cached in your registry, your CI system, and on every node that ever pulled the image. Rotating a key doesn't remove the old one from those caches.
 
 ## The primitives
 
