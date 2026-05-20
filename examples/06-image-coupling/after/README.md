@@ -56,7 +56,32 @@ Inspect what was created:
 
 ```bash
 kubectl get configmap model-config -o yaml
+```
+
+```yaml
+apiVersion: v1
+data:
+  WEIGHTS_SOURCE: s3://my-model-bucket/llm-v1/weights.txt
+kind: ConfigMap
+metadata:
+  name: model-config
+  namespace: default
+```
+
+```bash
 kubectl get secret model-credentials -o yaml
+```
+
+```yaml
+apiVersion: v1
+data:
+  AWS_ACCESS_KEY_ID: <base64-encoded-key-id>
+  AWS_SECRET_ACCESS_KEY: <base64-encoded-secret-key>
+kind: Secret
+metadata:
+  name: model-credentials
+  namespace: default
+type: Opaque
 ```
 
 Two things to notice in the output:
