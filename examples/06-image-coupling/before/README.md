@@ -13,11 +13,11 @@ cd examples/06-image-coupling/before
 cp .env.example .env
 ```
 
-Edit `.env` and set:
-
-```
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+```bash
+sed -i '' \
+  -e 's/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE/' \
+  -e 's/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI\/K7MDENG\/bPxRfiCYEXAMPLEKEY/' \
+  .env
 ```
 
 Then run:
