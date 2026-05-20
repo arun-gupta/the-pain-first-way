@@ -13,7 +13,7 @@ import shutil
 import sys
 import time
 
-# Destination is the shared emptyDir volume mounted at /model.
+# Destination is the shared PVC volume mounted at /model.
 DEST = "/model/weights.txt"
 # Source: in this demo, a local file bundled into the init container image.
 # In a real deployment, replace this with an S3/GCS/HuggingFace download.
@@ -22,6 +22,11 @@ SOURCE = "/weights-source/weights.txt"
 
 def download():
     os.makedirs(os.path.dirname(DEST), exist_ok=True)
+
+    if os.path.exists(DEST):
+        size = os.path.getsize(DEST)
+        print(f"[downloader] {DEST} already present ({size} bytes). Skipping download.")
+        sys.exit(0)
 
     if not os.path.exists(SOURCE):
         print(f"[downloader] ERROR: source file not found: {SOURCE}", file=sys.stderr)

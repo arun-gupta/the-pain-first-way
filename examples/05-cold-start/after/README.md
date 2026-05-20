@@ -105,7 +105,28 @@ prediction using model: [these are fake model weights
 layer_0: 0.312 0.847 0.193 0.65...]
 ```
 
-## 8. Clean up
+## 8. Simulate a pod restart
+
+Delete and re-create the pod to simulate a cold start on a node that already has the weights cached on the PVC:
+
+```bash
+kubectl delete pod inference-server
+kubectl apply -f init-container.yaml
+```
+
+Watch the init container logs again:
+
+```bash
+kubectl logs inference-server -c weight-downloader
+```
+
+```
+[downloader] /model/weights.txt already present (142 bytes). Skipping download.
+```
+
+The weights were already on the PVC from the first run. The server was ready instantly. No download cost on restart.
+
+## 9. Clean up
 
 Press `Ctrl+C` in the port-forward terminal to stop it, then delete the pod and PVC:
 
