@@ -150,4 +150,10 @@ The [`after/`](../after/) example removes the scatter entirely: credentials live
 
 ## Clean up
 
-Press `Ctrl+C` to stop the running container.
+Stop the container before moving to the `after` example — both use port 8080.
+
+If the container is running in the foreground, press `Ctrl+C`. If it is running in the background:
+
+```bash
+docker stop $(docker ps -q --filter ancestor=inference-server-before:v1)
+```
