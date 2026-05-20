@@ -6,14 +6,12 @@ The problem is where those env vars come from. The natural next step when contai
 
 ## Run it locally
 
-Set the env vars inline and run with Python -- no Docker needed:
+Copy the example env file and run with Python -- no Docker needed:
 
 ```bash
 cd examples/06-image-coupling/before
-
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE \
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
-python3 server.py
+cp .env.example .env
+export $(grep -v '^#' .env | xargs) && python3 server.py
 ```
 
 Expected output:
