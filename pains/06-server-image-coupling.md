@@ -34,7 +34,7 @@ And a security consequence that compounds all of the above: credentials inside a
 
 ## The primitives
 
-The fix is to break the single image into two responsibilities: one image that serves, one that fetches. The serving image stays frozen across every weight source change. The fetch logic -- the download tool, the bucket URL, the credentials -- moves into a separate setup step that runs once at startup, stages weights to a shared location, and exits before the server starts. Credentials never touch the server image. The bucket URL is stored as a separate config object, so switching sources is a config change, not a code change.
+The fix is to decouple everything that changes for operational reasons from the image itself. Config values -- source URL, model name, server parameters -- move into cluster objects that can be updated without touching the image. Secrets -- credentials, API tokens -- move into a separate store, injected at runtime and never baked in. The fetch logic moves into a separate setup step that runs once at startup, stages weights to a shared location, and exits before the server starts. The result: the server image changes only when serving code changes, and is identical across every environment.
 
 ```mermaid
 flowchart LR
