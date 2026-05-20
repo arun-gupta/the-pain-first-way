@@ -49,7 +49,7 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## Run it with Docker
 
-Press `Ctrl+C` in the terminal running `server.py` to stop it. If you haven't already, copy `.env.example` to `.env` and fill in the demo values (see "Run it locally" above). Then build and run:
+Press `Ctrl+C` in the terminal running `server.py` to stop it. The same `.env` file is used here:
 
 ```bash
 docker build -t inference-server-before:v1 .
