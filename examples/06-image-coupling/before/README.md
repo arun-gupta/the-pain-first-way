@@ -6,7 +6,7 @@ The problem is where those env vars come from. The natural next step when contai
 
 ## Run it locally
 
-Copy the example env file and run with Python -- no Docker needed:
+Copy the example env file and run with Python:
 
 ```bash
 cd examples/06-image-coupling/before
