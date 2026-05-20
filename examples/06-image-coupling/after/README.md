@@ -59,7 +59,12 @@ kubectl get configmap model-config -o yaml
 kubectl get secret model-credentials -o yaml
 ```
 
-The Secret values are base64-encoded in etcd. They are not in the image, not in the registry, and not in any build cache.
+Two things to notice in the output:
+
+- **ConfigMap** — `WEIGHTS_SOURCE` is plain text, readable directly. Non-sensitive config is expected to be readable.
+- **Secret** — `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are base64-encoded, not the raw values. Base64 is encoding, not encryption. Anyone with cluster access can decode them with `echo <value> | base64 -d`. The protection comes from RBAC restricting who can `kubectl get secret`, not from the encoding itself.
+
+Also notice the `last-applied-configuration` annotation contains the original `stringData` values in plain text. In production, use [External Secrets Operator](https://external-secrets.io) to source values from a vault — it never writes the raw value into the annotation.
 
 ## 4. Apply the pod manifest
 
