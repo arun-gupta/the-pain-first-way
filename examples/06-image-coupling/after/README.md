@@ -2,6 +2,22 @@
 
 `server.py` is serving code only. `downloader.py` is the init container entrypoint: it reads `WEIGHTS_SOURCE` from a ConfigMap and `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` from a Secret, stages the weights to a shared volume, and exits before the server starts. Neither value is in the image.
 
+```mermaid
+flowchart LR
+    CM[ConfigMap<br/>WEIGHTS_SOURCE]
+    SEC[Secret<br/>AWS_ACCESS_KEY_ID<br/>AWS_SECRET_ACCESS_KEY]
+
+    subgraph Init["Init container (downloader.py)"]
+        D[Download tool]
+    end
+
+    CM -->|env var| Init
+    SEC -->|env var| Init
+    Init -->|stages weights to<br/>shared volume| Vol[(/model/weights.txt)]
+    Vol --> Server["Server image<br/>server.py only<br/>no credentials"]
+    CM -->|model config| Server
+```
+
 ## 0. Navigate to this directory
 
 ```bash
