@@ -77,33 +77,45 @@ Kubernetes Secrets address the gap: a single object per cluster, scoped to a nam
 
 Your security team just flagged the access key as compromised. Rotate it.
 
-Here is what that requires with this setup:
+Here is the full path using `--env-file`, which is the cleanest local Docker option:
 
-**1. Find every place the credentials are set**
-
-They could be in your CI pipeline environment variables, a deploy script, a `.env` file committed to a config repo, or hardcoded in a Helm values file. There is no single source of truth -- you have to hunt.
-
-**2. Update each one** *(illustrative -- do not run)*
-
-Wherever the values live, you update them. For example, if they are in GitHub Actions secrets:
+**1. Create a `.env` file with the new key**
 
 ```bash
-gh secret set AWS_ACCESS_KEY_ID --body "AKIAI99999NEWKEY"
-gh secret set AWS_SECRET_ACCESS_KEY --body "newSecret/K7MDENG/bPxRfiCYNEWKEY"
+cat > .env <<EOF
+AWS_ACCESS_KEY_ID=AKIAI99999NEWKEY
+AWS_SECRET_ACCESS_KEY=newSecret/K7MDENG/bPxRfiCYNEWKEY
+EOF
 ```
 
-But they might also be in a `.env` file, a Helm values file, a deploy script, or a CI pipeline UI. There is no single place -- you have to find all of them.
+**2. Stop the running container**
 
-**3. Restart every running container**
+Press `Ctrl+C`, then restart with the env file:
 
 ```bash
-kubectl rollout restart deployment/inference-server
+docker run -p 8080:8080 --env-file .env inference-server-before:v1
 ```
 
-Each new pod picks up the updated values -- but only if your deployment is already wired to pass them through. If a container was started directly with `docker run -e`, you restart it manually.
+**3. Verify the new key is in use**
 
-You changed two string values. You touched your CI system, your deployment config, and restarted every instance. With no single place to update, it is easy to miss one.
+In a second terminal:
 
-Now imagine doing this at 2am after a credential leak. Or six times a year on a routine rotation schedule. Or across three environments (dev, staging, prod) that each need different keys -- each gets its own image tag, tracked and promoted separately.
+```bash
+curl localhost:8080/health
+docker inspect $(docker ps -q) | grep "AWS_ACCESS_KEY_ID"
+```
 
-The [`after/`](../after/) example removes this entirely: a key rotation is `kubectl apply` on one YAML file, with no image rebuild, no redeploy, and nothing left in the image to rotate.
+The container is now using the new key. No image rebuild needed -- for this one container.
+
+**The problem doesn't stop here.** The same credentials almost certainly exist in other places too:
+
+- Your CI pipeline (GitHub Actions secrets, Jenkins credentials store)
+- Your staging and prod deploy scripts, each running their own `docker run -e`
+- A Helm values file that passes them through to Kubernetes
+- A `.env.staging` and `.env.prod` that a teammate manages separately
+
+Each of those has to be found and updated. There is no single place to change. It is easy to miss one and leave a compromised key still active in staging.
+
+Now imagine doing this at 2am after a credential leak, or six times a year on a routine rotation schedule.
+
+The [`after/`](../after/) example removes the scatter entirely: credentials live in one Kubernetes Secret object, injected at pod startup. Rotation is `kubectl apply` on one file -- one place, one command, picked up by every new pod automatically.
