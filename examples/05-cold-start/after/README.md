@@ -75,9 +75,12 @@ kubectl logs inference-server
 ```
 
 ```
-[startup] Weights loaded from /model/weights.txt. Preview: these are fake model weights...
+[startup] Weights loaded from /model/weights.txt. Preview: these are fake model weights
+layer_0: 0.312 0.847 0.193 0.65...
 [startup] (No download happened here. The init container staged these weights.)
 [ready] Inference server listening on port 8080
+[ready]   GET /health  -> liveness check
+[ready]   GET /predict -> simulated inference
 ```
 
 The server never downloaded anything. It just read from the volume the init container prepared.
