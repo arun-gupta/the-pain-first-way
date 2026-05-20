@@ -1,4 +1,4 @@
-# Pain 8: Inference latency spiked and I can't tell why
+# Pain 9: Inference latency spiked and I can't tell why
 
 > *Your model server's p99 jumped from 200ms to 4s overnight. Logs show nothing weird. You don't know if it's the model, the GPU, the network, the queue, or the upstream caller.*
 
@@ -20,4 +20,4 @@ Diagnosis requires visibility. Production systems in cloud native instrument thr
 
 ---
 
-[← Pain 7: Can't roll back](07-cant-roll-back.md) · [Landscape](../README.md) · [Pain 9: Costs out of control →](09-costs-out-of-control.md)
+[← Pain 8: Can't roll back](08-cant-roll-back.md) · [Landscape](../README.md) · [Pain 10: Costs out of control →](10-costs-out-of-control.md)

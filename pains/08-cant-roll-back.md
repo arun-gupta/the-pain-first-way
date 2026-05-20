@@ -1,4 +1,4 @@
-# Pain 7: I can't roll back a bad model without downtime
+# Pain 8: I can't roll back a bad model without downtime
 
 > *You pushed v3 of your model. p99 doubled and accuracy on your top intent dropped 4 points. Reverting means SSHing into N boxes, hoping the previous binary is still there, and praying nothing is half-deployed.*
 
@@ -20,4 +20,4 @@ In cloud native, deployment is a controlled state transition rather than an impe
 
 ---
 
-[← Pain 6: GPU underutilization](06-gpu-underutilized.md) · [Landscape](../README.md) · [Pain 8: Latency spiked →](08-latency-spiked.md)
+[← Pain 7: GPU underutilization](07-gpu-underutilized.md) · [Landscape](../README.md) · [Pain 9: Latency spiked →](09-latency-spiked.md)

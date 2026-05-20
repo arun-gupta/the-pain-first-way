@@ -1,4 +1,4 @@
-# Pain 10: I can't tell which prompt version is in prod
+# Pain 11: I can't tell which prompt version is in prod
 
 > *A customer reports a regression on a specific kind of query. You suspect a prompt change from two weeks ago. The prompt lives partly in code, partly in a Notion doc, partly in a `.env` file on the prod box. Nobody can answer "what prompt was running on August 12th."*
 
@@ -20,4 +20,4 @@ Any value that affects behavior is config. In cloud native, config has a version
 
 ---
 
-[← Pain 9: Costs out of control](09-costs-out-of-control.md) · [Landscape](../README.md) · [Pain 11: Data residency →](11-data-residency.md)
+[← Pain 10: Costs out of control](10-costs-out-of-control.md) · [Landscape](../README.md) · [Pain 12: Data residency →](12-data-residency.md)

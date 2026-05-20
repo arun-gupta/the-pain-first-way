@@ -13,12 +13,13 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
 | 4 | Multi-node training | [`04-multi-node/`](04-multi-node/) | Available |
 | 5 | Cold start | [`05-cold-start/`](05-cold-start/) | Available |
-| 6 | GPU underutilization | `06-utilization/` | Planned |
-| 7 | Can't roll back | `07-rollouts/` | Planned |
-| 8 | Latency spiked | `08-observability/` | Planned |
-| 9 | Costs out of control | `09-autoscaling/` | Planned |
-| 10 | Prompt version in prod | `10-config/` | Planned |
-| 11 | Data residency | `11-multi-cluster/` | Planned |
+| 6 | Server image coupling | `06-image-coupling/` | Planned |
+| 7 | GPU underutilization | `07-utilization/` | Planned |
+| 8 | Can't roll back | `08-rollouts/` | Planned |
+| 9 | Latency spiked | `09-observability/` | Planned |
+| 10 | Costs out of control | `10-autoscaling/` | Planned |
+| 11 | Prompt version in prod | `11-config/` | Planned |
+| 12 | Data residency | `12-multi-cluster/` | Planned |
 
 ## Contributing an example
 

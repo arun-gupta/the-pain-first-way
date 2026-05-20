@@ -1,4 +1,4 @@
-# Pain 11: Customer X's data can't leave their region
+# Pain 12: Customer X's data can't leave their region
 
 > *Enterprise sale closes on the condition that the customer's prompts, embeddings, and outputs never leave the EU. Your inference cluster is in us-east-1. You promise it'll be fine. It isn't.*
 
@@ -22,4 +22,4 @@ When data locality is a hard requirement, workloads run in the region where the 
 
 ---
 
-[← Pain 10: Prompt version in prod](10-prompt-version.md) · [Landscape](../README.md)
+[← Pain 11: Prompt version in prod](11-prompt-version.md) · [Landscape](../README.md)

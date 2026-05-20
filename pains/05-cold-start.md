@@ -61,4 +61,4 @@ A working demonstration lives in [`examples/05-cold-start/`](../examples/05-cold
 
 ---
 
-[← Pain 4: Multi-node training](04-multi-node-training.md) · [Landscape](../README.md) · [Pain 6: GPU underutilization →](06-gpu-underutilized.md)
+[← Pain 4: Multi-node training](04-multi-node-training.md) · [Landscape](../README.md) · [Pain 6: Server image coupling →](06-server-image-coupling.md)
