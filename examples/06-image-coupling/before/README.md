@@ -1,17 +1,6 @@
 # Before: source URL and credentials baked into the server image
 
-`server.py` hardcodes `WEIGHTS_SOURCE`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` as constants. The download logic lives in the same file as the serving logic.
-
-This is the natural starting point. When you containerize this, those constants end up in the image -- either as `ENV` instructions in the Dockerfile or as values in the source file copied into it. Either way they travel with the image: cached in your registry, your CI system, and on every node that ever pulled it.
-
-The rebuild tax shows up as soon as anything operational changes:
-
-| Change | Requires image rebuild? |
-|---|---|
-| Rotate the access key | Yes |
-| Move weights to a new bucket | Yes |
-| Switch from S3 to GCS | Yes |
-| Fix a bug in the serving logic | Yes (of course) |
+`server.py` hardcodes `WEIGHTS_SOURCE`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` as constants. The download logic and the serving logic live in the same file. When you containerize this, those constants end up in the image -- either as `ENV` instructions in the Dockerfile or as values in the source file copied into it. Either way they travel with the image: cached in your registry, your CI system, and on every node that ever pulled it.
 
 ## Run it
 
@@ -22,7 +11,7 @@ cd examples/06-image-coupling/before
 python3 server.py
 ```
 
-## Expected output
+Expected output:
 
 ```
 [startup] Connecting to .../before/weights.txt
@@ -46,6 +35,20 @@ prediction using model: [these are fake model weights
 layer_0: 0.312 0.847 0.193 0.65...]
 ```
 
-## The problem
+## Now feel the pain
 
-The access key in `server.py` is now in your image. To rotate it you edit the file, commit, rebuild, re-push, and redeploy -- even though nothing about the serving logic changed. The [`after/`](../after/) example shows how a ConfigMap and a Secret decouple these concerns so neither the key nor the bucket URL ever lives in the image.
+Your security team just flagged the access key as compromised. Rotate it.
+
+Here is what that requires with this setup:
+
+1. Open `server.py` and change `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+2. Commit the change
+3. Rebuild the image (`docker build`)
+4. Push the new image to your registry
+5. Redeploy every running instance
+
+You changed two string values. You triggered a full build-push-deploy pipeline. The serving logic -- the part that actually handles inference requests -- did not change by a single character.
+
+Now imagine doing this at 2am after a credential leak. Or doing it six times a year as part of a routine rotation policy. Or having three environments (dev, staging, prod) that each need different keys, so each gets its own image tag that has to be built, tracked, and promoted separately.
+
+The [`after/`](../after/) example shows how a ConfigMap and a Secret remove this coupling so a key rotation is `kubectl apply` on one YAML file, with no image rebuild at all.
