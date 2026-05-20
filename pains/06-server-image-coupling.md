@@ -38,14 +38,18 @@ The fix is to decouple everything that changes for operational reasons from the 
 
 ```mermaid
 flowchart LR
-    subgraph Init["Init container (weight-downloader)"]
-        direction TB
+    CM[ConfigMap<br/>source URL<br/>model name<br/>server params]
+    SEC[Secret<br/>credentials<br/>API tokens]
+
+    subgraph Init["Init container"]
         I1[Download tool]
-        I2[Source URL<br/>from ConfigMap]
-        I3[Credentials<br/>from Secret]
     end
+
+    CM -->|source URL| Init
+    SEC -->|credentials| Init
     Init -->|stages weights to<br/>shared volume| Vol[(/model/weights.txt)]
-    Vol --> Server["Server image (after)<br/>serving code only"]
+    Vol --> Server["Server image<br/>serving code only"]
+    CM -->|model name<br/>server params| Server
 ```
 
 - **[Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)** (setup steps that must complete before your model server starts): move the download tool, source URL, and credentials out of the server image into a separate container. The server image becomes serving code only. Swap the init container to change the weight source; the server image never changes and never carries credentials. An init container that fails stops the pod before it serves a single request -- a fast-fail that prevents a server with missing or partial weights from ever becoming live.
