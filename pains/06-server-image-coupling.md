@@ -36,6 +36,14 @@ And a security consequence that compounds all of the above: credentials inside a
 
 The fix is to decouple everything that changes for operational reasons from the image itself. Config values -- source URL, model name, server parameters -- move into cluster objects that can be updated without touching the image. Secrets -- credentials, API tokens -- move into a separate store, injected at runtime and never baked in. The fetch logic moves into a separate setup step that runs once at startup, stages weights to a shared location, and exits before the server starts. The result: the server image changes only when serving code changes, and is identical across every environment.
 
+- **[ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** (Kubernetes objects that store non-sensitive configuration, also mountable as environment variables or files): store any config that changes independently of serving logic -- the weights source URL, the model name, max batch size, quantization settings, environment-specific endpoints -- as a ConfigMap. Each environment gets its own ConfigMap; the image is identical across all of them. Changing a value is a `kubectl apply` on one YAML object, not a code change.
+
+- **[Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)** (Kubernetes objects that store sensitive data as key-value pairs, scoped to a namespace, and mountable into containers without embedding values in the image): store credentials and API tokens as a Secret and mount them only into the containers that need them. The server image never sees the credentials. Rotate the Secret and the next pod picks up the new value without any image rebuild. The Secret API is the same on any cluster; what backs it -- AWS Secrets Manager, GCP Secret Manager, HashiCorp Vault -- is a separate concern that [External Secrets Operator](https://external-secrets.io) can abstract.
+
+- **[Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)** (setup steps that must complete before your model server starts): move the download tool out of the server image into a separate container that runs once at startup, reads its source URL from the ConfigMap and its credentials from the Secret, stages weights to a shared volume, and exits. The server image becomes serving code only. An init container that fails stops the pod before it serves a single request -- a fast-fail that prevents a server with missing or partial weights from ever becoming live.
+
+How these three wire together:
+
 ```mermaid
 flowchart LR
     CM[ConfigMap<br/>source URL<br/>model name<br/>server params]
@@ -51,12 +59,6 @@ flowchart LR
     Vol --> Server["Server image<br/>serving code only"]
     CM -->|model name<br/>server params| Server
 ```
-
-- **[Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)** (setup steps that must complete before your model server starts): move the download tool, source URL, and credentials out of the server image into a separate container. The server image becomes serving code only. Swap the init container to change the weight source; the server image never changes and never carries credentials. An init container that fails stops the pod before it serves a single request -- a fast-fail that prevents a server with missing or partial weights from ever becoming live.
-
-- **[Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)** (Kubernetes objects that store sensitive data as key-value pairs, scoped to a namespace, and mountable into containers without embedding values in the image): store bucket credentials as a Secret and mount it into the init container only. The server image never sees the credentials. Rotate the Secret and the next pod picks up the new value without any image rebuild. The Secret API is the same on any cluster; what backs it -- AWS Secrets Manager, GCP Secret Manager, HashiCorp Vault -- is a separate concern that [External Secrets Operator](https://external-secrets.io) can abstract.
-
-- **[ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** (Kubernetes objects that store non-sensitive configuration, also mountable as environment variables or files): store any config that changes independently of serving logic -- the weights source URL, the model name, max batch size, quantization settings, environment-specific endpoints -- as a ConfigMap. Each environment gets its own ConfigMap; the image is identical across all of them. Changing a value is a `kubectl apply` on one YAML object, not a code change.
 
 The resulting split:
 
