@@ -1,34 +1,31 @@
-"""Coupled inference server -- source URL and credentials baked into the image.
+"""Inference server that reads config and credentials from environment variables.
 
-The weights source URL and the credentials to fetch them are hardcoded constants.
-Change the bucket, rotate the key, or switch from S3 to GCS:
-you edit this file and rebuild the image.
-
-In a real deployment these values end up in a Dockerfile as ENV instructions,
-or in a .env file COPYed into the image. Either way they travel with the image:
-cached in your registry, your CI system, and on every node that ever pulled it.
+Reading from env vars is the right practice in Python -- no credentials in source code.
+The problem is where those env vars come from. In the typical containerisation path,
+they end up as ENV instructions in the Dockerfile, which bakes them into the image layer.
+The image then carries them wherever it goes: registry, CI cache, every node that pulls it.
 """
 import http.server
 import socketserver
 import shutil
 import os
+import sys
 import time
 
-# Source URL baked in. Change the bucket -> edit here -> rebuild the image.
-WEIGHTS_SOURCE = os.path.join(os.path.dirname(__file__), "weights.txt")
-
-# Credentials baked in. Rotate the key -> edit here -> rebuild the image.
-# In a real image these show up in `docker history` and in the registry cache.
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
-AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+WEIGHTS_SOURCE = os.environ.get("WEIGHTS_SOURCE", "./weights.txt")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 WEIGHTS_PATH = "/tmp/weights.txt"
 PORT = 8080
 
 
 def download_weights():
+    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+        print("[startup] ERROR: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set", file=sys.stderr)
+        sys.exit(1)
     print(f"[startup] Connecting to {WEIGHTS_SOURCE}")
-    print(f"[startup] Using key: {AWS_ACCESS_KEY_ID} (hardcoded in this file)")
+    print(f"[startup] Using key: {AWS_ACCESS_KEY_ID} (from env var -- but where did that env var come from?)")
     start = time.time()
     shutil.copy(WEIGHTS_SOURCE, WEIGHTS_PATH)
     elapsed = time.time() - start
@@ -63,7 +60,6 @@ if __name__ == "__main__":
     download_weights()
     model_weights = load_weights()
     print(f"[startup] Model loaded. Preview: {model_weights[:60]}...")
-    print(f"[startup] To change the source or rotate the key, edit this file and rebuild.")
 
     with socketserver.TCPServer(("", PORT), InferenceHandler) as httpd:
         httpd.model_weights = model_weights

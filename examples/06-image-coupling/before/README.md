@@ -1,27 +1,29 @@
-# Before: source URL and credentials baked into the server image
+# Before: credentials baked into the image via Dockerfile ENV
 
-`server.py` hardcodes `WEIGHTS_SOURCE`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` as constants. The download logic and the serving logic live in the same file. When you containerize this, those constants end up in the image -- either as `ENV` instructions in the Dockerfile or as values in the source file copied into it. Either way they travel with the image: cached in your registry, your CI system, and on every node that ever pulled it.
+`server.py` reads credentials and config from environment variables -- that part is correct. Reading from env vars keeps secrets out of source code.
 
-## Run it
+The problem is where those env vars come from. The natural next step when containerising is to set them in the Dockerfile as `ENV` instructions so the container starts without extra setup. That bakes them into the image layer: visible in `docker history`, cached in your registry and CI system, and present on every node that ever pulled the image.
 
-No dependencies beyond the standard library.
+## Run it locally
+
+Set the env vars inline and run with Python -- no Docker needed:
 
 ```bash
 cd examples/06-image-coupling/before
+
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE \
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
 python3 server.py
 ```
 
 Expected output:
 
 ```
-[startup] Connecting to .../before/weights.txt
-[startup] Using key: AKIAIOS... (hardcoded in this file)
-[startup] Weights staged in 0.000s -> /tmp/weights.txt
+[startup] Connecting to ./weights.txt
+[startup] Using key: AKIAIOSFODNN7EXAMPLE (from env var -- but where did that env var come from?)
+[startup] Weights staged in 0.001s -> /tmp/weights.txt
 [startup] Model loaded. Preview: these are fake model weights...
-[startup] To change the source or rotate the key, edit this file and rebuild.
 [ready] Inference server listening on port 8080
-[ready]   GET /health  -> liveness check
-[ready]   GET /predict -> simulated inference
 ```
 
 In another terminal:
@@ -35,25 +37,50 @@ prediction using model: [these are fake model weights
 layer_0: 0.312 0.847 0.193 0.65...]
 ```
 
+## Run it with Docker
+
+Build the image -- credentials are set via `ENV` in the Dockerfile:
+
+```bash
+docker build -t inference-server-before:v1 .
+docker run -p 8080:8080 inference-server-before:v1
+```
+
+Now inspect what ended up in the image:
+
+```bash
+docker history inference-server-before:v1
+```
+
+You will see the credentials in the layer history:
+
+```
+IMAGE          CREATED         CREATED BY
+...            ...             ENV AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/...
+...            ...             ENV AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+```
+
+Anyone with pull access to the registry can read them.
+
 ## Now feel the pain
 
 Your security team just flagged the access key as compromised. Rotate it.
 
 Here is what that requires with this setup:
 
-**1. Edit the source file**
+**1. Edit the Dockerfile**
 
 ```bash
 sed -i '' \
-  -e 's/AWS_ACCESS_KEY_ID = ".*"/AWS_ACCESS_KEY_ID = "AKIAI99999NEWKEY"/' \
-  -e 's/AWS_SECRET_ACCESS_KEY = ".*"/AWS_SECRET_ACCESS_KEY = "newSecret\/K7MDENG\/bPxRfiCYNEWKEY"/' \
-  server.py
+  -e 's/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=AKIAI99999NEWKEY/' \
+  -e 's/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=newSecret\/K7MDENG\/bPxRfiCYNEWKEY/' \
+  Dockerfile
 ```
 
 **2. Commit the change**
 
 ```bash
-git add server.py
+git add Dockerfile
 git commit -m "rotate access key"
 ```
 
@@ -77,8 +104,10 @@ kubectl set image deployment/inference-server \
 kubectl rollout status deployment/inference-server
 ```
 
-You changed two string values. You triggered a full build-push-deploy pipeline. The serving logic -- the part that actually handles inference requests -- did not change by a single character.
+You changed two string values. You triggered a full build-push-deploy pipeline. The serving logic did not change by a single character.
 
-Now imagine doing this at 2am after a credential leak. Or doing it six times a year as part of a routine rotation policy. Or having three environments (dev, staging, prod) that each need different keys, so each gets its own image tag that has to be built, tracked, and promoted separately.
+Note that the old image -- with the compromised key -- is still in your registry, still cached in your CI system, and still present on every node that pulled it. Rotating the key does not remove it from those places.
 
-The [`after/`](../after/) example shows how a ConfigMap and a Secret remove this coupling so a key rotation is `kubectl apply` on one YAML file, with no image rebuild at all.
+Now imagine doing this at 2am after a credential leak. Or six times a year on a routine rotation schedule. Or across three environments (dev, staging, prod) that each need different keys -- each gets its own image tag, tracked and promoted separately.
+
+The [`after/`](../after/) example removes this entirely: a key rotation is `kubectl apply` on one YAML file, with no image rebuild, no redeploy, and nothing left in the image to rotate.
