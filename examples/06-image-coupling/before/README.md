@@ -39,14 +39,10 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## Run it with Docker
 
-Press `Ctrl+C` in the terminal running `server.py` to stop it, then create a `.env` file, build, and run:
+Press `Ctrl+C` in the terminal running `server.py` to stop it, then create a `.env` file from the example, build, and run:
 
 ```bash
-cat > .env <<EOF
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-EOF
-
+cp .env.example .env   # .env is gitignored -- never commit it with real values
 docker build -t inference-server-before:v1 .
 docker run -p 8080:8080 --env-file .env inference-server-before:v1
 ```
@@ -81,13 +77,13 @@ Your security team just flagged the access key as compromised. Rotate it.
 
 Here is the full path using `--env-file`, which is the cleanest local Docker option:
 
-**1. Create a `.env` file with the new key**
+**1. Update `.env` with the new key**
 
 ```bash
-cat > .env <<EOF
-AWS_ACCESS_KEY_ID=AKIAI99999NEWKEY
-AWS_SECRET_ACCESS_KEY=newSecret/K7MDENG/bPxRfiCYNEWKEY
-EOF
+sed -i '' \
+  -e 's/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=AKIAI99999NEWKEY/' \
+  -e 's/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=newSecret\/K7MDENG\/bPxRfiCYNEWKEY/' \
+  .env
 ```
 
 **2. Stop the running container**
