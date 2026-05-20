@@ -6,11 +6,23 @@ The problem is where those env vars come from. The natural next step when contai
 
 ## Run it locally
 
-Copy the example env file and run with Python:
+Copy the example env file, fill in the demo values, and run:
 
 ```bash
 cd examples/06-image-coupling/before
 cp .env.example .env
+```
+
+Edit `.env` and set:
+
+```
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+```
+
+Then run:
+
+```bash
 export $(grep -v '^#' .env | xargs) && python3 server.py
 ```
 
@@ -37,10 +49,9 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## Run it with Docker
 
-Press `Ctrl+C` in the terminal running `server.py` to stop it, then create a `.env` file from the example, build, and run:
+Press `Ctrl+C` in the terminal running `server.py` to stop it. If you haven't already, copy `.env.example` to `.env` and fill in the demo values (see "Run it locally" above). Then build and run:
 
 ```bash
-cp .env.example .env   # .env is gitignored -- never commit it with real values
 docker build -t inference-server-before:v1 .
 docker run -p 8080:8080 --env-file .env inference-server-before:v1
 ```
