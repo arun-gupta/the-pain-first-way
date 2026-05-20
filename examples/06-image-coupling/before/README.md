@@ -83,14 +83,16 @@ Here is what that requires with this setup:
 
 They could be in your CI pipeline environment variables, a deploy script, a `.env` file committed to a config repo, or hardcoded in a Helm values file. There is no single source of truth -- you have to hunt.
 
-**2. Update each one**
+**2. Update each one** *(illustrative -- do not run)*
+
+Wherever the values live, you update them. For example, if they are in GitHub Actions secrets:
 
 ```bash
-# In your CI system: update the secret variable via the UI or CLI
-# e.g. for GitHub Actions:
 gh secret set AWS_ACCESS_KEY_ID --body "AKIAI99999NEWKEY"
 gh secret set AWS_SECRET_ACCESS_KEY --body "newSecret/K7MDENG/bPxRfiCYNEWKEY"
 ```
+
+But they might also be in a `.env` file, a Helm values file, a deploy script, or a CI pipeline UI. There is no single place -- you have to find all of them.
 
 **3. Restart every running container**
 
