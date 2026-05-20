@@ -42,13 +42,15 @@ kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reu
 chmod +x build.sh && ./build.sh
 ```
 
-This builds the Docker image (containing `server.py` and `downloader.py`) and loads it into Kind. No registry needed.
+This builds one image containing both `server.py` and `downloader.py` and loads it into Kind. The image has no credentials and no source URL — those come from the cluster at runtime, not from the build.
 
 ## 3. Apply the ConfigMap and Secret
 
 ```bash
 kubectl apply -f configmap.yaml -f secret.yaml
 ```
+
+This is the core of the fix. The source URL and credentials now live as independent cluster objects, not inside the image. Change either one with `kubectl apply` and the next pod picks up the new value — no rebuild needed.
 
 Inspect what was created:
 
@@ -57,13 +59,15 @@ kubectl get configmap model-config -o yaml
 kubectl get secret model-credentials -o yaml
 ```
 
-The Secret values are base64-encoded in etcd. They are not in the image.
+The Secret values are base64-encoded in etcd. They are not in the image, not in the registry, and not in any build cache.
 
 ## 4. Apply the pod manifest
 
 ```bash
 kubectl apply -f pod.yaml
 ```
+
+The pod spec wires the ConfigMap and Secret into the init container as env vars. The server container has no `env` entries at all — it cannot read the credentials even if it tried.
 
 ## 5. Watch the init container run first
 
@@ -80,6 +84,8 @@ inference-server   1/1     Running      0          5s
 
 Press `Ctrl+C` once the pod shows `Running`.
 
+The pod moves through `Init:0/1` before the server starts. The init container runs `downloader.py`, stages the weights, and exits — only then does the server container start.
+
 ## 6. Check the init container logs
 
 ```bash
@@ -93,7 +99,7 @@ kubectl logs inference-server -c weight-downloader
 [downloader] Done in 0.001s (142 bytes). Weights ready at /model/weights.txt.
 ```
 
-The init container received both values from the cluster. Neither was baked into the image.
+Both values arrived from the cluster. The image has no knowledge of either. Swap the ConfigMap or Secret and the next pod gets the new values automatically.
 
 ## 7. Check the server logs
 
@@ -106,6 +112,8 @@ kubectl logs inference-server
 [startup] (No source URL or credentials in this image.)
 [ready] Inference server listening on port 8080
 ```
+
+The server started with weights already on the shared volume. It never fetched anything and never saw a credential.
 
 ## 8. Test the endpoint
 
@@ -130,7 +138,9 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## 9. Simulate a key rotation (no image rebuild)
 
-Update the Secret with a new key value, then delete and recreate the pod. The image does not change.
+In the `before` example, rotating a key meant editing a file, rebuilding the image, pushing it, and redeploying. Here it is one command.
+
+Update the Secret with a new key value, then recycle the pod:
 
 ```bash
 kubectl create secret generic model-credentials \
@@ -142,7 +152,7 @@ kubectl delete pod inference-server
 kubectl apply -f pod.yaml
 ```
 
-Check the init container logs again:
+Check the init container logs:
 
 ```bash
 kubectl logs inference-server -c weight-downloader
@@ -153,18 +163,18 @@ kubectl logs inference-server -c weight-downloader
 [downloader] /model/weights.txt already present (142 bytes). Skipping download.
 ```
 
-The new key was picked up without touching the image.
+New key, same image. The old key is gone from the cluster — it was never in the image to begin with.
 
 ## 10. Simulate a source change (no image rebuild)
 
-Update the ConfigMap to point to a different bucket, then recycle the pod:
+In the `before` example, changing the weights bucket also meant a full rebuild. Here it is a config change.
 
 ```bash
 kubectl patch configmap model-config \
   --patch '{"data":{"WEIGHTS_SOURCE":"s3://my-model-bucket-v2/llm-v2/weights.txt"}}'
 
 kubectl delete pod inference-server
-kubectl delete pvc model-weights   # clear the cached weights so the new source is used
+kubectl delete pvc model-weights   # clear cached weights so the new source is used
 kubectl apply -f pod.yaml
 ```
 
@@ -177,7 +187,7 @@ kubectl logs inference-server -c weight-downloader
 [downloader] Staging weights to /model/weights.txt ...
 ```
 
-New source, same image.
+New source, same image. The server image has not changed since step 2.
 
 ## 11. Clean up
 
