@@ -49,7 +49,18 @@ docker run -p 8080:8080 \
   inference-server-before:v1
 ```
 
-Passing credentials via `-e` at runtime is the right Docker pattern -- they are not baked into the image and will not appear in `docker history`. But they are still visible on the running container. In a second terminal:
+Docker offers several ways to pass secrets to a container at runtime. None of them should be `ENV` in the Dockerfile.
+
+| Method | How | Credentials in image? | Visible in `docker inspect`? | Rotation |
+|---|---|---|---|---|
+| Inline `-e` | `docker run -e KEY=val` | No | Yes | Restart container manually |
+| Env file | `docker run --env-file .env` | No (if file not COPYed) | Yes | Update file, restart container |
+| Docker secrets (Swarm) | `docker secret create` + mounted at `/run/secrets/` | No | No | Update secret, redeploy service |
+| BuildKit `--secret` | `RUN --mount=type=secret,id=s` | No | Build-time only | N/A |
+
+**Inline `-e`** (what we used above) is fine for local development. **`--env-file`** is a small improvement -- secrets live in a file you keep out of git rather than inline on the command line. **Docker secrets** are the production-grade native option, but only available in Swarm mode.
+
+The gap: none of these handle the questions that matter at scale -- where do the values come from in CI, how do you rotate across dozens of containers, how do you scope per environment? In a second terminal:
 
 ```bash
 docker inspect $(docker ps -q) | grep -A2 "AWS_"
@@ -60,7 +71,7 @@ docker inspect $(docker ps -q) | grep -A2 "AWS_"
 "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 ```
 
-And you still have the harder questions: where do these values come from in your CI pipeline? How do you rotate them across dozens of running containers? How do you give staging different credentials than prod without maintaining separate run commands per environment? Docker has no answer for these at scale -- that is where Kubernetes Secrets come in.
+Kubernetes Secrets address the gap: a single object per cluster, scoped to a namespace, rotatable without restarting the image, and backed by external vaults via External Secrets Operator. That is what the [`after/`](../after/) example shows.
 
 ## Now feel the pain
 
