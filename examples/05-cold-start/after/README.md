@@ -82,15 +82,25 @@ The server never downloaded anything. It just read from the volume the init cont
 
 ## 7. Test the endpoint
 
+In one terminal, start the port-forward and leave it running:
+
 ```bash
 kubectl port-forward pod/inference-server 8080:8080
 ```
 
-In another terminal:
+Open a second terminal and run:
 
 ```bash
 curl http://localhost:8080/health
 curl http://localhost:8080/predict
+```
+
+Expected output:
+
+```
+ok
+prediction using model: [these are fake model weights
+layer_0: 0.312 0.847 0.193 0.65...]
 ```
 
 ## 8. Clean up
