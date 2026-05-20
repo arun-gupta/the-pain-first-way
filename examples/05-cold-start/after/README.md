@@ -105,6 +105,8 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## 8. Clean up
 
+Press `Ctrl+C` in the port-forward terminal to stop it, then delete the pod:
+
 ```bash
 kubectl delete pod inference-server
 ```
