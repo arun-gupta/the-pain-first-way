@@ -49,7 +49,7 @@ docker run -p 8080:8080 \
   inference-server-before:v1
 ```
 
-Passing credentials via `-e` at runtime is the right Docker pattern -- they are not baked into the image and will not appear in `docker history`. But they are still visible on the running container:
+Passing credentials via `-e` at runtime is the right Docker pattern -- they are not baked into the image and will not appear in `docker history`. But they are still visible on the running container. In a second terminal:
 
 ```bash
 docker inspect $(docker ps -q) | grep -A2 "AWS_"
