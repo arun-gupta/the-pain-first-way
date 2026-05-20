@@ -1,4 +1,4 @@
-# Before: credentials baked into the image via Dockerfile ENV
+# Before: credentials managed outside the image, scattered across environments
 
 `server.py` reads credentials and config from environment variables -- that part is correct. Reading from env vars keeps secrets out of source code.
 
@@ -54,6 +54,27 @@ Press `Ctrl+C` in the terminal running `server.py` to stop it. The same `.env` f
 ```bash
 docker build -t inference-server-before:v1 .
 docker run -p 8080:8080 --env-file .env inference-server-before:v1
+```
+
+Expected output:
+
+```
+[startup] Connecting to /app/weights.txt
+[startup] Using key: AKIAIOSFODNN7EXAMPLE (from env var -- but where did that env var come from?)
+[startup] Weights staged in 0.001s -> /tmp/weights.txt
+[startup] Model loaded. Preview: these are fake model weights...
+[ready] Inference server listening on port 8080
+```
+
+In a second terminal:
+
+```bash
+curl localhost:8080/predict
+```
+
+```
+prediction using model: [these are fake model weights
+layer_0: 0.312 0.847 0.193 0.65...]
 ```
 
 Docker offers several ways to pass secrets to a container at runtime. None of them should be `ENV` in the Dockerfile.
@@ -126,3 +147,7 @@ Each of those has to be found and updated. There is no single place to change. I
 Now imagine doing this at 2am after a credential leak, or six times a year on a routine rotation schedule.
 
 The [`after/`](../after/) example removes the scatter entirely: credentials live in one Kubernetes Secret object, injected at pod startup. Rotation is `kubectl apply` on one file -- one place, one command, picked up by every new pod automatically.
+
+## Clean up
+
+Press `Ctrl+C` to stop the running container.
