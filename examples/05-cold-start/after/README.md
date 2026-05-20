@@ -109,12 +109,6 @@ layer_0: 0.312 0.847 0.193 0.65...]
 kubectl delete pod inference-server
 ```
 
-If you are not running other examples, delete the cluster too:
-
-```bash
-kind delete cluster --name kind
-```
-
 ## What the manifest demonstrates
 
 The key is the shared `emptyDir` volume and the ordering guarantee:
