@@ -39,14 +39,16 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## Run it with Docker
 
-Press `Ctrl+C` in the terminal running `server.py` to stop it, then build and run:
+Press `Ctrl+C` in the terminal running `server.py` to stop it, then create a `.env` file, build, and run:
 
 ```bash
+cat > .env <<EOF
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+EOF
+
 docker build -t inference-server-before:v1 .
-docker run -p 8080:8080 \
-  -e AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE \
-  -e AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
-  inference-server-before:v1
+docker run -p 8080:8080 --env-file .env inference-server-before:v1
 ```
 
 Docker offers several ways to pass secrets to a container at runtime. None of them should be `ENV` in the Dockerfile.
