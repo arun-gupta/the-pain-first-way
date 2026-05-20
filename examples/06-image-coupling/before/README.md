@@ -39,13 +39,7 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## Run it with Docker
 
-Stop the local Python process first so port 8080 is free:
-
-```bash
-lsof -ti:8080 | xargs kill -9
-```
-
-Build the image -- credentials are set via `ENV` in the Dockerfile:
+Press `Ctrl+C` in the terminal running `server.py` to stop it, then build the image -- credentials are set via `ENV` in the Dockerfile:
 
 ```bash
 docker build -t inference-server-before:v1 .
