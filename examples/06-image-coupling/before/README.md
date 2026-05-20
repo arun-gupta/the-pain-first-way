@@ -41,11 +41,41 @@ Your security team just flagged the access key as compromised. Rotate it.
 
 Here is what that requires with this setup:
 
-1. Open `server.py` and change `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-2. Commit the change
-3. Rebuild the image (`docker build`)
-4. Push the new image to your registry
-5. Redeploy every running instance
+**1. Edit the source file**
+
+```bash
+sed -i '' \
+  -e 's/AWS_ACCESS_KEY_ID = ".*"/AWS_ACCESS_KEY_ID = "AKIAI99999NEWKEY"/' \
+  -e 's/AWS_SECRET_ACCESS_KEY = ".*"/AWS_SECRET_ACCESS_KEY = "newSecret\/K7MDENG\/bPxRfiCYNEWKEY"/' \
+  server.py
+```
+
+**2. Commit the change**
+
+```bash
+git add server.py
+git commit -m "rotate access key"
+```
+
+**3. Rebuild the image**
+
+```bash
+docker build -t myregistry/inference-server:v2 .
+```
+
+**4. Push the new image**
+
+```bash
+docker push myregistry/inference-server:v2
+```
+
+**5. Redeploy every running instance**
+
+```bash
+kubectl set image deployment/inference-server \
+  inference-server=myregistry/inference-server:v2
+kubectl rollout status deployment/inference-server
+```
 
 You changed two string values. You triggered a full build-push-deploy pipeline. The serving logic -- the part that actually handles inference requests -- did not change by a single character.
 
