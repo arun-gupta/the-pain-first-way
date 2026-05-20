@@ -157,6 +157,8 @@ The key is the shared PVC and the ordering guarantee:
 | `PVC (storageClassName: standard)` | PVC backed by local NVMe or shared storage (EFS, Filestore) |
 | Swap `downloader.py` | Swap init container image or entrypoint args |
 
+> **Scaling to multiple replicas:** This demo uses a single-node PVC (`ReadWriteOnce`). In production, use a `ReadWriteMany` PVC backed by a shared filesystem (EFS, Filestore, or similar) so all replicas (running instances of your model server) mount the same volume. The first init container downloads the weights once; every subsequent replica skips the download entirely.
+
 ---
 
 [← Back to Pain 5](../../pains/05-cold-start.md) · [Landscape](../../README.md) · [Examples index](../README.md)
