@@ -1,10 +1,10 @@
-# Pain 6: My server image bakes in the weights source
+# Pain 6: My server image bakes in config and secrets
 
-> *Every time the weights bucket changes, the team rebuilds the server image. The image carries the S3 URL, the download tool, and the credentials. Change any one of those -- a new bucket, a new region, a rotation of the access key -- and the server image version bumps. For something that has nothing to do with serving logic.*
+> *Every time the weights bucket changes, the team rebuilds the server image. The image carries the S3 URL, the download tool, and the credentials. Change any one of those -- a new bucket, a new region, a rotation of the access key -- and the server image version bumps. The same thing happens when the model name changes, when a downstream API key rotates, or when staging needs different parameters than prod. None of that is a code change, but the image rebuilds anyway.*
 
 ## The pattern
 
-The serving code (vLLM, TGI, a custom FastAPI app) and the delivery mechanism (where weights come from, how to fetch them, which credentials to use) are bundled in one image. Any change to the delivery mechanism forces an image rebuild and redeploy even when the serving code is unchanged. In the worst case, credentials live in environment variables baked into the Dockerfile or the server script itself.
+The serving code (vLLM, TGI, a custom FastAPI app) and everything it needs to start -- where weights come from, which model to load, which credentials to use, what parameters to apply -- are bundled in one image. Any change to any of those forces an image rebuild and redeploy even when the serving code is unchanged. The same image ends up carrying dev settings, staging settings, and prod settings as separate tags, or credentials live in environment variables baked into the Dockerfile itself.
 
 ```mermaid
 flowchart LR
@@ -14,13 +14,14 @@ flowchart LR
         B[Download tool<br/>aws-cli / gcsfuse /<br/>HuggingFace hub]
         C[Source URL<br/>s3://my-bucket/model/]
         D[Credentials<br/>AWS_ACCESS_KEY_ID<br/>AWS_SECRET_ACCESS_KEY]
+        E[Model config<br/>model name, max batch size,<br/>quantization settings]
     end
-    Coupled -->|starts| E[Downloads weights<br/>then serves]
+    Coupled -->|starts| F[Downloads weights<br/>then serves]
 ```
 
 The coupling shows up as pain in two ways:
 
-- **Operationally**: you want to move weights to a new bucket, rotate an access key, or switch from S3 to GCS. None of that is a code change, but you rebuild the image anyway.
+- **Operationally**: you want to move weights to a new bucket, rotate an access key, switch from S3 to GCS, change the model name, or tune a server parameter for a specific environment. None of that is a code change, but you rebuild the image anyway. Dev, staging, and prod end up as separate image tags that differ only in config values.
 - **As a security smell**: credentials inside an image get cached in your registry, your CI system, and on every node that ever pulled the image.
 
 ## The primitives
@@ -43,20 +44,21 @@ flowchart LR
 
 - **[Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)** (Kubernetes objects that store sensitive data as key-value pairs, scoped to a namespace, and mountable into containers without embedding values in the image): store bucket credentials as a Secret and mount it into the init container only. The server image never sees the credentials. Rotate the Secret and the next pod picks up the new value without any image rebuild. The Secret API is the same on any cluster; what backs it -- AWS Secrets Manager, GCP Secret Manager, HashiCorp Vault -- is a separate concern that [External Secrets Operator](https://external-secrets.io) can abstract.
 
-- **[ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** (Kubernetes objects that store non-sensitive configuration, also mountable as environment variables or files): store the weights source URL -- the bucket name, prefix, or HuggingFace repo ID -- as a ConfigMap. Changing the source is a `kubectl apply` on one YAML object, not a code change.
+- **[ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** (Kubernetes objects that store non-sensitive configuration, also mountable as environment variables or files): store any config that changes independently of serving logic -- the weights source URL, the model name, max batch size, quantization settings, environment-specific endpoints -- as a ConfigMap. Each environment gets its own ConfigMap; the image is identical across all of them. Changing a value is a `kubectl apply` on one YAML object, not a code change.
 
 The resulting split:
 
 | Concern | Lives in |
 |---|---|
-| Serving logic | Server image (built once, reused everywhere) |
+| Serving logic | Server image (built once, identical across all environments) |
 | Download tool | Init container image |
 | Source URL | ConfigMap |
-| Credentials | Secret |
+| Model name, server parameters | ConfigMap |
+| Credentials, API tokens | Secret |
 
 ## Trade-offs
 
-**What you keep**: your model and your model server. The server image is now a stable artifact -- same image across dev, staging, and prod, and across weight source changes.
+**What you keep**: your model and your model server. The server image is now a stable artifact -- identical across dev, staging, and prod, and across weight source, model name, and credential changes.
 
 **What you give up**: the simplicity of one image. You now build and maintain two images (server and init container), and coordinate their versions when the download interface changes. Init container failures are also highly visible: a bad Secret or wrong bucket URL blocks the pod from starting, which surfaces problems early but means the pod never reaches `Running` until credentials and source are correct.
 
