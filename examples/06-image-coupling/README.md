@@ -1,16 +1,14 @@
 # Example 06: Server image coupling
 
-Demonstrates the pain and the fix from [Pain 6: My server image bakes in the weights source](../../pains/06-server-image-coupling.md).
+A working demonstration of [Pain 6: My server image is coupled to its config and secrets](../../pains/06-server-image-coupling.md).
 
-| | Before | After |
-|---|---|---|
-| Source URL | Hardcoded constant in `server.py` | ConfigMap, injected into init container |
-| Credentials | Hardcoded constants in `server.py` | Secret, injected into init container only |
-| Rotate the key | Edit code + rebuild image | `kubectl apply` on the Secret, recycle pod |
-| Change the bucket | Edit code + rebuild image | `kubectl apply` on the ConfigMap, recycle pod |
-| Credentials in registry | Yes | No |
+## The point of the diff
 
-## Structure
+`before/server.py` hardcodes the weights source URL and credentials as constants. Any operational change -- rotating a key, moving to a new bucket, switching environments -- means editing the file and rebuilding the image.
+
+`after/server.py` is serving code only. Source URL and credentials never enter the image; they are injected at runtime from a ConfigMap and a Secret. The server image is identical across every environment.
+
+## What's here
 
 ```
 before/
@@ -28,23 +26,10 @@ after/
   weights.txt     # fake model weights bundled into the init container image
 ```
 
-## Run the before
+## Run it
 
-No Docker or Kubernetes needed:
-
-```bash
-cd before && python3 server.py
-```
-
-## Run the after
-
-Requires Docker, kubectl, and kind:
-
-```bash
-cd after && ./build.sh && kubectl apply -f configmap.yaml -f secret.yaml -f pod.yaml
-```
-
-See [`after/README.md`](after/README.md) for the full walkthrough, including the key-rotation and source-change demos.
+- [`before/README.md`](before/README.md) -- run bare with Python, observe the hardcoded source URL and credentials on every startup
+- [`after/README.md`](after/README.md) -- build, apply, then simulate a key rotation and source change without rebuilding the image
 
 ---
 
