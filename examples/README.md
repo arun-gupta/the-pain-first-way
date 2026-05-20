@@ -12,7 +12,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 2 | GPU job crashed at hour 14 | [`02-jobs/`](02-jobs/) | Available |
 | 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
 | 4 | Multi-node training | [`04-multi-node/`](04-multi-node/) | Available |
-| 5 | Cold start | `05-cold-start/` | Planned |
+| 5 | Cold start | [`05-cold-start/`](05-cold-start/) | Available |
 | 6 | GPU underutilization | `06-utilization/` | Planned |
 | 7 | Can't roll back | `07-rollouts/` | Planned |
 | 8 | Latency spiked | `08-observability/` | Planned |

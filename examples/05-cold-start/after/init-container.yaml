@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-weights
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Mi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inference-server
+spec:
+  # The init container runs first and must exit 0 before the server starts.
+  # It downloads weights to the shared volume at /model.
+  initContainers:
+    - name: weight-downloader
+      image: inference-server:latest
+      imagePullPolicy: Never
+      command: ["python", "downloader.py"]
+      volumeMounts:
+        - name: model
+          mountPath: /model
+
+  containers:
+    - name: inference-server
+      image: inference-server:latest
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: model
+          mountPath: /model
+
+  # PVC: persists across pod restarts so the init container only downloads once.
+  volumes:
+    - name: model
+      persistentVolumeClaim:
+        claimName: model-weights
+
+  restartPolicy: Never
