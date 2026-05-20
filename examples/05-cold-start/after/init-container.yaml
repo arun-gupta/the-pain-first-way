@@ -1,11 +1,22 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-weights
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Mi
+  storageClassName: standard
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: inference-server
 spec:
   # The init container runs first and must exit 0 before the server starts.
   # It downloads weights to the shared volume at /model.
-  # Swap this container to change the weight source. The server container never changes.
   initContainers:
     - name: weight-downloader
       image: inference-server:latest
@@ -25,10 +36,10 @@ spec:
         - name: model
           mountPath: /model
 
-  # emptyDir: shared scratch space, lives for the lifetime of the pod.
-  # The init container writes to it; the server reads from it.
+  # PVC: persists across pod restarts so the init container only downloads once.
   volumes:
     - name: model
-      emptyDir: {}
+      persistentVolumeClaim:
+        claimName: model-weights
 
   restartPolicy: Never

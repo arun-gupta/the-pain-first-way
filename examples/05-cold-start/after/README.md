@@ -36,6 +36,8 @@ This builds the Docker image (which contains both `server.py` and `downloader.py
 kubectl apply -f init-container.yaml
 ```
 
+This creates a PersistentVolumeClaim (a request for persistent storage) and a Pod. The init container stages weights to the PVC; the server reads from it.
+
 ## 4. Watch the init container run first
 
 ```bash
@@ -105,19 +107,21 @@ layer_0: 0.312 0.847 0.193 0.65...]
 
 ## 8. Clean up
 
-Press `Ctrl+C` in the port-forward terminal to stop it, then delete the pod:
+Press `Ctrl+C` in the port-forward terminal to stop it, then delete the pod and PVC:
 
 ```bash
 kubectl delete pod inference-server
+kubectl delete pvc model-weights
 ```
 
 ## What the manifest demonstrates
 
-The key is the shared `emptyDir` volume and the ordering guarantee:
+The key is the shared PVC and the ordering guarantee:
 
 - `initContainers` run to completion before any container in `containers` starts.
-- Both containers mount the same `emptyDir` at `/model`.
+- Both containers mount the same PVC at `/model`.
 - The server starts with weights already present. It does not wait, poll, or retry.
+- The PVC persists across pod restarts. On the first start, the init container downloads the weights. On subsequent restarts, the weights are already on the volume and the init container exits immediately.
 
 ## What this maps to on a real GPU cluster
 
@@ -126,9 +130,7 @@ The key is the shared `emptyDir` volume and the ordering guarantee:
 | `python:3.11-slim` base | vLLM or TGI base image |
 | `weights.txt` (142 bytes) | 70B FP16 weights (~140 GB) |
 | `shutil.copy2` | `aws s3 sync`, `gsutil cp`, or HuggingFace hub download |
-| `emptyDir` | PVC backed by local NVMe or shared storage (EFS, Filestore). A PVC persists across pod restarts so the init container only downloads weights once; `emptyDir` re-downloads on every restart. |
-
-> **Why `emptyDir` and not a PVC?** Kind has no default StorageClass for dynamic PVC provisioning, so a PVC would stay in `Pending` with no volume bound. `emptyDir` keeps the manifest runnable without extra setup. In production, swap `emptyDir` for a PVC backed by local NVMe so the init container only downloads weights once and subsequent restarts skip the download entirely.
+| `PVC (storageClassName: standard)` | PVC backed by local NVMe or shared storage (EFS, Filestore) |
 | Swap `downloader.py` | Swap init container image or entrypoint args |
 
 ---
