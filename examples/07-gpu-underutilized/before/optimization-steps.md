@@ -105,11 +105,14 @@ ollama list
 
 Expected output:
 ```
-NAME         ID            SIZE    MODIFIED
-qwen:0.5b    ...           394 MB  ...
+NAME           ID              SIZE      MODIFIED
+qwen:0.5b      b5dc5e784f2a    394 MB    5 minutes ago
+llama3.2:1b    baf6a787fdff    1.3 GB    ...
+llama3.2:3b    a80c4f17acd5    2.0 GB    ...
+mistral:7b     6577803aa9a0    4.4 GB    ...
 ```
 
-On a larger model the difference is dramatic: a 7B FP16 model is ~14 GB; the GGUF Q4 variant is ~4 GB. Same model, 3.5× less memory, proportionally faster reads per token step.
+All are GGUF — already quantized at pull time. `mistral:7b` at 4.4 GB is the INT4 quantized variant; the FP16 original is ~14 GB. Same model, 3× less memory, proportionally faster HBM reads per token step.
 
 ### Step 3 — Prefix caching
 
