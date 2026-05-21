@@ -51,6 +51,6 @@ The server handles one request at a time. Concurrent traffic does not help — e
 
 ## Pre-CN optimizations
 
-Before reaching for Kubernetes, ML practitioners optimize at the model and serving engine layer. [`vllm-commands.md`](./vllm-commands.md) shows the vLLM launch flags for continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — each a configuration change, no infrastructure required.
+Before reaching for Kubernetes, ML practitioners optimize at the model and serving engine layer. [`optimization-steps.md`](./optimization-steps.md) covers two tracks: the **Mac path** using ollama (runnable without a GPU — continuous batching, quantization, prefix caching) and the **GPU path** using vLLM (production reference — prefix caching, sequence packing, quantization, speculative decoding, disaggregation).
 
 Once those are in place, [`after/`](../after/) shows the infrastructure layer: KEDA autoscaling on `inference_requests_in_flight` (Step 2) and GPU Operator MIG configuration (Step 3).

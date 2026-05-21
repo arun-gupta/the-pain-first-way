@@ -8,7 +8,7 @@ A working demonstration of [Pain 7: My GPU sits at 30% but my bill says 100%](..
 07-gpu-underutilized/
 ├── before/
 │   ├── server.py          # naive sequential server — the problem
-│   ├── vllm-commands.md   # pre-CN fixes: continuous batching, quantization, prefix caching, speculative decoding
+│   ├── optimization-steps.md   # pre-CN fixes: continuous batching, quantization, prefix caching, speculative decoding
 │   └── README.md
 └── after/                 # three incremental CN fixes
     ├── server.py          # Step 1: concurrent batching server with /metrics endpoint
@@ -24,13 +24,13 @@ No GPU required. All GPU behavior is simulated with `time.sleep`. The cloud-nati
 
 `before/server.py` shows the problem: requests process one at a time, GPU idle between them. Five concurrent requests take ~2.5s wall time. CPU stays at 5% so Kubernetes HPA never triggers.
 
-`before/vllm-commands.md` shows what ML practitioners do first — before touching infrastructure. Continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation are all vLLM launch flags. No Kubernetes required.
+`before/optimization-steps.md` shows what ML practitioners do first — before touching infrastructure. Two tracks: Mac path using ollama (no GPU required — runnable today on Apple Silicon) and GPU path using vLLM (production reference). Covers continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation.
 
 `after/server.py` simulates a batching-aware engine: up to `MAX_CONCURRENT` requests run in parallel, five concurrent requests take ~0.5s regardless of count, and `/metrics` exposes `inference_requests_in_flight` so the autoscaler watches the right signal.
 
 `after/scaledobject.yaml` configures KEDA to add replicas when `inference_requests_in_flight` exceeds 3. `after/mig-config.yaml` shows how to partition a physical GPU into isolated slices via the GPU Operator so multiple workloads can share one card.
 
-Each layer is independent. `vllm-commands.md` needs no infrastructure. Step 1 is a server swap. Steps 2 and 3 add infrastructure only when you need it.
+Each layer is independent. `optimization-steps.md` needs no infrastructure. Step 1 is a server swap. Steps 2 and 3 add infrastructure only when you need it.
 
 ## Run it
 
