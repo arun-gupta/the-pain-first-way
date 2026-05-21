@@ -42,7 +42,7 @@ class InferenceHandler(http.server.BaseHTTPRequestHandler):
         if self.path == "/health":
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(b"ok")
+            self.wfile.write(b"ok\n")
         elif self.path == "/predict":
             self.send_response(200)
             self.end_headers()
