@@ -13,7 +13,7 @@ flowchart LR
     A[Request A arrives] --> B[GPU busy] --> C[GPU idle] --> D[Request B arrives] --> E[GPU busy] --> F[GPU idle] --> G[...]
 ```
 
-When traffic increases, the instinct is to let Kubernetes scale out. But HPA defaults to CPU utilization, and an inference server barely uses CPU — all the compute is on the GPU. CPU stays at 5% while the queue grows, the KV cache fills, and latency climbs:
+When traffic increases, the instinct is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
 
 ```mermaid
 flowchart LR
