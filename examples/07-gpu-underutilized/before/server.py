@@ -50,9 +50,12 @@ class InferenceHandler(http.server.BaseHTTPRequestHandler):
         pass
 
 
+class SequentialServer(socketserver.TCPServer):
+    allow_reuse_address = True
+
+
 if __name__ == "__main__":
-    with socketserver.TCPServer(("", PORT), InferenceHandler) as httpd:
-        httpd.allow_reuse_address = True
+    with SequentialServer(("", PORT), InferenceHandler) as httpd:
         print(f"[ready] Sequential inference server listening on port {PORT}")
         print(f"[ready]   GET /health  -> liveness check")
         print(f"[ready]   GET /predict -> simulated inference (sequential)")
