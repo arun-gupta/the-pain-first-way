@@ -60,7 +60,7 @@ Run it three times. The first request loads the model into memory; subsequent on
 
 Once `total_ms` stabilises around 200ms the model is warm. Proceed to the concurrent request demo.
 
-Now send five requests concurrently. All five should complete within ~350ms of each other — contrast with `server.py` where they serialized one at a time and took ~2.5s total:
+Once the model is warm (steady-state ~200ms), send five requests concurrently:
 
 ```bash
 for i in $(seq 1 5); do
@@ -71,7 +71,8 @@ done
 wait
 ```
 
-Expected output — all five durations appear at roughly the same time, each ~200ms:
+The parallelism signal is the **spread**, not the absolute values. All five durations should appear within ~200ms of each other and print at roughly the same time:
+
 ```
 203
 215
@@ -79,6 +80,8 @@ Expected output — all five durations appear at roughly the same time, each ~20
 290
 312
 ```
+
+With `server.py`, the same five requests would print one at a time, each ~500ms apart (~2.5s total). Here they all land within a 100–200ms window regardless of count — that is continuous batching.
 
 ### Step 2 — Observe quantization (already applied)
 
