@@ -1,0 +1,22 @@
+# Step 2 of incremental adoption: scale on the right signal.
+# KEDA watches inference_requests_in_flight from Prometheus and adds replicas
+# when in-flight requests exceed 3. CPU never triggers this — inference servers
+# barely use CPU even under heavy load.
+#
+# Prerequisites: KEDA installed (https://keda.sh/docs/latest/deploy/)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: inference-server-scaledobject
+spec:
+  scaleTargetRef:
+    name: inference-server
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: inference_requests_in_flight
+        query: inference_requests_in_flight
+        threshold: "3"

@@ -1,0 +1,28 @@
+# Step 3 of incremental adoption: share the GPU (informational).
+# This ConfigMap is read by the NVIDIA GPU Operator to configure MIG profiles
+# on nodes that carry the nvidia.com/mig.config label. It divides one A100 80GB
+# into three equal 3g.40gb partitions, each with its own HBM slice and compute
+# fraction. Three inference services share one physical GPU without memory
+# interference.
+#
+# Requires: a real GPU node (A100 or H100) with the NVIDIA GPU Operator installed.
+# Claiming a specific MIG slice from a pod requires DRA (Dynamic Resource
+# Allocation) — the default nvidia.com/gpu counter cannot express slice type.
+# See https://github.com/arun-gupta/the-pain-first-way/issues/21 for the full
+# DRA pain.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mig-config
+  namespace: gpu-operator
+  labels:
+    app: gpu-operator
+data:
+  config.yaml: |
+    version: v1
+    mig-configs:
+      all-3g.40gb:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "3g.40gb": 3

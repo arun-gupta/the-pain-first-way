@@ -88,6 +88,10 @@ The complexity is real, but two things keep it manageable. First, the ecosystem 
 
 The alternative — running three or four underutilized replicas — is also complexity. It just shows up on your bill instead of your config.
 
+## Try it
+
+A working demonstration lives in [`examples/07-gpu-underutilized/`](../examples/07-gpu-underutilized/). The before case runs a sequential server that processes one request at a time — send five concurrent requests and watch them serialize. The after case walks the three incremental layers: swap to the batching server and observe parallelism and the `/metrics` endpoint (Step 1, no infrastructure required); apply the KEDA `ScaledObject` to scale on `inference_requests_in_flight` instead of CPU (Step 2); review the GPU Operator MIG config that exposes partitions to Kubernetes (Step 3, informational — requires a real GPU node). Runnable on a Mac with no GPU required for Steps 1 and 2.
+
 ---
 
 [← Pain 6: Server image coupling](06-server-image-coupling.md) · [Landscape](../README.md) · [Pain 8: Can't roll back →](08-cant-roll-back.md)
