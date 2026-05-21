@@ -67,22 +67,56 @@ The queue backing up — `inference_requests_in_flight` rising above 3 — is th
 
 ## Step 1 — Scale on the right signal
 
-Requires a Kind cluster. Install KEDA:
+The instinct is to let Kubernetes HPA handle scaling. The problem: an inference server's CPU stays near 5% regardless of load — the GPU does the work, not the CPU. Apply a CPU-based HPA and send load to see it miss the signal entirely.
 
-```bash
-kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.16.0/keda-2.16.0.yaml
-```
-
-Wait for KEDA to be ready:
-
-```bash
-kubectl rollout status deployment/keda-operator -n keda
-```
-
-Apply the deployment:
+Requires a Kind cluster. Apply the deployment:
 
 ```bash
 kubectl apply -f deployment.yaml
+```
+
+### The naive approach: CPU HPA misses the signal
+
+Apply a CPU-based HPA:
+
+```bash
+kubectl apply -f hpa-cpu.yaml
+```
+
+Send sustained load (run this for ~30 seconds):
+
+```bash
+for i in $(seq 1 50); do curl -s localhost:8080/predict & done; wait
+```
+
+Check whether HPA reacts:
+
+```bash
+kubectl get hpa inference-server-cpu-hpa
+```
+
+Expected output:
+
+```
+NAME                      REFERENCE                     TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+inference-server-cpu-hpa  Deployment/inference-server   4%/50%    1         5         1          30s
+```
+
+CPU sits at ~4% — well below the 50% threshold. HPA never adds a replica. Meanwhile the GPU queue is backed up and latency is climbing. This is the failure mode: Kubernetes is watching the wrong signal.
+
+Delete the CPU HPA before proceeding:
+
+```bash
+kubectl delete -f hpa-cpu.yaml
+```
+
+### The right approach: KEDA scales on GPU saturation
+
+Install KEDA:
+
+```bash
+kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.16.0/keda-2.16.0.yaml
+kubectl rollout status deployment/keda-operator -n keda
 ```
 
 Apply the ScaledObject:
@@ -91,9 +125,7 @@ Apply the ScaledObject:
 kubectl apply -f scaledobject.yaml
 ```
 
-KEDA watches `inference_requests_in_flight` from Prometheus. When in-flight requests on any replica exceed 3, KEDA adds a replica — up to 5. When traffic drops, it scales back to 1. Step 2 (MIG) is independent — it can be applied alongside this or separately.
-
-Observe scaling:
+KEDA watches `inference_requests_in_flight` from Prometheus. When in-flight requests on any replica exceed 3, KEDA adds a replica — up to 5. When traffic drops, it scales back to 1.
 
 ```bash
 kubectl get scaledobject inference-server-scaledobject
@@ -110,9 +142,7 @@ NAME                                     REFERENCE                     TARGETS  
 keda-hpa-inference-server-scaledobject   Deployment/inference-server   <unknown>/3 (avg)   1         5         0          5s
 ```
 
-`READY: False` and `<unknown>/3 (avg)` are expected without a Prometheus stack — KEDA created the HPA but cannot yet read the metric. In a cluster with Prometheus scraping the deployment, `TARGETS` would show the live `inference_requests_in_flight` value and KEDA would add replicas when it exceeds 3.
-
-This is the key difference from scaling on CPU: an inference server's CPU barely moves under load. The GPU queue fills and latency climbs while HPA watches CPU stay at 5% and does nothing. `inference_requests_in_flight` reflects actual GPU saturation.
+`READY: False` and `<unknown>/3 (avg)` are expected without a Prometheus stack — KEDA created the HPA but cannot yet read the metric. In a cluster with Prometheus scraping the deployment, `TARGETS` would show the live `inference_requests_in_flight` value and KEDA would add replicas when it exceeds 3 — the condition the CPU HPA never saw. Step 2 (MIG) is independent and can be applied alongside this.
 
 ## Step 2 — Share the GPU (informational)
 

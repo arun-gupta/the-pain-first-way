@@ -7,14 +7,15 @@ A working demonstration of [Pain 7: My GPU sits at 30% but my bill says 100%](..
 ```
 07-gpu-underutilized/
 ├── before/
-│   ├── server.py          # naive sequential server — the problem
+│   ├── server.py               # naive sequential server — the problem
 │   ├── optimization-steps.md   # pre-CN fixes: continuous batching, quantization, prefix caching, speculative decoding
 │   └── README.md
-└── after/                 # three incremental CN fixes
-    ├── server.py          # Step 1: concurrent batching server with /metrics endpoint
-    ├── deployment.yaml    # Step 1: Kubernetes deployment with Prometheus scrape annotations
-    ├── scaledobject.yaml  # Step 2: KEDA scales on inference_requests_in_flight
-    ├── mig-config.yaml    # Step 3: MIG profiles via GPU Operator (requires real GPU)
+└── after/                      # CN layers on top of a batching server
+    ├── server.py               # batching server with /metrics endpoint (foundation for CN steps)
+    ├── deployment.yaml         # Kubernetes deployment with Prometheus scrape annotations
+    ├── hpa-cpu.yaml            # CPU-based HPA — shows it misses the signal (CPU stays at ~4%)
+    ├── scaledobject.yaml       # Step 1: KEDA scales on inference_requests_in_flight instead
+    ├── mig-config.yaml         # Step 2: MIG profiles via GPU Operator (requires real GPU)
     └── README.md
 ```
 
@@ -28,7 +29,7 @@ No GPU required. All GPU behavior is simulated with `time.sleep`. The cloud-nati
 
 `after/server.py` simulates a batching-aware engine: up to `MAX_CONCURRENT` requests run in parallel, five concurrent requests take ~0.5s regardless of count, and `/metrics` exposes `inference_requests_in_flight` so the autoscaler watches the right signal.
 
-`after/scaledobject.yaml` configures KEDA to add replicas when `inference_requests_in_flight` exceeds 3. `after/mig-config.yaml` shows how to partition a physical GPU into isolated slices via the GPU Operator so multiple workloads can share one card.
+`after/hpa-cpu.yaml` is a CPU-based HPA that demonstrates the failure mode: CPU stays at ~4% under inference load, so the HPA never triggers. `after/scaledobject.yaml` replaces it with a KEDA ScaledObject that scales on `inference_requests_in_flight` instead — the signal that actually reflects GPU saturation. `after/mig-config.yaml` shows how to partition a physical GPU into isolated slices via the GPU Operator so multiple workloads can share one card.
 
 Each layer is independent. `optimization-steps.md` needs no infrastructure. Step 1 is a server swap. Steps 2 and 3 add infrastructure only when you need it.
 
