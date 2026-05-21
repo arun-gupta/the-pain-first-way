@@ -37,7 +37,7 @@ ollama pull qwen:0.5b
 
 `qwen:0.5b` is ~394 MB, GGUF Q4, no authentication required.
 
-Send a single request to confirm the server is ready:
+Send the same request three times to observe the model warming up:
 
 ```bash
 curl -s http://localhost:11434/api/generate \
@@ -45,13 +45,20 @@ curl -s http://localhost:11434/api/generate \
   | jq '{response: .response, total_ms: (.total_duration / 1000000 | round)}'
 ```
 
-Expected output (first request is slow due to model load; subsequent ones are fast):
-```json
-{
-  "response": "...",
-  "total_ms": 200
-}
+Run it three times. The first request loads the model into memory; subsequent ones hit steady-state:
+
 ```
+# First request — model loading
+{ "response": "...", "total_ms": 918 }
+
+# Second request — warming up
+{ "response": "...", "total_ms": 310 }
+
+# Third request — steady state
+{ "response": "...", "total_ms": 198 }
+```
+
+Once `total_ms` stabilises around 200ms the model is warm. Proceed to the concurrent request demo.
 
 Now send five requests concurrently. All five should complete within ~350ms of each other — contrast with `server.py` where they serialized one at a time and took ~2.5s total:
 
