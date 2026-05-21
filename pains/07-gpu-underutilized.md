@@ -6,33 +6,42 @@
 
 ## The pattern
 
-LLM inference is memory-bandwidth-bound. During the decode phase (token generation), the GPU reads the entire model and KV cache from HBM for every generated token — those reads happen regardless of how many sequences are in flight. A batch of 16 requests costs roughly the same GPU bandwidth as a batch of 1, because the weights are loaded once and applied to all sequences in parallel.
-
-That property means **batching is the primary lever for utilization**. Without it, requests are processed one at a time and the GPU idles between them:
+LLM inference is memory-bandwidth-bound. During the decode phase (token generation), the GPU reads the entire model and KV cache from HBM for every generated token — those reads happen regardless of how many sequences are in flight. A batch of 16 requests costs roughly the same GPU bandwidth as a batch of 1, because the weights are loaded once and applied to all sequences in parallel. Without a batching-aware server, requests are processed one at a time and the GPU idles between them:
 
 ```mermaid
 flowchart LR
-    subgraph seq["Sequential — naive server (~30% utilization)"]
-        direction LR
-        R1[Request A<br/>compute] --> I1[GPU idle] --> R2[Request B<br/>compute] --> I2[GPU idle] --> R3[...]
-    end
-    subgraph bat["Continuous batching (~80% utilization)"]
-        direction LR
-        B1["A + B + C<br/>compute in parallel"] --> B2["D + E + F<br/>compute in parallel"] --> B3[...]
-    end
+    A[Request A arrives] --> B[GPU busy] --> C[GPU idle] --> D[Request B arrives] --> E[GPU busy] --> F[GPU idle] --> G[...]
 ```
 
-Three problems compound into the underutilization you see on the dashboard:
+When traffic increases, the instinct is to let Kubernetes scale out. But HPA defaults to CPU utilization, and an inference server barely uses CPU — all the compute is on the GPU. CPU stays at 5% while the queue grows, the KV cache fills, and latency climbs:
 
-1. **No batching, or static batching**: A static-batch server waits for the current batch to drain before starting the next one. A naive sequential server processes one request at a time. Either way, new arrivals wait in a queue while the GPU idles. With continuous batching, new requests join batches already in flight — a request that arrives mid-decode slots into the next decode step rather than queuing behind it.
+```mermaid
+flowchart LR
+    Traffic["Traffic spike"] --> Server["Inference server\nCPU: 5% · GPU queue: growing"]
+    Server --> HPA["HPA watching CPU"]
+    HPA -->|"CPU 5% — nothing to do"| NoScale["No new replicas"]
+    Server --> Latency["p99 latency climbs"]
+```
 
-2. **Autoscaling on the wrong signal**: Kubernetes HPA defaults to CPU utilization. An inference server barely uses CPU — all the compute is on the GPU. CPU at 5% tells Kubernetes there is nothing to scale. Queue depth is rising, KV cache is filling, latency is climbing — none of that is visible to HPA unless you tell it what metric to watch.
+Adding replicas manually doesn't fix the root cause. Each new replica runs the same underutilized loop — a 7B INT4 model occupies ~4 GB of an H100's 80 GB HBM, so spreading traffic across three replicas means each runs at ~15% while you pay for three full cards:
 
-3. **One GPU per workload by default**: A 7B INT4 model fit into ~4 GB of HBM assigned to an 80 GB H100 leaves 76 GB idle. No other workload can use those resources by default, so you pay for the whole card at all times.
+```mermaid
+flowchart LR
+    Traffic2["Same traffic\n(split manually)"] --> R1["Replica 1\nGPU: 15%"] & R2["Replica 2\nGPU: 15%"] & R3["Replica 3\nGPU: 15%"]
+    R1 & R2 & R3 --> Bill["3× GPU cost\nno throughput gain"]
+```
 
 ## The primitives
 
-**Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change. New requests join in-flight batches rather than queuing behind them; the GPU stays busy across the full decode stream.
+**Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change. New requests join in-flight batches rather than queuing behind them; the GPU stays busy across the full decode stream:
+
+```mermaid
+flowchart LR
+    subgraph bat["Continuous batching (~70–80% utilization)"]
+        direction LR
+        B1["A + B + C<br/>one decode step"] --> B2["D + E + F<br/>next decode step"] --> B3[...]
+    end
+```
 
 With continuous batching in place, the remaining problems are scheduling, scaling, and sharing problems — and those are where cloud native primitives apply:
 
