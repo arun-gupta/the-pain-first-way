@@ -13,7 +13,17 @@ flowchart LR
     A[Request A arrives] --> B[GPU busy] --> C[GPU idle] --> D[Request B arrives] --> E[GPU busy] --> F[GPU idle] --> G[...]
 ```
 
-When traffic increases, the instinct is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
+The first instinct is to optimize the model and serving engine. ML practitioners reach for:
+
+- **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
+- **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
+- **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
+- **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
+- **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
+
+These reduce what the GPU has to do per request. But they don't address how the infrastructure responds when load increases.
+
+The next instinct is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
 
 ```mermaid
 flowchart LR
@@ -31,15 +41,7 @@ flowchart LR
     R1 & R2 & R3 --> Bill["3× GPU cost\nno throughput gain"]
 ```
 
-Before reaching for infrastructure, ML practitioners typically work the model and serving engine first:
-
-- **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
-- **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
-- **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
-- **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
-- **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
-
-These reduce what the GPU has to do per request. The rest of this page covers what happens at the infrastructure layer once the serving engine is already efficient.
+The fix requires both layers: a serving engine that keeps the GPU continuously busy, and infrastructure that scales on GPU-side signals and shares the card when one workload can't fill it.
 
 ## The primitives
 
