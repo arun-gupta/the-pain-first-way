@@ -31,6 +31,16 @@ flowchart LR
     R1 & R2 & R3 --> Bill["3× GPU cost\nno throughput gain"]
 ```
 
+Before reaching for infrastructure, ML practitioners typically work the model and serving engine first:
+
+- **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
+- **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
+- **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
+- **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
+- **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
+
+These reduce what the GPU has to do per request. The rest of this page covers what happens at the infrastructure layer once the serving engine is already efficient.
+
 ## The primitives
 
 **Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change.
