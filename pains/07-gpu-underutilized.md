@@ -82,7 +82,11 @@ With both layers in place — CN infrastructure scaling on the right signal and 
 
 **What you keep**: your model. The wins come from how you serve it.
 
-**What you give up**: the simplicity of one GPU, one process. Continuous batching requires a supported engine (vLLM, TGI, SGLang) rather than a plain FastAPI loop. Custom-metric HPA requires a Prometheus stack and a custom-metrics adapter. GPU sharing (MIG, time-slicing) adds scheduling complexity and changes how pods must request GPU resources from the cluster. The leverage is real — a well-batched, correctly-scaled server on one GPU can serve the same traffic as three or four underutilized replicas — but each layer adds operational surface.
+**What you give up**: the simplicity of one GPU, one process. Continuous batching requires a supported engine (vLLM, TGI, SGLang) rather than a plain FastAPI loop. Custom-metric HPA requires a Prometheus stack and a custom-metrics adapter. GPU sharing (MIG, time-slicing) adds scheduling complexity and changes how pods must request GPU resources from the cluster.
+
+The complexity is real, but two things keep it manageable. First, the ecosystem has absorbed most of it: vLLM, KEDA, and the NVIDIA GPU Operator are production-hardened and widely deployed — you are not wiring this from scratch. Second, each layer is independent and can be adopted incrementally: continuous batching is a single engine swap with no infrastructure change; custom-metric autoscaling follows when you need to scale out; GPU sharing only when you are running multiple workloads on the same card.
+
+The alternative — running three or four underutilized replicas — is also complexity. It just shows up on your bill instead of your config.
 
 ---
 
