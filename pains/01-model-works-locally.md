@@ -30,7 +30,12 @@ The unit of deployment is not your code, it's your code plus everything it depen
 
 ```mermaid
 flowchart LR
-  DF[Dockerfile\ndeclares all 3 layers] --> IMG[Container image\ncode + Python + libs + weights]
+  subgraph DF["📄 Dockerfile"]
+    L1[Python runtime]
+    L2[system libs]
+    L3[weights + state]
+  end
+  DF --> IMG[Container image]
   IMG -->|same digest| E1[Your laptop ✓]
   IMG -->|same digest| E2[Teammate ✓]
   IMG -->|same digest| E3[Prod ✓]
