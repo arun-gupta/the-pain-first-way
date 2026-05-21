@@ -6,9 +6,27 @@
 
 GPUs aren't always scarce. They're often just invisible. You can't see who has them, when they'll free up, or whether your job would start if you waited five minutes. The scheduler knows, but it isn't telling you.
 
-A queue makes allocation declared, ordered, and observable. It doesn't conjure more GPUs; it gives every job a visible position, a priority, and a clear answer to "when will mine run?"
+**Without a queue**
 
-A queue makes allocation visible and ordered. It doesn't conjure more GPUs; it gives every job a position and a priority.
+Jobs go directly to the Kubernetes scheduler. Two claim the available GPU slots; the rest land in `Pending` with no position, no priority, and no ETA. The production fine-tune has no way to jump ahead of the weekend experiments.
+
+```mermaid
+flowchart TB
+    J1[experiment-a] & J2[experiment-b] & J3[experiment-c] & J4[production-finetune]
+    -->|kubectl apply| K8s
+
+    subgraph K8s["Cluster — 2 GPU slots"]
+        direction TB
+        R1([experiment-a · running])
+        R2([experiment-b · running])
+        P1([experiment-c · Pending · ❓ no position, no ETA])
+        P2([production-finetune · Pending · ❓ no position, no ETA])
+    end
+```
+
+**With a queue**
+
+A queue makes allocation declared, ordered, and observable. It doesn't conjure more GPUs; it gives every job a visible position, a priority, and a clear answer to "when will mine run?"
 
 ```mermaid
 flowchart TB

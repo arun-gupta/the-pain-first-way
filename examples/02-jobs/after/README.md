@@ -4,6 +4,12 @@ Same `train.py`, with a checkpoint hook. A Kubernetes Job runs it to completion 
 
 Kill the pod mid-run. The Job restarts it. It resumes from the last checkpoint, not from epoch 0.
 
+## 0. Navigate to this directory
+
+```bash
+cd examples/02-jobs/after
+```
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
@@ -102,12 +108,15 @@ kubectl delete -f pvc.yaml
 kind delete cluster --name kind
 ```
 
-## What the Dockerfile declares
+## What the manifest demonstrates
 
-- `FROM python:3.11-slim` -- one Python, pinned, no host env
-- stdlib only, no pip install needed
-- Non-root user
-- `/checkpoints` as the volume mount point
+| This demo | What it does |
+|---|---|
+| `FROM python:3.11-slim` | Pins one Python; no host environment leaks in |
+| stdlib only, no `pip install` | Minimal image — only what the training code needs |
+| Non-root `USER app` | Container runs without root privileges |
+| `/checkpoints` mount point | Shared with the PVC; checkpoints survive pod restarts |
+| `backoffLimit: 4` | Job retries up to 4 times before giving up |
 
 The `train.py` in this folder is byte-for-byte identical to `before/train.py` except for the checkpoint logic. **The cloud-native version adds checkpointing and a manifest; it doesn't rewrite your training code.**
 

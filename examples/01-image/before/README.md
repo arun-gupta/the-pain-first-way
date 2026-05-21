@@ -11,13 +11,28 @@ pip install -r requirements.txt
 python -m uvicorn app:app --reload
 ```
 
+Expected output:
+
+```
+INFO:     Started server process [12345]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+```
+
+(On first run, `sentence-transformers` downloads `all-MiniLM-L6-v2` (~22 MB) to `~/.cache/huggingface/` before the server starts. Subsequent starts load from cache.)
+
+In another terminal:
+
 ```bash
 curl -X POST http://localhost:8000/embed \
   -H 'content-type: application/json' \
   -d '{"text": "hello"}'
 ```
 
-It works.
+```json
+{"text":"hello","dim":384,"embedding_preview":[0.028,0.123,-0.045,0.056,0.089,-0.012,0.034,0.078]}
+```
 
 ## What breaks when you ship this to a real machine
 

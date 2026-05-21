@@ -21,6 +21,8 @@ There are two axes of attack. On the model side: smaller models, quantized weigh
 
 ## The primitives
 
+Apply these techniques together and the startup sequence collapses from ~4 minutes to ~35 seconds, with each technique eliminating a specific cost:
+
 ```mermaid
 flowchart LR
     A2[Image cached on node<br/>DaemonSet · ~0s] --> B2[Weights on local volume<br/>PVC · ~5s] --> C2[Load to GPU<br/>~20s] --> D2[Engine warmup<br/>~10s] --> E2[Ready<br/>~35s]

@@ -6,39 +6,43 @@
 
 **Without a container image**
 
-```mermaid
-flowchart LR
-  subgraph Laptop["💻 Your laptop"]
-    C[code]
-    P[Python 3.11 + pyenv]
-    L[libomp, CUDA 12.1]
-    M[~/.cache/huggingface]
-  end
-  C -->|git push| Prod["☁️ Prod VM\n(different Python,\nmissing libs,\nno model cache)"]
-  Prod --> X[💥 crash on import]
-```
-
 Three layers that don't travel with `git push`: runtime, system libs, and cached state.
 
-**With a container image**
-
 ```mermaid
 flowchart LR
-  DF[Dockerfile\ndeclares all 3 layers] --> IMG[Container image\ncode + Python + libs + weights]
-  IMG -->|same digest| E1[Your laptop ✓]
-  IMG -->|same digest| E2[Teammate ✓]
-  IMG -->|same digest| E3[Prod ✓]
+  subgraph Dev["💻 Your laptop"]
+    C[code]
+    R[Python runtime]
+    S[system libs]
+    W[weights + state]
+  end
+  C -->|"git push (code only)"| E1["💻 Teammate\ndifferent stack ❓"]
+  C -->|"git push (code only)"| E2["🖥️ CI / staging\ndifferent stack ❓"]
+  C -->|"git push (code only)"| E3["☁️ Prod\ndifferent stack 💥"]
 ```
-
-One artifact, identical everywhere.
-
-The unit of deployment is not your code, it's your code plus everything it depends on. You declare that whole thing once, freeze it, sign it, and ship the frozen artifact to every environment.
-
-Three layers of your environment don't travel with `git push`:
 
 - **Your Python is plural.** Multiple installs (system, brew, pyenv, conda), multiple env managers (venv, conda, poetry, uv), packages from different sources (PyPI vs conda-forge). `pip freeze` records names and versions but not which index they came from or which Python they're attached to.
 - **Python isn't all of it.** System libs (`libomp`, `ffmpeg`, CUDA toolkit, BLAS) get linked at install time against whatever your machine happens to have. None of this lives in your requirements file.
 - **State lives outside your code.** Model weights in `~/.cache/huggingface`, tokens in `~/.huggingface/token`, env vars in `~/.zshrc` (`CUDA_HOME`, `HF_HOME`), data at hardcoded paths. None of it ships with `git push`.
+
+**With a container image**
+
+The unit of deployment is not your code, it's your code plus everything it depends on. You declare that whole thing once, freeze it, sign it, and ship the frozen artifact to every environment.
+
+```mermaid
+flowchart LR
+  subgraph Image["📦 Container image"]
+    C[code]
+    R[Python runtime]
+    S[system libs]
+    W[weights + state]
+  end
+  Image -->|"docker pull (all layers)"| E1[Your laptop ✓]
+  Image -->|"docker pull (all layers)"| E2[Teammate ✓]
+  Image -->|"docker pull (all layers)"| E3[Prod ✓]
+```
+
+One artifact, identical everywhere.
 
 ## The primitives
 
