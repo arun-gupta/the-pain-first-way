@@ -69,7 +69,17 @@ The queue backing up — `inference_requests_in_flight` rising above 3 — is th
 
 The instinct is to let Kubernetes HPA handle scaling. The problem: an inference server's CPU stays near 5% regardless of load — the GPU does the work, not the CPU. Apply a CPU-based HPA and send load to see it miss the signal entirely.
 
-Requires a Kind cluster. Apply the deployment:
+Requires a Kind cluster. Install metrics-server (required for CPU HPA — not included in Kind by default):
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch deployment metrics-server -n kube-system \
+  --type='json' \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+kubectl rollout status deployment/metrics-server -n kube-system
+```
+
+Apply the deployment:
 
 ```bash
 kubectl apply -f deployment.yaml
@@ -95,11 +105,11 @@ Check whether HPA reacts:
 kubectl get hpa inference-server-cpu-hpa
 ```
 
-Expected output:
+Expected output (give it ~60s for metrics-server to collect the first sample):
 
 ```
-NAME                      REFERENCE                     TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-inference-server-cpu-hpa  Deployment/inference-server   4%/50%    1         5         1          30s
+NAME                       REFERENCE                     TARGETS      MINPODS   MAXPODS   REPLICAS   AGE
+inference-server-cpu-hpa   Deployment/inference-server   4%/50%       1         5         1          60s
 ```
 
 CPU sits at ~4% — well below the 50% threshold. HPA never adds a replica. Meanwhile the GPU queue is backed up and latency is climbing. This is the failure mode: Kubernetes is watching the wrong signal.

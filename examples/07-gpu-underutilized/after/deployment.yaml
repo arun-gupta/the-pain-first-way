@@ -28,6 +28,10 @@ spec:
               value: "8080"
             - name: MAX_CONCURRENT
               value: "4"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
           readinessProbe:
             httpGet:
               path: /health
