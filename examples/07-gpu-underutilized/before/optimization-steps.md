@@ -71,7 +71,19 @@ done
 wait
 ```
 
-The parallelism signal is the **spread**, not the absolute values. All five durations should appear within ~200ms of each other and print at roughly the same time:
+The parallelism signal is the **spread**, not the absolute values. All five results print at roughly the same time and land within ~200ms of each other regardless of count.
+
+If the model just loaded (cold), absolute values will be high but the spread is still tight:
+
+```
+16055
+16120
+16151
+16184
+16215
+```
+
+After the warmup steps above, absolute values drop to steady state:
 
 ```
 203
@@ -81,7 +93,7 @@ The parallelism signal is the **spread**, not the absolute values. All five dura
 312
 ```
 
-With `server.py`, the same five requests would print one at a time, each ~500ms apart (~2.5s total). Here they all land within a 100–200ms window regardless of count — that is continuous batching.
+With `server.py`, the same five requests print one at a time, each ~500ms apart — ~2.5s total. Here the entire batch lands within a ~160ms window. That is continuous batching.
 
 ### Step 2 — Observe quantization (already applied)
 
