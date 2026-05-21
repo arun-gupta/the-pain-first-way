@@ -1,19 +1,61 @@
-# After: the cloud native way
+# After: the same code, wrapped in a Dockerfile
 
-The same `app.py` and `requirements.txt` as [`../before/`](../before/), wrapped in a Dockerfile. The image is the deployment artifact.
+`app.py` and `requirements.txt` are byte-for-byte identical to [`../before/`](../before/). The Dockerfile is the entire delta. It pins the Python version, installs the system library PyTorch needs, and bakes the model weights into the image at build time so the running container needs no network access.
 
-## Build and run
+## 0. Navigate to this directory
+
+```bash
+cd examples/01-image/after
+```
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
+
+## 1. Build the image
 
 ```bash
 bash build.sh
+```
+
+This builds `embedder:latest`. The build downloads `sentence-transformers/all-MiniLM-L6-v2` (~22 MB) into the image layer at build time. The first build takes a minute or two; subsequent builds use the Docker layer cache.
+
+Expected output (abbreviated):
+
+```
+[+] Building ...
+ => [1/8] FROM docker.io/library/python:3.11-slim
+ => [2/8] RUN apt-get update && apt-get install -y --no-install-recommends libgomp1
+ => [3/8] COPY requirements.txt .
+ => [4/8] RUN pip install --no-cache-dir -r requirements.txt
+ => [5/8] RUN python -c "from sentence_transformers import SentenceTransformer; ..."
+ => [6/8] COPY app.py .
+ => [7/8] RUN useradd --create-home --shell /bin/bash app ...
+ => exporting to image
+
+Built embedder:latest
+```
+
+## 2. Run the container
+
+```bash
 docker run -p 8000:8000 embedder:latest
 ```
 
-Or skip the build and pull the pre-built image:
+Expected output:
 
-```bash
-docker run -p 8000:8000 arungupta/embedder:latest
 ```
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+No model download on startup. The weights were baked into the image in step 1.
+
+## 3. Test the endpoint
+
+In another terminal:
 
 ```bash
 curl -X POST http://localhost:8000/embed \
@@ -21,25 +63,44 @@ curl -X POST http://localhost:8000/embed \
   -d '{"text": "hello"}'
 ```
 
+Expected output:
+
+```json
+{"text":"hello","dim":384,"embedding_preview":[0.028,0.123,-0.045,0.056,0.089,-0.012,0.034,0.078]}
+```
+
+(Embedding values are deterministic for a given model and input, but the exact preview depends on the model version.)
+
+## 4. Clean up
+
+Press `Ctrl+C` in the container terminal to stop it. If it is running in the background:
+
+```bash
+docker stop $(docker ps -q --filter ancestor=embedder:latest)
+```
+
 ## What the Dockerfile declares
 
-Three things, mapping to Pain 1's three layers of "what's actually happening":
-
-1. **Python and OS.** `FROM python:3.11-slim` pins the runtime. There is one Python in this container.
-2. **System libraries.** `RUN apt-get install -y libgomp1` makes the OpenMP shared object part of the image. PyTorch's `dlopen` finds it because the file declared it.
-3. **Python packages and model weights.** `pip install -r requirements.txt` runs inside the image with that pinned Python. The `RUN python -c "...SentenceTransformer(...)"` step downloads the model at build time so the runtime container doesn't need network access for it.
+| Layer | What it pins |
+|---|---|
+| `FROM python:3.11-slim` | Python 3.11 exactly; no host Python leaks in |
+| `RUN apt-get install -y libgomp1` | The OpenMP shared object PyTorch requires at runtime |
+| `pip install -r requirements.txt` | All Python deps pinned against that one interpreter |
+| `SentenceTransformer(...)` at build time | Model weights baked into the image layer; no network needed at runtime |
+| Non-root `USER app` | Container runs without root privileges |
 
 The image is the boundary. Inside, everything is declared. Outside no longer affects the runtime.
 
-## Push to Docker Hub
+## What this maps to on a real GPU cluster
 
-```bash
-docker login -u <DOCKER_USERNAME>
-bash build.sh --push
-```
+| This demo | Real ML service |
+|---|---|
+| `python:3.11-slim` base | CUDA base image (`nvcr.io/nvidia/pytorch:24.05-py3`) |
+| `sentence-transformers/all-MiniLM-L6-v2` (22 MB) | 7B–70B model (7 GB–140 GB) |
+| Model baked at build time | Model staged via init container at runtime (see [Pain 5](../../pains/05-cold-start.md)) |
+| `libgomp1` | CUDA toolkit, cuDNN, NCCL baked into GPU base image |
+| `docker run -p 8000:8000` | Kubernetes Deployment with N replicas and GPU resource requests |
 
-`build.sh --push` tags as `<DOCKER_USERNAME>/embedder:latest` and pushes. Set `DOCKER_USERNAME` if you're not the default.
+---
 
-## Why bake the model at build time
-
-Pain 1 is about packaging everything together. Baking the 22MB MiniLM is the strictest version of that. The running container needs no network for the model. For multi-gigabyte LLMs, you'd download at runtime from a PVC or model registry; see [Pain 5: Cold start](../../pains/05-cold-start.md).
+[← Back to Pain 1](../../pains/01-model-works-locally.md) · [Landscape](../../README.md) · [Examples index](../README.md)

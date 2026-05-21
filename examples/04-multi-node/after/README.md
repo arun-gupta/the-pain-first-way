@@ -18,6 +18,12 @@ rendezvous succeeds. Training completes across two separate Kind nodes.
 | High-performance networking (RDMA, GPUDirect) | ❌ Kind uses plain TCP — requires real InfiniBand/RoCE hardware |
 | Topology-aware scheduling | ❌ Kind nodes share the same host — no real network fabric to schedule against |
 
+## 0. Navigate to this directory
+
+```bash
+cd examples/04-multi-node/after
+```
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
@@ -331,7 +337,7 @@ flowchart LR
 The operator owns the lifecycle. Both pods are created atomically across separate
 nodes. If either fails, `restartPolicy: OnFailure` replaces it without touching the other.
 
-## What the manifests declare
+## What the manifest demonstrates
 
 | Field | What it does |
 |---|---|

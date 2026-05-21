@@ -2,6 +2,12 @@
 
 Same training job, submitted through [Kueue](https://kueue.sigs.k8s.io/). The queue admits two jobs at a time. A third waits with a visible position. A high-priority production job preempts a waiting experiment so it can start immediately.
 
+## 0. Navigate to this directory
+
+```bash
+cd examples/03-queueing/after
+```
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) (tested with 29+)
@@ -170,7 +176,7 @@ flowchart LR
 
 The job carries two labels. Everything else is cluster-side configuration your training code never sees.
 
-## What the manifests declare
+## What the manifest demonstrates
 
 | Manifest | What it does |
 |---|---|
