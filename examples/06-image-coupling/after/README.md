@@ -221,8 +221,9 @@ New source, same image. The server image has not changed since step 2.
 
 ## 11. Clean up
 
+Press `Ctrl+C` in the port-forward terminal first, then:
+
 ```bash
-kubectl port-forward  # Ctrl+C in that terminal first
 kubectl delete pod inference-server
 kubectl delete pvc model-weights
 kubectl delete configmap model-config
