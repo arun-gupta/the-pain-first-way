@@ -20,9 +20,13 @@ flowchart LR
   Prod --> X[💥 crash on import]
 ```
 
+- **Your Python is plural.** Multiple installs (system, brew, pyenv, conda), multiple env managers (venv, conda, poetry, uv), packages from different sources (PyPI vs conda-forge). `pip freeze` records names and versions but not which index they came from or which Python they're attached to.
+- **Python isn't all of it.** System libs (`libomp`, `ffmpeg`, CUDA toolkit, BLAS) get linked at install time against whatever your machine happens to have. None of this lives in your requirements file.
+- **State lives outside your code.** Model weights in `~/.cache/huggingface`, tokens in `~/.huggingface/token`, env vars in `~/.zshrc` (`CUDA_HOME`, `HF_HOME`), data at hardcoded paths. None of it ships with `git push`.
+
 **With a container image**
 
-One artifact, identical everywhere.
+The unit of deployment is not your code, it's your code plus everything it depends on. You declare that whole thing once, freeze it, sign it, and ship the frozen artifact to every environment.
 
 ```mermaid
 flowchart LR
@@ -32,13 +36,7 @@ flowchart LR
   IMG -->|same digest| E3[Prod ✓]
 ```
 
-The unit of deployment is not your code, it's your code plus everything it depends on. You declare that whole thing once, freeze it, sign it, and ship the frozen artifact to every environment.
-
-Three layers of your environment don't travel with `git push`:
-
-- **Your Python is plural.** Multiple installs (system, brew, pyenv, conda), multiple env managers (venv, conda, poetry, uv), packages from different sources (PyPI vs conda-forge). `pip freeze` records names and versions but not which index they came from or which Python they're attached to.
-- **Python isn't all of it.** System libs (`libomp`, `ffmpeg`, CUDA toolkit, BLAS) get linked at install time against whatever your machine happens to have. None of this lives in your requirements file.
-- **State lives outside your code.** Model weights in `~/.cache/huggingface`, tokens in `~/.huggingface/token`, env vars in `~/.zshrc` (`CUDA_HOME`, `HF_HOME`), data at hardcoded paths. None of it ships with `git push`.
+One artifact, identical everywhere.
 
 ## The primitives
 
