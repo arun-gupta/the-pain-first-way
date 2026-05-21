@@ -100,6 +100,18 @@ kubectl get scaledobject inference-server-scaledobject
 kubectl get hpa
 ```
 
+Expected output:
+
+```
+NAME                            SCALETARGETKIND      SCALETARGETNAME    MIN   MAX   READY   ACTIVE   FALLBACK   PAUSED    TRIGGERS
+inference-server-scaledobject   apps/v1.Deployment   inference-server   1     5     False   False    Unknown    Unknown   prometheus
+
+NAME                                     REFERENCE                     TARGETS             MINPODS   MAXPODS   REPLICAS   AGE
+keda-hpa-inference-server-scaledobject   Deployment/inference-server   <unknown>/3 (avg)   1         5         0          5s
+```
+
+`READY: False` and `<unknown>/3 (avg)` are expected without a Prometheus stack — KEDA created the HPA but cannot yet read the metric. In a cluster with Prometheus scraping the deployment, `TARGETS` would show the live `inference_requests_in_flight` value and KEDA would add replicas when it exceeds 3.
+
 This is the key difference from scaling on CPU: an inference server's CPU barely moves under load. The GPU queue fills and latency climbs while HPA watches CPU stay at 5% and does nothing. `inference_requests_in_flight` reflects actual GPU saturation.
 
 ## Step 2 — Share the GPU (informational)
