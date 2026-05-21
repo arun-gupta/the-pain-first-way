@@ -15,13 +15,14 @@ flowchart LR
 
 The first instinct is to optimize the model and serving engine. ML practitioners reach for:
 
+- **Continuous batching**: replace the naive serving loop with an engine (vLLM, TGI, SGLang) that processes multiple requests in parallel. Instead of waiting for one request to finish before starting the next, the engine runs a batch of sequences through each token step together — requests join and leave mid-flight as they finish. This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change.
 - **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
 - **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
 - **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
 - **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
 - **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
 
-These reduce what the GPU has to do per request. But they don't address how the infrastructure responds when load increases.
+These reduce what the GPU has to do per request and how efficiently it processes them. But they don't address how the infrastructure responds when load increases.
 
 The next instinct is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
 
@@ -67,14 +68,7 @@ flowchart LR
 
 With these in place, Kubernetes scales at the right time and shares the GPU. But each replica is still processing requests one at a time — the GPU idles between them. You're scaling an inefficient unit: more replicas absorb the load, but the utilization per replica stays low.
 
-**Continuous batching** closes that gap. It operates at the granularity of a single token step: the server generates one token at a time across all in-flight requests. After each step, any request that finished immediately frees its slot and the next queued request takes its place — the batch is continuously topped up rather than drained and refilled:
-
-```mermaid
-flowchart LR
-    S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
-```
-
-The GPU never idles between requests. The gains are large because LLM inference is memory-bandwidth-bound: the GPU reads the entire model and KV cache from HBM on every token step regardless of how many sequences are in flight, so a batch of 16 costs roughly the same bandwidth as a batch of 1. Batching is nearly free throughput. vLLM, TGI, and SGLang all implement it; switching from a naive serving loop typically moves utilization from ~30% to ~70–80% before any infrastructure change.
+**Continuous batching** closes that gap. Already covered in the pattern above as a serving-engine optimization, it also compounds with CN infrastructure: once each replica processes requests in parallel rather than sequentially, the GPU never idles between requests and the right-signal autoscaling above is scaling an efficient unit rather than an inefficient one.
 
 With both layers in place — CN infrastructure scaling on the right signal and sharing the GPU, continuous batching keeping each replica efficient — a single well-configured server can serve the traffic that previously required three or four underutilized replicas.
 
