@@ -1,57 +1,103 @@
-# Pre-CN optimizations: vLLM serving commands
+# Pre-CN optimizations: the AI/ML developer path
 
-These are the model and serving engine optimizations that ML practitioners apply before reaching for Kubernetes. Each is a launch flag or configuration change — no infrastructure required.
+Before reaching for Kubernetes, AI/ML developers optimize at the model and serving engine layer. Each step below builds on the previous one. Steps 1–3 are fully runnable on a Mac without a GPU.
 
-## Continuous batching
-
-Replace the naive serving loop (`server.py`) with vLLM. Continuous batching is on by default:
+## Prerequisites
 
 ```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct
+pip install vllm
 ```
 
-Typical result: GPU utilization moves from ~30% to ~70–80% at the same traffic level, before any infrastructure change.
+## Step 0 — The problem (already seen in server.py)
 
-## Quantization
+`server.py` processes one request at a time. Five concurrent requests take ~2.5s. The GPU idles between them.
 
-Reduce model weight size and HBM bandwidth consumption per token step:
+## Step 1 — Switch to vLLM (continuous batching, the biggest win)
+
+Replace the naive serving loop with vLLM. Continuous batching is on by default — no flags needed.
 
 ```bash
-# AWQ (Activation-aware Weight Quantization) — INT4, requires pre-quantized model
+vllm serve facebook/opt-125m --device cpu
+```
+
+`facebook/opt-125m` is ~250 MB, publicly available, no HuggingFace token required, runs on CPU.
+
+Test it:
+
+```bash
+curl http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "facebook/opt-125m", "prompt": "The GPU utilization is", "max_tokens": 20}'
+```
+
+Send five requests concurrently and observe they are processed in parallel rather than sequentially:
+
+```bash
+for i in $(seq 1 5); do
+  curl -s http://localhost:8000/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{"model": "facebook/opt-125m", "prompt": "The GPU utilization is", "max_tokens": 10}' &
+done
+wait
+```
+
+Check the metrics endpoint vLLM exposes by default:
+
+```bash
+curl http://localhost:8000/metrics | grep -E "num_requests_running|gpu_cache_usage"
+```
+
+## Step 2 — Enable prefix caching
+
+Avoid recomputing attention for repeated prefixes — system prompts, few-shot examples, shared context.
+
+```bash
+vllm serve facebook/opt-125m --device cpu --enable-prefix-caching
+```
+
+Send the same prompt twice and observe the second request is faster (cache hit):
+
+```bash
+# First request — full prefill cost
+time curl -s http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "facebook/opt-125m", "prompt": "You are a helpful assistant. The weather today is", "max_tokens": 20}'
+
+# Second request — prefix cached, prefill skipped
+time curl -s http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "facebook/opt-125m", "prompt": "You are a helpful assistant. The capital of France is", "max_tokens": 20}'
+```
+
+The shared prefix `"You are a helpful assistant."` is cached after the first request. The second request skips its prefill.
+
+## Step 3 — Enable sequence packing (chunked prefill)
+
+Bin-pack multiple short prompts into one context window to eliminate padding waste.
+
+```bash
+vllm serve facebook/opt-125m --device cpu --enable-prefix-caching --enable-chunked-prefill
+```
+
+With chunked prefill enabled, vLLM fills each batch step to the token budget rather than leaving gaps at the end of short sequences. Observable as higher `gpu_cache_usage` at the same request rate.
+
+## Step 4 — Quantization (GPU required)
+
+Reduces model weight size and HBM bandwidth per token step. Requires a pre-quantized model and a GPU.
+
+```bash
+# AWQ — INT4, requires pre-quantized model variant
 vllm serve meta-llama/Llama-3.1-8B-Instruct-AWQ --quantization awq
 
-# GPTQ — INT4/INT8
-vllm serve meta-llama/Llama-3.1-8B-Instruct-GPTQ --quantization gptq
-
-# FP8 — on H100/A100, handled by the engine
+# FP8 — on H100/A100
 vllm serve meta-llama/Llama-3.1-8B-Instruct --quantization fp8
 ```
 
-A 70B FP16 model at ~140 GB becomes ~35 GB in INT4. Same model, 4× less HBM, faster memory reads per token step.
+A 70B FP16 model at ~140 GB becomes ~35 GB in INT4 — 4× less HBM, proportionally faster memory reads per token step.
 
-## KV cache: prefix caching
+## Step 5 — Speculative decoding (GPU required)
 
-Avoid recomputing attention for repeated prefixes (system prompts, few-shot examples):
-
-```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct --enable-prefix-caching
-```
-
-Requests that share a common prefix (e.g. the same system prompt) reuse the cached KV state. The first request pays the full prefill cost; subsequent ones skip it.
-
-## Sequence packing (chunked prefill)
-
-Bin-pack multiple short sequences into one context window to eliminate padding waste:
-
-```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct --enable-chunked-prefill
-```
-
-Short prompts that would otherwise each occupy a full batch slot are packed together. Fewer batch steps for the same number of requests.
-
-## Speculative decoding
-
-Use a small draft model to propose tokens; the large model verifies them in one forward pass:
+A small draft model proposes N tokens; the large model verifies them in one forward pass. Reduces full model reads per output token.
 
 ```bash
 vllm serve meta-llama/Llama-3.1-8B-Instruct \
@@ -59,26 +105,20 @@ vllm serve meta-llama/Llama-3.1-8B-Instruct \
   --num-speculative-tokens 5
 ```
 
-Each verification step accepts multiple tokens at once if the draft was correct. Reduces full model reads per output token at the cost of occasional wasted draft work.
+## Step 6 — Prefill/decode disaggregation (GPU required)
 
-## Prefill/decode disaggregation
-
-Route the compute-bound prefill phase and the memory-bandwidth-bound decode phase to separate instances:
+Routes the compute-bound prefill phase and the memory-bandwidth-bound decode phase to separate instances.
 
 ```bash
-# Prefill instance (handles prompt processing)
+# Prefill instance
 vllm serve meta-llama/Llama-3.1-8B-Instruct \
-  --pipeline-parallel-size 1 \
   --kv-transfer-config '{"kv_connector":"PyNcclConnector","kv_role":"kv_producer"}'
 
-# Decode instance (handles token generation)
+# Decode instance
 vllm serve meta-llama/Llama-3.1-8B-Instruct \
-  --pipeline-parallel-size 1 \
   --kv-transfer-config '{"kv_connector":"PyNcclConnector","kv_role":"kv_consumer"}'
 ```
 
-Prefill is compute-bound (large prompt, one pass); decode is memory-bandwidth-bound (one token at a time, many passes). Mixing them on one GPU underserves both. Disaggregation lets each phase run on hardware sized for its profile.
-
 ---
 
-Once these are in place, the remaining problems are infrastructure: autoscaling on the right signal and sharing the GPU across workloads. That is where the `after/` examples take over.
+Steps 1–3 improve utilization at the serving engine layer with no infrastructure change. When traffic grows beyond what a single server can handle, the [`after/`](../after/) examples take over: KEDA autoscaling on `inference_requests_in_flight` (Step 2) and GPU partitioning via the GPU Operator (Step 3).
