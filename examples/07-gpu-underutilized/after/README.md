@@ -47,7 +47,20 @@ inference_requests_total 5
 inference_tokens_per_second 0
 ```
 
-`inference_requests_in_flight` is 0 because all five finished before you checked. To see it climb, lower the concurrency limit and send requests while they are still in flight:
+`inference_requests_in_flight` is 0 because all five finished before you checked. This gauge is what the autoscaler in Step 1 reads — it reflects actual GPU saturation, not CPU load:
+
+```mermaid
+flowchart LR
+    R["5 concurrent\nrequests"] --> S["semaphore\nMAX_CONCURRENT=4"]
+    S -->|"4 slots acquired"| A["processing\n~0.5s each"]
+    S -->|"1 queued"| B["waiting for slot"]
+    A --> M["/metrics\ninference_requests_in_flight: 4"]
+    B --> M
+```
+
+**Measurable now** — `curl localhost:8080/metrics` while requests are in flight shows `inference_requests_in_flight` above 0.
+
+To see it climb, lower the concurrency limit and send requests while they are still in flight:
 
 ```bash
 MAX_CONCURRENT=2 python3 server.py
@@ -87,6 +100,16 @@ kubectl apply -f deployment.yaml
 
 ### The naive approach: CPU HPA misses the signal
 
+```mermaid
+flowchart LR
+    T["Traffic spike"] --> IS["inference-server\nGPU queue: growing\nCPU: ~4%"]
+    IS --> HPA["CPU HPA\ntarget: 50%"]
+    HPA -->|"4% &lt; 50%\nnothing to do"| NR["REPLICAS: 1\n(no scale-out)"]
+    IS --> L["p99 latency\nclimbs"]
+```
+
+**Measurable** — `kubectl get hpa inference-server-cpu-hpa` shows `4%/50%` under load. Replicas stay at 1.
+
 Apply a CPU-based HPA:
 
 ```bash
@@ -122,6 +145,17 @@ kubectl delete -f hpa-cpu.yaml
 
 ### The right approach: KEDA scales on GPU saturation
 
+```mermaid
+flowchart LR
+    T["Traffic spike"] --> IS["inference-server\n/metrics"]
+    IS -->|"inference_requests_in_flight: 5"| P["Prometheus"]
+    P --> K["KEDA ScaledObject\nthreshold: 3"]
+    K -->|"5 &gt; 3 → +1 replica"| D["REPLICAS: 2"]
+    D -->|"in-flight drops"| K
+```
+
+**Measurable with Prometheus** — `kubectl get hpa keda-hpa-inference-server-scaledobject` shows `TARGETS` rising above threshold and `REPLICAS` incrementing. Without Prometheus the wiring is still visible (`kubectl get scaledobject`) but `TARGETS` shows `<unknown>`.
+
 Install KEDA:
 
 ```bash
@@ -155,6 +189,18 @@ keda-hpa-inference-server-scaledobject   Deployment/inference-server   <unknown>
 `READY: False` and `<unknown>/3 (avg)` are expected without a Prometheus stack — KEDA created the HPA but cannot yet read the metric. In a cluster with Prometheus scraping the deployment, `TARGETS` would show the live `inference_requests_in_flight` value and KEDA would add replicas when it exceeds 3 — the condition the CPU HPA never saw. Step 2 (MIG) is independent and can be applied alongside this.
 
 ## Step 2 — Share the GPU (informational)
+
+```mermaid
+flowchart TB
+    GPU["A100 80GB\n(1 physical GPU)"]
+    GPU --> P1["3g.40gb\n~40GB HBM\nworkload A"]
+    GPU --> P2["3g.40gb\n~40GB HBM\nworkload B"]
+    GPU --> P3["3g.40gb\n~40GB HBM\nworkload C"]
+    P1 -.->|"hardware-isolated\nno HBM bleed"| P2
+    P2 -.->|"hardware-isolated\nno HBM bleed"| P3
+```
+
+**Not measurable without real hardware** — requires an A100 or H100 node with the NVIDIA GPU Operator installed. The YAML is provided as a reference for when that hardware is available.
 
 `mig-config.yaml` is a ConfigMap that the NVIDIA GPU Operator reads to configure MIG profiles on GPU nodes. It divides one A100 80GB into three `3g.40gb` partitions. Three inference services share one physical GPU with hardware-enforced memory isolation.
 
