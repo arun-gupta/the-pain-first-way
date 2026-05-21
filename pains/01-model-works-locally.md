@@ -10,14 +10,15 @@ Three layers that don't travel with `git push`: runtime, system libs, and cached
 
 ```mermaid
 flowchart LR
-  subgraph Laptop["💻 Your laptop"]
+  subgraph Dev["💻 Your laptop"]
     C[code]
     R[Python runtime]
     S[system libs]
     W[weights + state]
   end
-  C -->|"git push (code only)"| Prod["☁️ Prod VM\n(different Python,\nmissing libs,\nno weights)"]
-  Prod --> X[💥 crash on import]
+  C -->|"git push (code only)"| E1["💻 Teammate\ndifferent stack ❓"]
+  C -->|"git push (code only)"| E2["🖥️ CI / staging\ndifferent stack ❓"]
+  C -->|"git push (code only)"| E3["☁️ Prod\ndifferent stack 💥"]
 ```
 
 - **Your Python is plural.** Multiple installs (system, brew, pyenv, conda), multiple env managers (venv, conda, poetry, uv), packages from different sources (PyPI vs conda-forge). `pip freeze` records names and versions but not which index they came from or which Python they're attached to.
