@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-weights
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Mi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inference-server
+spec:
+  initContainers:
+    - name: weight-downloader
+      image: inference-server:latest
+      imagePullPolicy: Never
+      command: ["python", "downloader.py"]
+      env:
+        # Source URL injected from ConfigMap -- no rebuild needed to change it.
+        - name: WEIGHTS_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              name: model-config
+              key: WEIGHTS_SOURCE
+        # Credentials injected from Secret -- no rebuild needed to rotate them.
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: model-credentials
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: model-credentials
+              key: AWS_SECRET_ACCESS_KEY
+      volumeMounts:
+        - name: model
+          mountPath: /model
+
+  containers:
+    - name: inference-server
+      image: inference-server:latest
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 8080
+      # No credentials here. The server image is unaware of the weights source.
+      volumeMounts:
+        - name: model
+          mountPath: /model
+
+  volumes:
+    - name: model
+      persistentVolumeClaim:
+        claimName: model-weights
+
+  restartPolicy: Never

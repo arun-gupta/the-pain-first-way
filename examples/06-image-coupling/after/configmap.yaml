@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-config
+data:
+  # Change this value and apply the ConfigMap -- no image rebuild needed.
+  # In a real deployment this would be an S3 URL, a GCS path, or a HuggingFace repo ID.
+  WEIGHTS_SOURCE: "s3://my-model-bucket/llm-v1/weights.txt"

@@ -13,7 +13,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
 | 4 | Multi-node training | [`04-multi-node/`](04-multi-node/) | Available |
 | 5 | Cold start | [`05-cold-start/`](05-cold-start/) | Available |
-| 6 | Server image coupling | `06-image-coupling/` | Planned |
+| 6 | Server image coupling | [`06-image-coupling/`](06-image-coupling/) | Available |
 | 7 | GPU underutilization | `07-utilization/` | Planned |
 | 8 | Can't roll back | `08-rollouts/` | Planned |
 | 9 | Latency spiked | `09-observability/` | Planned |
