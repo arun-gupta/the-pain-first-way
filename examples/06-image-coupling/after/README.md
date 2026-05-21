@@ -204,7 +204,7 @@ kubectl patch configmap model-config \
   --patch '{"data":{"WEIGHTS_SOURCE":"s3://my-model-bucket-v2/llm-v2/weights.txt"}}'
 
 kubectl delete pod inference-server
-kubectl delete pvc model-weights   # clear cached weights so the new source is used
+kubectl delete pvc model-weights
 kubectl apply -f pod.yaml
 ```
 
