@@ -45,18 +45,16 @@ The fix requires both layers: a serving engine that keeps the GPU continuously b
 
 ## The primitives
 
-**Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change.
-
-Why the gains are so large: LLM inference is memory-bandwidth-bound. During the decode phase, the GPU reads the entire model and KV cache from HBM for every generated token — those reads happen regardless of how many sequences are in flight. A batch of 16 requests costs roughly the same GPU bandwidth as a batch of 1, because the weights are loaded once and applied to all sequences in parallel. Batching is nearly free throughput.
-
-The mechanism is iteration-level scheduling. The server generates one token at a time across all in-flight requests. After each token step, it checks the queue: any request that just finished (hit its stop token) immediately frees its slot, and the next queued request takes its place. The batch is continuously topped up rather than drained and refilled:
+**Continuous batching** operates at the granularity of a single token step. The server generates one token at a time across all in-flight requests. After each step, any request that just finished (hit its stop token) immediately frees its slot, and the next queued request takes its place — the batch is continuously topped up rather than drained and refilled:
 
 ```mermaid
 flowchart LR
     S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
 ```
 
-The GPU never waits for a slow request to finish before accepting new work, and never idles between batches.
+The GPU never waits for a slow request to finish before accepting new work, and never idles between batches. The gains are large because LLM inference is memory-bandwidth-bound: the GPU reads the entire model and KV cache from HBM on every token step regardless of how many sequences are in flight, so a batch of 16 costs roughly the same bandwidth as a batch of 1. Batching is nearly free throughput.
+
+This is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% before any infrastructure change.
 
 With continuous batching in place, the remaining problems are scheduling, scaling, and sharing problems — and those are where cloud native primitives apply:
 
