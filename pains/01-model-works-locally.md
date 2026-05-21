@@ -12,11 +12,11 @@ Three layers that don't travel with `git push`: runtime, system libs, and cached
 flowchart LR
   subgraph Laptop["💻 Your laptop"]
     C[code]
-    P[Python 3.11 + pyenv]
-    L[libomp, CUDA 12.1]
-    M[~/.cache/huggingface]
+    R[Python runtime]
+    S[system libs]
+    W[weights + state]
   end
-  C -->|git push| Prod["☁️ Prod VM\n(different Python,\nmissing libs,\nno model cache)"]
+  C -->|"git push (code only)"| Prod["☁️ Prod VM\n(different Python,\nmissing libs,\nno weights)"]
   Prod --> X[💥 crash on import]
 ```
 
@@ -30,15 +30,15 @@ The unit of deployment is not your code, it's your code plus everything it depen
 
 ```mermaid
 flowchart LR
-  subgraph DF["📄 Dockerfile"]
-    L1[Python runtime]
-    L2[system libs]
-    L3[weights + state]
+  subgraph Image["📦 Container image"]
+    C[code]
+    R[Python runtime]
+    S[system libs]
+    W[weights + state]
   end
-  DF --> IMG[Container image]
-  IMG -->|same digest| E1[Your laptop ✓]
-  IMG -->|same digest| E2[Teammate ✓]
-  IMG -->|same digest| E3[Prod ✓]
+  Image -->|"docker pull (all layers)"| E1[Your laptop ✓]
+  Image -->|"docker pull (all layers)"| E2[Teammate ✓]
+  Image -->|"docker pull (all layers)"| E3[Prod ✓]
 ```
 
 One artifact, identical everywhere.
