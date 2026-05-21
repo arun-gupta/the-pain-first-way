@@ -22,9 +22,11 @@ The first instinct is to optimize the model and serving engine. ML practitioners
 - **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
 - **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
 
-These reduce what the GPU has to do per request and how efficiently it processes them. But they don't address how the infrastructure responds when load increases.
+These reduce what the GPU has to do per request and how efficiently it processes them. The problem re-emerges at the infrastructure layer when traffic grows and more capacity is needed.
 
-The next instinct is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
+## The primitives
+
+The instinct when traffic increases is to let Kubernetes scale out. But HPA's built-in resource metrics — CPU and memory — are both blind to this workload. An inference server barely uses CPU, and system RAM is stable regardless of load because the model weights are resident in GPU HBM from startup, not in system memory. CPU stays at 5%, system memory stays flat, while the queue grows, the KV cache fills, and latency climbs:
 
 ```mermaid
 flowchart LR
@@ -42,11 +44,7 @@ flowchart LR
     R1 & R2 & R3 --> Bill["3× GPU cost\nno throughput gain"]
 ```
 
-The fix requires both layers: a serving engine that keeps the GPU continuously busy, and infrastructure that scales on GPU-side signals and shares the card when one workload can't fill it.
-
-## The primitives
-
-Cloud native primitives address the infrastructure problems independently of the serving engine — they help even with a sequential server.
+The right approach has two parts: scale on GPU-side signals rather than CPU, and share the card when one workload can't fill it.
 
 **[Custom-metric HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#scaling-on-custom-metrics)** (Kubernetes' built-in scale-out controller, extended to scale on any metric you can expose): scale your inference deployment on tokens-per-second, requests-in-flight, or KV-cache fill rate rather than CPU. vLLM ships a `/metrics` Prometheus endpoint by default. Scrape it with Prometheus, expose it through the custom metrics adapter, and configure HPA to use it. The result: Kubernetes adds replicas when the GPU is actually saturated, not when CPU happens to tick upward.
 
