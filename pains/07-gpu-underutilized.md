@@ -20,17 +20,9 @@ flowchart LR
     S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
 ```
 
-This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change. ML practitioners also reach for:
+This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change. ML practitioners follow this with quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — each reducing what the GPU has to do per request or how efficiently it does it. The runnable walkthrough for both Mac (ollama) and GPU (vLLM) paths is in [`examples/07-gpu-underutilized/before/`](../examples/07-gpu-underutilized/before/).
 
-- **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
-- **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
-- **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
-- **Sequence packing**: bin-packs multiple short sequences into one context window to eliminate padding waste at the edges of each request.
-- **Prefill/decode disaggregation**: routes the prompt-processing phase (prefill — compute-bound) and the token-generation phase (decode — memory-bandwidth-bound) to separate hardware, since their resource profiles differ enough that mixing them on one GPU underserves both.
-- **[MIG (Multi-Instance GPU)](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/)**: NVIDIA hardware partitioning for A100 and H100 that divides one physical GPU into up to seven isolated partitions, each with its own HBM slice and compute fraction. Two or three inference services share one H100 without memory interference. MIG is hardware-enforced: one partition cannot access another's memory.
-- **[GPU time-slicing](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/gpu-sharing.html)** and **[MPS](https://docs.nvidia.com/deploy/mps/index.html)**: for GPUs that predate MIG (V100 and earlier), NVIDIA time-slicing lets multiple workloads share one GPU in time slices. Less isolation than MIG — one workload can affect another's latency — but works on older hardware. MPS provides spatial sharing with lower overhead for trusted workloads.
-
-These reduce what the GPU has to do per request, how efficiently it processes them, and how many workloads can share a single card. The problem re-emerges at the infrastructure layer when traffic grows and more capacity is needed.
+The problem re-emerges at the infrastructure layer when traffic grows and more capacity is needed.
 
 ## The primitives
 
@@ -90,7 +82,7 @@ The alternative — running three or four underutilized replicas — is also com
 
 ## Try it
 
-A working demonstration lives in [`examples/07-gpu-underutilized/`](../examples/07-gpu-underutilized/). The before case has two parts: `server.py` shows a sequential server processing one request at a time — send five concurrent requests and watch them serialize; [`optimization-steps.md`](../examples/07-gpu-underutilized/before/optimization-steps.md) shows the vLLM launch flags for continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — the model and serving engine optimizations that apply before any infrastructure change. The after case walks the three incremental CN layers: swap to the batching server and observe parallelism and the `/metrics` endpoint (Step 1); apply the KEDA `ScaledObject` to scale on `inference_requests_in_flight` instead of CPU (Step 2); review the GPU Operator MIG config (Step 3, informational — requires a real GPU node). No GPU required for Steps 1 and 2.
+A working demonstration lives in [`examples/07-gpu-underutilized/`](../examples/07-gpu-underutilized/). [`before/`](../examples/07-gpu-underutilized/before/) shows the sequential server and the full pre-CN optimization path — continuous batching, quantization, prefix caching, and the vLLM production flags — with a Mac (ollama) track runnable without a GPU. [`after/`](../examples/07-gpu-underutilized/after/) covers the CN layers: observe the CPU HPA miss the signal under load, then apply KEDA to scale on `inference_requests_in_flight` instead (Step 1); review the GPU Operator MIG config for GPU sharing (Step 2, informational — requires a real GPU node). No GPU required for Step 1.
 
 ---
 
