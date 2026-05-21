@@ -20,10 +20,15 @@ brew install ollama
 
 ### Step 1 — Switch to ollama (continuous batching)
 
-Replace the naive serving loop with ollama. Start the server and pull a small model:
+Replace the naive serving loop with ollama. In a separate terminal, start the server:
 
 ```bash
-ollama serve &
+ollama serve
+```
+
+Back in the original terminal, pull a small model:
+
+```bash
 ollama pull qwen:0.5b
 ```
 
