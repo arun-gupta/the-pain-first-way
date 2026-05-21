@@ -8,6 +8,8 @@ Distributed training is all-or-nothing. The platform either gives you every node
 
 **Without gang scheduling — the failure mode:**
 
+Without coordination, Kubernetes schedules pods as resources become available. One slow worker — still pulling the image, waiting for a GPU slot, or under memory pressure — means the master times out at the rendezvous barrier and the entire run dies. Every rank restarts from epoch 0.
+
 ```mermaid
 sequenceDiagram
     participant K as Kubernetes
@@ -29,6 +31,8 @@ sequenceDiagram
 ```
 
 **With a training operator — the fix:**
+
+The operator gang-schedules the job: all N pods are created together or none start. It injects `MASTER_ADDR`, `RANK`, and `WORLD_SIZE` automatically so the rendezvous always succeeds. When a single worker crashes, only that pod is replaced — the master keeps running and training continues.
 
 ```mermaid
 sequenceDiagram
