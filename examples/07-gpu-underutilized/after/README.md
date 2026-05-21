@@ -1,6 +1,6 @@
 # After: two cloud-native layers on top of a batching server
 
-The CN steps here (KEDA autoscaling, GPU partitioning) require a batching-aware server as their foundation. `server.py` is that foundation: it handles concurrent requests and exposes a `/metrics` endpoint in Prometheus format. The serving engine work — continuous batching, quantization, prefix caching — is covered in [`before/optimization-steps.md`](../before/optimization-steps.md). `server.py` simulates the result of that work so the CN layers can be demonstrated without a real GPU.
+The CN steps here (KEDA autoscaling, GPU partitioning) require a batching-aware server as their foundation. `server.py` is that foundation: it handles concurrent requests and exposes a `/metrics` endpoint in Prometheus format. The serving engine work — continuous batching, quantization, prefix caching — is covered in [`before/README.md`](../before/README.md). `server.py` simulates the result of that work so the CN layers can be demonstrated without a real GPU.
 
 ## Setup — Run the batching server
 

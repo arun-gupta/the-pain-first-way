@@ -1,6 +1,6 @@
-# Pain 7 example: the same traffic, three layers of improvement
+# Pain 7 example: the same traffic, two layers of improvement
 
-A working demonstration of [Pain 7: My GPU sits at 30% but my bill says 100%](../../pains/07-gpu-underutilized.md). Same inference server, same simulated workload, three independent improvements applied one at a time. No GPU required.
+A working demonstration of [Pain 7: My GPU sits at 30% but my bill says 100%](../../pains/07-gpu-underutilized.md). Same inference server, same simulated workload: pre-CN serving-engine optimizations in `before/`, then two independent CN layers in `after/`. No GPU required.
 
 ## What's here
 
@@ -30,12 +30,12 @@ No GPU required. All GPU behavior is simulated with `time.sleep`. The cloud-nati
 
 `after/hpa-cpu.yaml` is a CPU-based HPA that demonstrates the failure mode: CPU stays at ~4% under inference load, so the HPA never triggers. `after/scaledobject.yaml` replaces it with a KEDA ScaledObject that scales on `inference_requests_in_flight` instead — the signal that actually reflects GPU saturation. `after/mig-config.yaml` shows how to partition a physical GPU into isolated slices via the GPU Operator so multiple workloads can share one card.
 
-Each layer is independent. `optimization-steps.md` needs no infrastructure. Step 1 is a server swap. Steps 2 and 3 add infrastructure only when you need it.
+Each layer is independent. The serving-engine optimizations in `before/` need no infrastructure. The CN steps in `after/` add infrastructure only when you need it.
 
 ## Run it
 
 - [`before/README.md`](before/README.md) — run the sequential server, observe serialization, then follow the full pre-CN optimization path (ollama on Mac or vLLM on GPU)
-- [`after/README.md`](after/README.md) — Step 1: run the batching server, observe parallelism and metrics; Step 2: apply KEDA; Step 3: configure MIG
+- [`after/README.md`](after/README.md) — Setup: run the batching server, observe parallelism and metrics; Step 1: apply KEDA; Step 2: configure MIG
 
 ---
 

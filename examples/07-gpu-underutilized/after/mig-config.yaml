@@ -1,4 +1,4 @@
-# Step 3 of incremental adoption: share the GPU (informational).
+# Step 2 of incremental adoption: share the GPU (informational).
 # This ConfigMap is read by the NVIDIA GPU Operator to configure MIG profiles
 # on nodes that carry the nvidia.com/mig.config label. It divides one A100 80GB
 # into three equal 3g.40gb partitions, each with its own HBM slice and compute
