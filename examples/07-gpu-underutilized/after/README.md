@@ -67,7 +67,17 @@ The queue backing up — `inference_requests_in_flight` rising above 3 — is th
 
 ## Step 1 — Scale on the right signal
 
-Requires a Kind cluster with [KEDA installed](https://keda.sh/docs/latest/deploy/) and Prometheus scraping the deployment.
+Requires a Kind cluster. Install KEDA:
+
+```bash
+kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.16.0/keda-2.16.0.yaml
+```
+
+Wait for KEDA to be ready:
+
+```bash
+kubectl rollout status deployment/keda-operator -n keda
+```
 
 Apply the deployment:
 
