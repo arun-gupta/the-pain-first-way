@@ -1,10 +1,8 @@
-# After: three incremental layers of improvement
+# After: two cloud-native layers on top of a batching server
 
-Each step is independent. Step 1 requires no infrastructure. Steps 2 and 3 build on top of it.
+The CN steps here (KEDA autoscaling, GPU partitioning) require a batching-aware server as their foundation. `server.py` is that foundation: it handles concurrent requests and exposes a `/metrics` endpoint in Prometheus format. The serving engine work — continuous batching, quantization, prefix caching — is covered in [`before/optimization-steps.md`](../before/optimization-steps.md). `server.py` simulates the result of that work so the CN layers can be demonstrated without a real GPU.
 
-## Step 1 — Swap the serving engine (no infrastructure change)
-
-`server.py` uses `ThreadingMixIn` to handle multiple requests concurrently. Up to `MAX_CONCURRENT` (default 4) requests run in parallel. Send five concurrent requests and they overlap — total wall time stays near 0.5s instead of 2.5s.
+## Setup — Run the batching server
 
 ```bash
 cd examples/07-gpu-underutilized/after
@@ -13,21 +11,29 @@ python3 server.py
 
 No dependencies beyond the standard library.
 
-In another terminal, send five concurrent requests:
+Send five concurrent requests to populate the counters:
 
 ```bash
 for i in $(seq 1 5); do curl -s localhost:8080/predict & done; wait
 ```
 
-Watch the server terminal. Multiple requests start before the first one finishes.
+Expected output (order is non-deterministic — four requests acquire the semaphore immediately, the fifth waits for a slot):
 
-Check the Prometheus metrics endpoint:
+```
+prediction: total=4 elapsed=0.501s
+prediction: total=3 elapsed=0.501s
+prediction: total=2 elapsed=0.501s
+prediction: total=1 elapsed=0.505s
+prediction: total=5 elapsed=1.006s
+```
+
+`elapsed` is measured from when the request arrived, including any queue wait. Then check the metrics endpoint:
 
 ```bash
 curl localhost:8080/metrics
 ```
 
-Expected output:
+Expected output (on a fresh server start after five requests):
 
 ```
 # HELP inference_requests_in_flight Current concurrent inference requests
@@ -41,13 +47,25 @@ inference_requests_total 5
 inference_tokens_per_second 0
 ```
 
-Set `MAX_CONCURRENT` via env var to change the concurrency limit:
+`inference_requests_in_flight` is 0 because all five finished before you checked. To see it climb, lower the concurrency limit and send requests while they are still in flight:
 
 ```bash
 MAX_CONCURRENT=2 python3 server.py
 ```
 
-## Step 2 — Scale on the right signal
+Send the same five concurrent requests. With only 2 slots, they batch into groups of 2, 2, 1:
+
+```
+prediction: total=1 elapsed=0.501s
+prediction: total=2 elapsed=0.503s
+prediction: total=3 elapsed=1.002s
+prediction: total=4 elapsed=1.008s
+prediction: total=5 elapsed=1.503s
+```
+
+The queue backing up — `inference_requests_in_flight` rising above 3 — is the signal Step 1 (KEDA) reacts to.
+
+## Step 1 — Scale on the right signal
 
 Requires a Kind cluster with [KEDA installed](https://keda.sh/docs/latest/deploy/) and Prometheus scraping the deployment.
 
@@ -63,7 +81,7 @@ Apply the ScaledObject:
 kubectl apply -f scaledobject.yaml
 ```
 
-KEDA watches `inference_requests_in_flight` from Prometheus. When in-flight requests on any replica exceed 3, KEDA adds a replica — up to 5. When traffic drops, it scales back to 1.
+KEDA watches `inference_requests_in_flight` from Prometheus. When in-flight requests on any replica exceed 3, KEDA adds a replica — up to 5. When traffic drops, it scales back to 1. Step 2 (MIG) is independent — it can be applied alongside this or separately.
 
 Observe scaling:
 
@@ -74,7 +92,7 @@ kubectl get hpa
 
 This is the key difference from scaling on CPU: an inference server's CPU barely moves under load. The GPU queue fills and latency climbs while HPA watches CPU stay at 5% and does nothing. `inference_requests_in_flight` reflects actual GPU saturation.
 
-## Step 3 — Share the GPU (informational)
+## Step 2 — Share the GPU (informational)
 
 `mig-config.yaml` is a ConfigMap that the NVIDIA GPU Operator reads to configure MIG profiles on GPU nodes. It divides one A100 80GB into three `3g.40gb` partitions. Three inference services share one physical GPU with hardware-enforced memory isolation.
 

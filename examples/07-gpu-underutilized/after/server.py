@@ -42,11 +42,11 @@ class InferenceHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(b"ok")
 
         elif self.path == "/predict":
+            start = time.time()
             _semaphore.acquire()
             try:
                 in_flight, total = _inc()
                 print(f"[batch] {in_flight}/{MAX_CONCURRENT} requests in flight (total={total})")
-                start = time.time()
                 time.sleep(0.5)
                 elapsed = time.time() - start
                 in_flight = _dec()

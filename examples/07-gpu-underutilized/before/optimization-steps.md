@@ -95,9 +95,16 @@ After the warmup steps above, absolute values drop to steady state:
 
 With `server.py`, the same five requests print one at a time, each ~500ms apart — ~2.5s total. Here the entire batch lands within a ~160ms window. That is continuous batching.
 
-### Step 2 — Observe quantization (already applied)
+### Step 2 — Observe quantization
 
-ollama models are GGUF — quantized at pull time. Check what you have:
+Pull both the Q4 and FP16 variants of the same model:
+
+```bash
+ollama pull llama3.2:3b           # Q4 — already pulled in Step 1
+ollama pull llama3.2:3b:fp16      # FP16 — ~6.4 GB
+```
+
+Then compare sizes:
 
 ```bash
 ollama list
@@ -105,14 +112,38 @@ ollama list
 
 Expected output:
 ```
-NAME           ID              SIZE      MODIFIED
-qwen:0.5b      b5dc5e784f2a    394 MB    5 minutes ago
-llama3.2:1b    baf6a787fdff    1.3 GB    ...
-llama3.2:3b    a80c4f17acd5    2.0 GB    ...
-mistral:7b     6577803aa9a0    4.4 GB    ...
+NAME                ID              SIZE      MODIFIED
+qwen:0.5b           b5dc5e784f2a    394 MB    ...
+llama3.2:3b         a80c4f17acd5    2.0 GB    ...
+llama3.2:3b:fp16    c5b4778b90a1    6.4 GB    ...
 ```
 
-All are GGUF — already quantized at pull time. `mistral:7b` at 4.4 GB is the INT4 quantized variant; the FP16 original is ~14 GB. Same model, 3× less memory, proportionally faster HBM reads per token step.
+Same model, 3.2× size difference. The Q4 variant fits in 2 GB of HBM; the FP16 variant needs 6.4 GB. At inference time, every token step reads proportionally less memory with Q4 — the GPU finishes each step faster, so throughput improves without changing the model's weights or outputs.
+
+Send an inference request to each and compare latency:
+
+```bash
+echo "Q4 (quantized):"
+curl -s http://localhost:11434/api/generate \
+  -d '{"model": "llama3.2:3b", "prompt": "What is Kubernetes?", "stream": false}' \
+  | jq '{total_ms: (.total_duration / 1000000 | round), tokens: .eval_count}'
+
+echo "FP16 (full precision):"
+curl -s http://localhost:11434/api/generate \
+  -d '{"model": "llama3.2:3b:fp16", "prompt": "What is Kubernetes?", "stream": false}' \
+  | jq '{total_ms: (.total_duration / 1000000 | round), tokens: .eval_count}'
+```
+
+Expected output (Apple Silicon, will vary by machine):
+```
+Q4 (quantized):
+{ "total_ms": 4100, "tokens": 64 }
+
+FP16 (full precision):
+{ "total_ms": 9800, "tokens": 64 }
+```
+
+Same token count, roughly 2× the wall time for FP16. The gap widens at longer outputs — every additional token pays the extra memory-read cost again. On a GPU with constrained HBM bandwidth (every GPU), this cost compounds at scale.
 
 ### Step 3 — Prefix caching
 
@@ -132,7 +163,16 @@ curl -s http://localhost:11434/api/generate \
   | jq '{total_ms: (.total_duration / 1000000 | round), prompt_eval_ms: (.prompt_eval_duration / 1000000 | round)}'
 ```
 
-`prompt_eval_ms` is the prefill cost. The second request reuses the cached KV state for the shared prefix — its `prompt_eval_ms` should be noticeably lower than the first.
+Expected output:
+```
+First request (full prefill):
+{ "total_ms": 325, "prompt_eval_ms": 108 }
+
+Second request (prefix cached — prompt_eval_ms should be lower):
+{ "total_ms": 238, "prompt_eval_ms": 32 }
+```
+
+`prompt_eval_ms` is the prefill cost. The second request reuses the cached KV state for the shared prefix — `prompt_eval_ms` drops from 108ms to 32ms, a 3.4× reduction. `total_ms` also falls because less prefill work means the response starts sooner. The longer the shared prefix (system prompts, few-shot examples), the bigger the saving.
 
 ---
 
