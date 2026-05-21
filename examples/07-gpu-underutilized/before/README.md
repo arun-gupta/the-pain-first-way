@@ -49,4 +49,8 @@ Watch the server terminal. You will see each request start only after the previo
 
 The server handles one request at a time. Concurrent traffic does not help — each request waits for the previous one to finish. Scaling out adds more replicas, but each replica runs the same sequential loop. Three replicas under the same load means three instances each at ~15% utilization. The bill triples; the throughput is unchanged.
 
-The [`after/`](../after/) example shows two things: a batching-aware server that runs multiple requests in parallel (Step 1, no infrastructure change), and KEDA autoscaling on the right signal — `inference_requests_in_flight` rather than CPU (Step 2).
+## Pre-CN optimizations
+
+Before reaching for Kubernetes, ML practitioners optimize at the model and serving engine layer. [`vllm-commands.md`](./vllm-commands.md) shows the vLLM launch flags for continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — each a configuration change, no infrastructure required.
+
+Once those are in place, [`after/`](../after/) shows the infrastructure layer: KEDA autoscaling on `inference_requests_in_flight` (Step 2) and GPU Operator MIG configuration (Step 3).

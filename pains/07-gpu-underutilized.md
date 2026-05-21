@@ -90,7 +90,7 @@ The alternative — running three or four underutilized replicas — is also com
 
 ## Try it
 
-A working demonstration lives in [`examples/07-gpu-underutilized/`](../examples/07-gpu-underutilized/). The before case runs a sequential server that processes one request at a time — send five concurrent requests and watch them serialize. The after case walks the three incremental layers: swap to the batching server and observe parallelism and the `/metrics` endpoint (Step 1, no infrastructure required); apply the KEDA `ScaledObject` to scale on `inference_requests_in_flight` instead of CPU (Step 2); review the GPU Operator MIG config that exposes partitions to Kubernetes (Step 3, informational — requires a real GPU node). Runnable on a Mac with no GPU required for Steps 1 and 2.
+A working demonstration lives in [`examples/07-gpu-underutilized/`](../examples/07-gpu-underutilized/). The before case has two parts: `server.py` shows a sequential server processing one request at a time — send five concurrent requests and watch them serialize; [`vllm-commands.md`](../examples/07-gpu-underutilized/before/vllm-commands.md) shows the vLLM launch flags for continuous batching, quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — the model and serving engine optimizations that apply before any infrastructure change. The after case walks the three incremental CN layers: swap to the batching server and observe parallelism and the `/metrics` endpoint (Step 1); apply the KEDA `ScaledObject` to scale on `inference_requests_in_flight` instead of CPU (Step 2); review the GPU Operator MIG config (Step 3, informational — requires a real GPU node). No GPU required for Steps 1 and 2.
 
 ---
 
