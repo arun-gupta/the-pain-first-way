@@ -33,15 +33,16 @@ flowchart LR
 
 ## The primitives
 
-**Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change. New requests join in-flight batches rather than queuing behind them; the GPU stays busy across the full decode stream:
+**Continuous batching** is the prerequisite — without it, the cloud native primitives below cannot help. vLLM, TGI, and SGLang all implement it. Switching from a naive serving loop to one of these engines typically moves GPU utilization from ~30% to ~70–80% at the same throughput level, before any infrastructure change.
+
+The mechanism is iteration-level scheduling. The server generates one token at a time across all in-flight requests. After each token step, it checks the queue: any request that just finished (hit its stop token) immediately frees its slot, and the next queued request takes its place. The batch is continuously topped up rather than drained and refilled:
 
 ```mermaid
 flowchart LR
-    subgraph bat["Continuous batching (~70–80% utilization)"]
-        direction LR
-        B1["A + B + C<br/>one decode step"] --> B2["D + E + F<br/>next decode step"] --> B3[...]
-    end
+    S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
 ```
+
+The GPU never waits for a slow request to finish before accepting new work, and never idles between batches.
 
 With continuous batching in place, the remaining problems are scheduling, scaling, and sharing problems — and those are where cloud native primitives apply:
 
