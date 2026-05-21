@@ -4,7 +4,23 @@ Before reaching for Kubernetes, AI/ML developers optimize at the model and servi
 
 ## Prerequisites
 
+vLLM requires Python 3.9–3.12. Python 3.13 is not yet supported. Check your version:
+
 ```bash
+python3 --version
+```
+
+If you are on 3.13, install 3.12 via Homebrew and use it explicitly:
+
+```bash
+brew install python@3.12
+```
+
+Create a virtual environment and install vLLM:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install vllm
 ```
 
