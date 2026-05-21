@@ -13,9 +13,15 @@ flowchart LR
     A[Request A arrives] --> B[GPU busy] --> C[GPU idle] --> D[Request B arrives] --> E[GPU busy] --> F[GPU idle] --> G[...]
 ```
 
-The first instinct is to optimize the model and serving engine. ML practitioners reach for:
+The first instinct is to optimize the model and serving engine. The biggest single lever is **continuous batching**: replacing the naive serving loop with an engine (vLLM, TGI, SGLang) that processes multiple requests in parallel. Instead of waiting for one request to finish before starting the next, the engine runs a batch of sequences through each token step together — requests join and leave mid-flight as they finish:
 
-- **Continuous batching**: replace the naive serving loop with an engine (vLLM, TGI, SGLang) that processes multiple requests in parallel. Instead of waiting for one request to finish before starting the next, the engine runs a batch of sequences through each token step together — requests join and leave mid-flight as they finish. This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change.
+```mermaid
+flowchart LR
+    S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
+```
+
+This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change. ML practitioners also reach for:
+
 - **Quantization** (INT8, INT4, FP8): shrinks model weights so less HBM bandwidth is consumed per token step — a 70B FP16 model at ~140 GB becomes ~35 GB in INT4, reducing memory reads proportionally.
 - **Speculative decoding**: a small draft model proposes N tokens; the large model verifies them in one forward pass. Fewer full model reads per output token at the cost of occasional wasted draft work.
 - **KV cache management** (PagedAttention, prefix caching): avoids recomputing attention for repeated prefixes such as system prompts. vLLM's PagedAttention removes KV cache fragmentation that wastes HBM capacity.
