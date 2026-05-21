@@ -6,6 +6,8 @@
 
 **Without a container image**
 
+Three layers that don't travel with `git push`: runtime, system libs, and cached state.
+
 ```mermaid
 flowchart LR
   subgraph Laptop["💻 Your laptop"]
@@ -18,9 +20,9 @@ flowchart LR
   Prod --> X[💥 crash on import]
 ```
 
-Three layers that don't travel with `git push`: runtime, system libs, and cached state.
-
 **With a container image**
+
+One artifact, identical everywhere.
 
 ```mermaid
 flowchart LR
@@ -29,8 +31,6 @@ flowchart LR
   IMG -->|same digest| E2[Teammate ✓]
   IMG -->|same digest| E3[Prod ✓]
 ```
-
-One artifact, identical everywhere.
 
 The unit of deployment is not your code, it's your code plus everything it depends on. You declare that whole thing once, freeze it, sign it, and ship the frozen artifact to every environment.
 
