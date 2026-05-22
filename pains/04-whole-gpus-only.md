@@ -13,8 +13,6 @@ The extended resource model treats all GPUs as interchangeable integers: `nvidia
 
 The workaround is placement hints and custom labels that approximate what the scheduler should understand natively. Workloads land on the wrong topology. Partitioned GPU slices go unscheduled because the scheduler cannot express "give me this specific partition."
 
-[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/) replaces the count-based model with structured resource claims.
-
 ## The primitives
 
 **[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: stable in Kubernetes 1.32 (KEP-3063), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
