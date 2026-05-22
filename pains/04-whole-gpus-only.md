@@ -57,8 +57,7 @@ graph LR
 
 ## Try it
 
-- [`examples/04-whole-gpus-only/before/`](../examples/04-whole-gpus-only/before/README.md) — Kind cluster demo: observe the integer model placing pods without topology awareness, run the AllReduce bandwidth simulation
-- [`examples/04-whole-gpus-only/after/`](../examples/04-whole-gpus-only/after/README.md) — DRA reference YAML: `ResourceClaim` with NVLink domain constraint and MIG profile selector (requires Kubernetes 1.34 + vendor DRA driver)
+A working demonstration lives in [`examples/04-whole-gpus-only/`](../examples/04-whole-gpus-only/). [`before/`](../examples/04-whole-gpus-only/before/README.md) shows the integer model placing pods without topology awareness — observe a pod land on the wrong NVLink domain and a MIG profile request the scheduler can't satisfy, plus a local AllReduce simulation that makes the 40% throughput penalty tangible without a GPU. [`after/`](../examples/04-whole-gpus-only/after/README.md) is DRA reference YAML: a `ResourceClaim` with an NVLink domain constraint and a second with a MIG profile CEL selector, both showing what the scheduler guarantees and what error it gives when no matching node exists (requires Kubernetes 1.34 and a vendor DRA driver).
 
 ---
 
