@@ -15,7 +15,7 @@ The workaround is placement hints and custom labels that approximate what the sc
 
 ## The primitives
 
-**[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: stable in Kubernetes 1.32 (KEP-3063), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
+**[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: GA since Kubernetes 1.34 (KEP-3063), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
 
 **[ResourceClaim](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: a namespaced object a workload creates to request a specific device configuration. Replaces the `resources.limits` integer counter. The workload describes *what* it needs — a GPU partition of a particular profile, a GPU co-located with a specific NIC — not *which* device it wants.
 
@@ -31,7 +31,7 @@ The workaround is placement hints and custom labels that approximate what the sc
 
 **What you gain**: the scheduler understands your topology requirements natively instead of approximating them with labels and affinity rules. GPU partitions are first-class resources. Workloads land on the right hardware.
 
-**What you give up**: operational simplicity. DRA requires Kubernetes 1.32 and a DRA-aware driver from your GPU vendor. Driver maturity varies across vendors — NVIDIA's driver covers MIG and NVLink topology; AMD and Intel drivers are earlier in their lifecycle. Debugging misplaced workloads shifts from "why didn't my placement hint match" to "why did the scheduler not find a matching ResourceSlice."
+**What you give up**: operational simplicity. DRA requires Kubernetes 1.34 and a DRA-aware driver from your GPU vendor. Driver maturity varies across vendors — NVIDIA's driver covers MIG and NVLink topology; AMD and Intel drivers are earlier in their lifecycle. Debugging misplaced workloads shifts from "why didn't my placement hint match" to "why did the scheduler not find a matching ResourceSlice."
 
 **Related**: [Pain 3](03-cant-get-a-gpu.md) covers scheduling fairness — getting *any* GPU when the cluster is contended. [Pain 8](08-gpu-underutilized.md) covers GPU *utilization* — making efficient use of the GPU once you have it. DRA is the scheduling primitive that makes Pain 3's priority classes and Pain 8's GPU partitioning work correctly at scale: you can queue and prioritize any GPU (Pain 3), but without DRA you cannot guarantee that partitioned GPUs (Pain 8) are claimed by the right workloads.
 
