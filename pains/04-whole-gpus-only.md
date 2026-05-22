@@ -33,7 +33,7 @@ The workaround is placement hints and custom labels that approximate what the sc
 
 **What you give up**: operational simplicity. DRA requires Kubernetes 1.32 and a DRA-aware driver from your GPU vendor. Driver maturity varies across vendors — not all GPU configurations are supported. Debugging misplaced workloads shifts from "why didn't my placement hint match" to "why did the scheduler not find a matching ResourceSlice."
 
-**Related**: Pain 3 covers scheduling fairness — getting *any* GPU when the cluster is contended. Pain 8 covers GPU *utilization* — making efficient use of the GPU once you have it. DRA is the scheduling primitive that makes Pain 3's priority classes and Pain 8's GPU partitioning work correctly at scale: you can queue and prioritize any GPU (Pain 3), but without DRA you cannot guarantee that partitioned GPUs (Pain 8) are claimed by the right workloads.
+**Related**: [Pain 3](03-cant-get-a-gpu.md) covers scheduling fairness — getting *any* GPU when the cluster is contended. [Pain 8](08-gpu-underutilized.md) covers GPU *utilization* — making efficient use of the GPU once you have it. DRA is the scheduling primitive that makes Pain 3's priority classes and Pain 8's GPU partitioning work correctly at scale: you can queue and prioritize any GPU (Pain 3), but without DRA you cannot guarantee that partitioned GPUs (Pain 8) are claimed by the right workloads.
 
 ## Try it
 
