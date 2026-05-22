@@ -4,4 +4,4 @@ Example coming soon. See [issue #21](https://github.com/arun-gupta/the-pain-firs
 
 ---
 
-[← Back to Pain 4](../../pains/04-dra.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain 4](../../pains/04-whole-gpus-only.md) · [Landscape](../../README.md) · [Examples index](../README.md)

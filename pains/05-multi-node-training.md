@@ -72,4 +72,4 @@ A working demonstration lives in [`examples/05-multi-node/`](../examples/05-mult
 
 ---
 
-[← Pain 4: Can't express GPU requirements](04-dra.md) · [Landscape](../README.md) · [Pain 6: Cold start →](06-cold-start.md)
+[← Pain 4: Can't express GPU requirements](04-whole-gpus-only.md) · [Landscape](../README.md) · [Pain 6: Cold start →](06-cold-start.md)
