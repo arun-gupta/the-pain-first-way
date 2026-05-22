@@ -1,6 +1,6 @@
-# Pain 4: I need a specific GPU configuration but Kubernetes only knows how to count GPUs
+# Pain 4: I asked for two GPUs and got two GPUs — but they can't talk to each other
 
-> *Your inference workload needs two NVLink-connected GPUs for peer-to-peer memory transfers. Kubernetes places it on two GPUs that don't share a switch. NCCL falls back to system RAM. Training throughput drops 40%. You add node selectors to approximate the constraint. It works until someone adds a node.*
+> *Your workload needs two NVLink-connected GPUs for peer-to-peer memory transfers. You get two GPUs — but they don't share a switch. NCCL falls back to system RAM. Throughput drops 40%. You patch it with placement hints. It works until someone adds a node.*
 
 ## The pattern
 
