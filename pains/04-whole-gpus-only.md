@@ -13,9 +13,32 @@ The extended resource model treats all GPUs as interchangeable integers: `nvidia
 
 The workaround is placement hints and custom labels that approximate what the scheduler should understand natively. Workloads land on the wrong topology. Partitioned GPU slices go unscheduled because the scheduler cannot express "give me this specific partition." The scheduler isn't wrong; the resource API never gave it the vocabulary to distinguish topology.
 
+```mermaid
+flowchart LR
+    subgraph before["Before: integer model"]
+        direction TB
+        W1["Pod\nnvidia.com/gpu: 2"] -->|schedules on| N1
+        subgraph N1["Node"]
+            G1["GPU 0\n(Switch A)"]
+            G2["GPU 1\n(Switch B)"]
+        end
+        G1 -. "no shared interconnect\nP2P via system RAM" .- G2
+    end
+
+    subgraph after["After: DRA"]
+        direction TB
+        W2["Pod\nResourceClaim: 2 GPUs\nsame interconnect domain"] -->|schedules on| N2
+        subgraph N2["Node (ResourceSlice published)"]
+            G3["GPU 0\n(Switch A)"]
+            G4["GPU 1\n(Switch A)"]
+        end
+        G3 == "NVLink / Infinity Fabric" === G4
+    end
+```
+
 ## The primitives
 
-**[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: GA since Kubernetes 1.34 (KEP-3063), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
+**[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: GA since Kubernetes 1.34 ([KEP-3063](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/3063-dynamic-resource-allocation)), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
 
 **[ResourceClaim](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: a namespaced object a workload creates to request a specific device configuration. Replaces the `resources.limits` integer counter. The workload describes *what* it needs — a GPU partition of a particular profile, a GPU co-located with a specific NIC — not *which* device it wants.
 
