@@ -64,4 +64,4 @@ A working demonstration lives in [`examples/03-queueing/`](../examples/03-queuei
 
 ---
 
-[← Pain 2: GPU job crashed](02-gpu-job-crashed.md) · [Landscape](../README.md) · [Pain 4: Multi-node training →](04-multi-node-training.md)
+[← Pain 2: GPU job crashed](02-gpu-job-crashed.md) · [Landscape](../README.md) · [Pain 4: Can't express GPU requirements →](04-dra.md)
