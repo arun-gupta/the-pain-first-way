@@ -57,7 +57,8 @@ graph LR
 
 ## Try it
 
-Example coming soon. See [issue #21](https://github.com/arun-gupta/the-pain-first-way/issues/21) for what the example will cover.
+- [`examples/04-whole-gpus-only/before/`](../examples/04-whole-gpus-only/before/README.md) — Kind cluster demo: observe the integer model placing pods without topology awareness, run the AllReduce bandwidth simulation
+- [`examples/04-whole-gpus-only/after/`](../examples/04-whole-gpus-only/after/README.md) — DRA reference YAML: `ResourceClaim` with NVLink domain constraint and MIG profile selector (requires Kubernetes 1.34 + vendor DRA driver)
 
 ---
 

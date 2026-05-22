@@ -1,0 +1,11 @@
+# DeviceClass — cluster-scoped, written once by the cluster admin.
+# Analogous to StorageClass for volumes.
+# All GPU ResourceClaims reference this class.
+apiVersion: resource.k8s.io/v1beta1
+kind: DeviceClass
+metadata:
+  name: gpu.nvidia.com
+spec:
+  selectors:
+  - cel:
+      expression: device.driver == "gpu.resource.nvidia.com"

@@ -1,0 +1,25 @@
+# Pod referencing the MIG slice ResourceClaim.
+# The scheduler matched this pod to a node whose ResourceSlice advertises
+# a 3g.40gb profile. The workload knows it has 40 GB HBM available.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-inference
+spec:
+  resourceClaims:
+  - name: gpu
+    resourceClaimName: large-mig-slice
+  containers:
+  - name: inference
+    image: nvcr.io/nvidia/cuda:12.6-base-ubuntu22.04
+    command:
+    - bash
+    - -c
+    - |
+      echo "MIG device info:"
+      nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+      echo "Confirmed 3g.40gb slice — ~40 GB HBM available"
+    resources:
+      claims:
+      - name: gpu
+  restartPolicy: Never

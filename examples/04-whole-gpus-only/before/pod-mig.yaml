@@ -1,0 +1,36 @@
+# MIG slice request — integer model cannot express a profile preference.
+#
+# This workload needs 40 GB of HBM (a 3g.40gb MIG slice on an A100 80GB).
+# The only thing the integer model offers is: nvidia.com/gpu: 1.
+# The scheduler places this pod on any node with one GPU available.
+# It cannot distinguish a 3g.40gb slice from a 1g.10gb slice from a full device.
+#
+# If the node is configured with 1g.10gb slices (~10 GB HBM each), the workload
+# gets a GPU but fails at runtime: not enough memory for the model.
+# No scheduling error — the integer model considered the request satisfied.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-inference
+  labels:
+    workload: large-inference
+spec:
+  containers:
+  - name: inference
+    image: busybox
+    command:
+    - sh
+    - -c
+    - |
+      echo "scheduled on node: $(cat /proc/sys/kernel/hostname)"
+      echo "node mig-profile label: unknown to scheduler"
+      echo "needs 3g.40gb (40 GB HBM) — may have received 1g.10gb (10 GB HBM)"
+      sleep 3600
+    resources:
+      requests:
+        # On a real cluster: nvidia.com/gpu: 1
+        # The scheduler sees 1 GPU available. It cannot read the MIG profile.
+        cpu: "1"
+      limits:
+        cpu: "1"
+  restartPolicy: Never

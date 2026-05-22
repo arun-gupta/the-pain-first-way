@@ -1,0 +1,20 @@
+# ResourceClaim — a specific MIG slice profile.
+#
+# The CEL selector matches against structured attributes published by the
+# NVIDIA DRA driver in the node's ResourceSlice. The scheduler only places
+# this pod on a node that has a 3g.40gb slice available — not a 1g.10gb
+# slice, not a full device. The integer model (nvidia.com/gpu: 1) cannot
+# express any of this.
+apiVersion: resource.k8s.io/v1beta1
+kind: ResourceClaim
+metadata:
+  name: large-mig-slice
+spec:
+  devices:
+    requests:
+    - name: gpu
+      deviceClassName: gpu.nvidia.com
+      selectors:
+      - cel:
+          expression: >-
+            device.attributes["gpu.resource.nvidia.com"].migProfile == "3g.40gb"
