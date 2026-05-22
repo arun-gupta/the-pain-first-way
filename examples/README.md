@@ -11,15 +11,16 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 1 | Model works locally, breaks in prod | [`01-image/`](01-image/) | Available |
 | 2 | GPU job crashed at hour 14 | [`02-jobs/`](02-jobs/) | Available |
 | 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
-| 4 | Multi-node training | [`04-multi-node/`](04-multi-node/) | Available |
-| 5 | Cold start | [`05-cold-start/`](05-cold-start/) | Available |
-| 6 | Server image coupling | [`06-image-coupling/`](06-image-coupling/) | Available |
-| 7 | GPU underutilization | `07-utilization/` | Planned |
-| 8 | Can't roll back | `08-rollouts/` | Planned |
-| 9 | Latency spiked | `09-observability/` | Planned |
-| 10 | Costs out of control | `10-autoscaling/` | Planned |
-| 11 | Prompt version in prod | `11-config/` | Planned |
-| 12 | Data residency | `12-multi-cluster/` | Planned |
+| 4 | Can't express GPU requirements (DRA) | [`04-dra/`](04-dra/) | Planned |
+| 5 | Multi-node training | [`05-multi-node/`](05-multi-node/) | Available |
+| 6 | Cold start | [`06-cold-start/`](06-cold-start/) | Available |
+| 7 | Server image coupling | [`07-image-coupling/`](07-image-coupling/) | Available |
+| 8 | GPU underutilization | [`08-gpu-underutilized/`](08-gpu-underutilized/) | Available |
+| 9 | Can't roll back | `09-rollouts/` | Planned |
+| 10 | Latency spiked | `10-observability/` | Planned |
+| 11 | Costs out of control | `11-autoscaling/` | Planned |
+| 12 | Prompt version in prod | `12-config/` | Planned |
+| 13 | Data residency | `13-multi-cluster/` | Planned |
 
 ## Contributing an example
 
