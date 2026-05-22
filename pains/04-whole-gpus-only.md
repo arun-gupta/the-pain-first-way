@@ -1,6 +1,6 @@
 # Pain 4: I asked for two GPUs and got two GPUs — but they can't talk to each other
 
-> *Your workload needs two GPUs on the same high-speed interconnect for peer-to-peer memory transfers. You get two GPUs — but they're on different switches. Collective communication falls back to system RAM. Throughput drops 40%. You patch it with placement hints. It works until someone adds a node.*
+> *Your workload needs two GPUs on the same high-speed interconnect for peer-to-peer memory transfers. You get two GPUs — but they're on different switches. Peer-to-peer transfers fall back to system RAM for inference; collective operations take the same hit during training. Throughput drops 40%. You patch it with placement hints. It works until someone adds a node.*
 
 ## The pattern
 
