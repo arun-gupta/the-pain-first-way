@@ -2,6 +2,8 @@
 
 **Prerequisites**: a Kubernetes cluster with NVIDIA GPU nodes and the NVIDIA device plugin installed.
 
+> These manifests have not been verified on live hardware. If you have access to GPU nodes, contributions welcome — see [issue #24](https://github.com/arun-gupta/the-pain-first-way/issues/24).
+
 `nvidia.com/gpu: N` is a count, not a description. The scheduler fills the count. It cannot check interconnect topology or MIG profile.
 
 ## Scenario 1: topology mismatch

@@ -2,6 +2,8 @@
 
 **Not runnable in Kind** — DRA requires Kubernetes 1.34 and a vendor DRA driver installed on GPU nodes. The YAML here is the reference for when that hardware is available. Each file includes inline notes explaining what the scheduler does differently.
 
+> These manifests have not been verified on live hardware. If you have access to GPU nodes with a DRA driver, contributions welcome — see [issue #24](https://github.com/arun-gupta/the-pain-first-way/issues/24).
+
 This is the same situation as MIG configuration in [Pain 8's after example](../../08-gpu-underutilized/after/README.md): the manifests are the artefact; a simulated cluster cannot exercise them.
 
 ## What changes
