@@ -1,14 +1,13 @@
 # v2-bad — simulates a broken model update.
-# The container starts (so the pod shows Running) but never serves HTTP.
-# Without a readiness probe, the Deployment considers this a successful rollout.
+# The container starts (pod shows Running) but never serves HTTP.
+# Without a readiness probe, the rolling update completes and Kubernetes
+# reports success — even though every pod is now serving nothing.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: model-server
 spec:
   replicas: 2
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: model-server

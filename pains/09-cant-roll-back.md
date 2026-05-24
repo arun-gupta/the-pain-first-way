@@ -1,27 +1,27 @@
 # Pain 9: I can't roll back a bad model without downtime
 
-> *You pushed v3 of your model. p99 doubled and accuracy on your top intent dropped 4 points. Reverting means SSHing into N boxes, hoping the previous binary is still there, and praying nothing is half-deployed.*
+> *You pushed v3 of your model with `kubectl set image`. The rollout completed. p99 doubled and accuracy on your top intent dropped 4 points. You dig through CI logs trying to find the previous image tag. You didn't know `kubectl rollout undo` existed.*
 
 ## The pattern
 
-Without a managed rollout, deployment is an imperative script: terminate the old process, start the new one. Every replica is a manual step. A bad push leaves some replicas on v2, some still on v1, none of them recoverable without knowing the exact previous artifact and re-running the whole procedure.
+Before Kubernetes, this was SSH, `scp` new weights, restart the process, and hope nothing is half-deployed. On Kubernetes the mechanism exists — Deployments, rollout history, `kubectl rollout undo` — but without a readiness probe, the platform has no signal to distinguish a healthy rollout from a broken one. The rollout completes. Traffic shifts. The bad model serves.
 
-With a Deployment and a readiness probe, the controller manages the transition. New pods must pass a health check before old ones are replaced. A bad push stalls — the old pods keep serving — and rollback is a single command against tracked history.
+With a readiness probe, the platform gets that signal. A pod that fails its health check is never added to Service endpoints and never counted as a successful rollout step. A bad push stalls rather than completes, old pods keep serving, and rollback is a single command against tracked history.
 
-Without a readiness probe, a `Recreate` strategy terminates all old pods before starting new ones:
+Without a readiness probe, `RollingUpdate` replaces old pods with new ones regardless of whether they serve traffic:
 
 ```mermaid
 graph LR
-    V1["v1 pods serving"] -->|"apply v2-bad\nRecreate"| T["all v1 pods\nterminated"]
-    T --> C["v2-bad pods start\nno health gate"]
-    C --> D["service down\nuntil manual re-deploy"]
+    V1["v1 pods serving"] -->|"kubectl set image\nno readiness probe"| R["rolling update\ncompletes"]
+    R --> B["v2-bad pods\nget traffic"]
+    B --> D["bad responses\nno automatic detection"]
 ```
 
-With `RollingUpdate` and a readiness probe, the bad version never becomes live:
+With a readiness probe, the bad version never becomes live:
 
 ```mermaid
 graph LR
-    V1["v1 pods serving"] -->|"apply v2-bad\nRollingUpdate"| P["new v2-bad pod starts\nreadiness probe fails"]
+    V1["v1 pods serving"] -->|"kubectl set image\nreadiness probe set"| P["new v2-bad pod starts\nprobe fails"]
     P --> S["rolling update stalls\nv1 keeps serving"]
     S -->|"kubectl rollout undo"| R["v1 restored\nzero downtime"]
 ```
@@ -46,7 +46,7 @@ graph LR
 
 ## Try it
 
-A working demonstration lives in [`examples/09-cant-roll-back/`](../examples/09-cant-roll-back/). [`before/`](../examples/09-cant-roll-back/before/README.md) uses a `Recreate` strategy with no readiness probe — observe the service go down during the update and the deployment falsely report success while pods are broken. [`after/`](../examples/09-cant-roll-back/after/README.md) adds a `RollingUpdate` strategy and a readiness probe — the bad push stalls, v1 keeps serving, and `kubectl rollout undo` restores the previous version in one command. Both run on a local Kind cluster with no GPU required.
+A working demonstration lives in [`examples/09-cant-roll-back/`](../examples/09-cant-roll-back/). [`before/`](../examples/09-cant-roll-back/before/README.md) uses a `RollingUpdate` Deployment with no readiness probe — observe the rollout complete successfully while the new pods serve nothing, with no warning from Kubernetes. [`after/`](../examples/09-cant-roll-back/after/README.md) adds a readiness probe — the bad push stalls, v1 keeps serving, and `kubectl rollout undo` restores the previous version in one command. Both run on a local Kind cluster with no GPU required.
 
 ---
 

@@ -1,14 +1,12 @@
-# v1 of the model server — Recreate strategy, no readiness probe.
-# The scheduler considers pods ready as soon as they are Running,
-# regardless of whether they actually serve traffic.
+# v1 of the model server — default RollingUpdate strategy, no readiness probe.
+# Without a readiness probe, Kubernetes has no signal to distinguish a healthy
+# pod from a broken one. Any pod that starts counts as a successful rollout step.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: model-server
 spec:
   replicas: 2
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: model-server

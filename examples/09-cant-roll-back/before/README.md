@@ -1,8 +1,8 @@
-# Before: Recreate strategy, no readiness probe
+# Before: RollingUpdate with no readiness probe
 
 **Prerequisites**: a Kubernetes cluster (Kind works fine — `kind create cluster`).
 
-With `Recreate`, all existing pods are terminated before new ones start. Without a readiness probe, the Deployment considers a pod ready as soon as it is Running — regardless of whether it serves traffic.
+The default `RollingUpdate` strategy replaces pods in batches. Without a readiness probe, Kubernetes has no signal to distinguish a healthy pod from a broken one — any pod that starts counts as a successful rollout step. A bad push completes silently and bad pods receive traffic.
 
 ## 1. Deploy v1
 
@@ -24,28 +24,19 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 
 ## 2. Push v2-bad
 
+In practice this would be `kubectl set image deployment/model-server server=myrepo/model:v3`. Here we apply a new manifest to simulate the same effect:
+
 ```bash
 kubectl apply -f deployment-v2-bad.yaml
-kubectl get pods -w
-```
-
-```
-NAME                           READY   STATUS        RESTARTS
-model-server-5d4b9f-xkq        1/1     Terminating   0
-model-server-5d4b9f-zrp        1/1     Terminating   0
-model-server-7c8d2a-nwt        0/1     Running       0
-model-server-7c8d2a-pvs        0/1     Running       0
-```
-
-All v1 pods terminated before v2 started — the service was unavailable during the gap. The new pods show `Running` but sleep instead of serving HTTP.
-
-```bash
 kubectl rollout status deployment/model-server
 ```
 
 ```
+Waiting for deployment "model-server" rollout to finish: 1 out of 2 new replicas have been updated...
 deployment "model-server" successfully rolled out
 ```
+
+The rollout completed. Check the service:
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
@@ -55,15 +46,16 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 curl: (52) Empty reply from server
 ```
 
-The Deployment reports success. The service is broken. No warning was given.
+The pods are Running, the rollout reported success, and the service is broken. Kubernetes gave no warning.
 
 ## 3. Roll back
 
 ```bash
-kubectl apply -f deployment-v1.yaml
+kubectl rollout undo deployment/model-server
+kubectl rollout status deployment/model-server
 ```
 
-Manual re-apply of the previous manifest. This works here because the file is still present. On a real cluster, the previous version may be a CI artifact from a pipeline run three weeks ago.
+`kubectl rollout undo` works here — but most teams don't know about it until after the first incident. The more common instinct is to dig through CI logs for the previous image tag and re-apply the old manifest.
 
 ## Clean up
 
@@ -74,4 +66,4 @@ kubectl delete -f deployment-v1.yaml
 
 ---
 
-The [after/](../after/) folder shows how a readiness probe and `RollingUpdate` prevent the bad version from ever becoming live.
+The [after/](../after/) folder shows how adding a readiness probe prevents the bad version from completing the rollout at all.
