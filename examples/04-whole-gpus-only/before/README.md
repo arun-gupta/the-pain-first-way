@@ -9,7 +9,7 @@ kubectl apply -f pod-topology.yaml
 kubectl logs two-gpu-no-topology
 ```
 
-The pod gets two GPUs. If they are on different PCI switches, `nvidia-smi topo -m` shows `SYS` (traverses system RAM) instead of `NV4` (NVLink). AllReduce falls back to system RAM — ~40% throughput penalty on every gradient sync. No scheduling error; the scheduler considered the request satisfied.
+The pod gets two GPUs. If they are on different PCI switches, `nvidia-smi topo -m` shows `SYS` (traverses system RAM) instead of `NV4` (NVLink). peer-to-peer transfers fall back to system RAM — ~40% throughput penalty. No scheduling error; the scheduler considered the request satisfied.
 
 ## Scenario 2: MIG profile mismatch
 

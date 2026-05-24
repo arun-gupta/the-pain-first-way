@@ -1,7 +1,7 @@
 # Two-GPU workload — raw integer request, no topology constraints.
 # The scheduler places this pod on any node with 2 GPUs free.
 # It cannot tell whether those GPUs share an NVLink domain.
-# If they don't, AllReduce falls back to system RAM — ~40% throughput penalty.
+# If they don't, peer-to-peer transfers fall back to system RAM — ~40% throughput penalty.
 apiVersion: v1
 kind: Pod
 metadata:
