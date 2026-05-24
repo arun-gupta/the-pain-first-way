@@ -1,0 +1,20 @@
+# ResourceClaim — two GPUs, same NVLink domain.
+#
+# The constraint tells the scheduler: both gpu-0 and gpu-1 must have the
+# same value for the nvlinkDomain attribute in the node's ResourceSlice.
+# If no node has two GPUs in the same domain, the pod stays Pending —
+# an explicit signal, not a silent placement into the wrong topology.
+apiVersion: resource.k8s.io/v1beta1
+kind: ResourceClaim
+metadata:
+  name: two-nvlink-gpus
+spec:
+  devices:
+    requests:
+    - name: gpu-0
+      deviceClassName: gpu.nvidia.com
+    - name: gpu-1
+      deviceClassName: gpu.nvidia.com
+    constraints:
+    - requests: [gpu-0, gpu-1]
+      matchAttribute: "gpu.resource.nvidia.com/nvlinkDomain"

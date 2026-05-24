@@ -1,0 +1,23 @@
+# Large inference workload — integer model cannot express a MIG profile preference.
+# This workload needs a 3g.40gb slice (~40 GB HBM) on an A100 80GB.
+# The scheduler places it on any node with one GPU free — it cannot distinguish
+# a 3g.40gb slice from a 1g.10gb slice. If the node has 1g.10gb slices,
+# the workload gets a GPU but fails at runtime: not enough memory for the model.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-inference
+spec:
+  containers:
+  - name: inference
+    image: nvcr.io/nvidia/cuda:12.6-base-ubuntu22.04
+    command:
+    - bash
+    - -c
+    - |
+      nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+      echo "got a GPU — but was it the right profile?"
+    resources:
+      limits:
+        nvidia.com/gpu: "1"
+  restartPolicy: Never

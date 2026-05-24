@@ -1,0 +1,26 @@
+# Pod referencing the topology ResourceClaim.
+# resources.claims replaces resources.limits for DRA-allocated devices.
+# The ResourceClaim must exist before the pod is created (or use
+# ResourceClaimTemplate in a Job for per-replica claims).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-gpu-workload
+spec:
+  resourceClaims:
+  - name: gpus
+    resourceClaimName: two-nvlink-gpus
+  containers:
+  - name: training
+    image: nvcr.io/nvidia/cuda:12.6-base-ubuntu22.04
+    command:
+    - bash
+    - -c
+    - |
+      echo "GPU topology:"
+      nvidia-smi topo -m
+      echo "Both GPUs confirmed on same NVLink domain — scheduler guaranteed it"
+    resources:
+      claims:
+      - name: gpus
+  restartPolicy: Never

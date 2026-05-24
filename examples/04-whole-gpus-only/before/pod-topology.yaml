@@ -1,0 +1,22 @@
+# Two-GPU workload — raw integer request, no topology constraints.
+# The scheduler places this pod on any node with 2 GPUs free.
+# It cannot tell whether those GPUs share an NVLink domain.
+# If they don't, peer-to-peer transfers fall back to system RAM — ~40% throughput penalty.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-gpu-no-topology
+spec:
+  containers:
+  - name: training
+    image: nvcr.io/nvidia/cuda:12.6-base-ubuntu22.04
+    command:
+    - bash
+    - -c
+    - |
+      nvidia-smi topo -m
+      echo "no topology guarantee — these GPUs may be on different switches"
+    resources:
+      limits:
+        nvidia.com/gpu: "2"
+  restartPolicy: Never

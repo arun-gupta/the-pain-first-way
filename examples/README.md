@@ -11,7 +11,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 1 | Model works locally, breaks in prod | [`01-image/`](01-image/) | Available |
 | 2 | GPU job crashed at hour 14 | [`02-jobs/`](02-jobs/) | Available |
 | 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
-| 4 | Can't express GPU requirements (DRA) | [`04-dra/`](04-dra/) | Planned |
+| 4 | Can't express GPU requirements (DRA) | [`04-whole-gpus-only/`](04-whole-gpus-only/) | Planned |
 | 5 | Multi-node training | [`05-multi-node/`](05-multi-node/) | Available |
 | 6 | Cold start | [`06-cold-start/`](06-cold-start/) | Available |
 | 7 | Server image coupling | [`07-image-coupling/`](07-image-coupling/) | Available |
