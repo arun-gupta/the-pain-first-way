@@ -1,5 +1,7 @@
 # Before: integer GPU request with no topology awareness
 
+**Prerequisites**: a Kubernetes cluster with NVIDIA GPU nodes and the NVIDIA device plugin installed.
+
 `nvidia.com/gpu: N` is a count, not a description. The scheduler fills the count. It cannot check interconnect topology or MIG profile.
 
 ## Scenario 1: topology mismatch
