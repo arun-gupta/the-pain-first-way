@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 """
-Simulate ring AllReduce throughput under two GPU placement scenarios.
+Purpose
+-------
+The core problem in Pain 4 is that two GPUs on different PCI switches fall
+back to system RAM for peer-to-peer transfers, costing ~40% throughput on
+every collective operation during training. A Kind cluster with fake GPU
+labels cannot show this: pods schedule and run fine, the CPU workload
+completes normally, and nothing looks wrong.
 
-No GPU required — this is a bandwidth model to make the 40% throughput
-penalty tangible when two GPUs are on different PCI switches and P2P
-transfers fall back to system RAM instead of NVLink / Infinity Fabric.
+This script fills that gap. It simulates a ring AllReduce over a 14 GB
+payload (7B model in FP16) at three bandwidth tiers and prints the wall-time
+comparison. The "different switch — system RAM" row is what the integer
+scheduler silently produces when `nvidia.com/gpu: 2` lands on a node where
+the two GPUs are on separate switches. That penalty is paid on every gradient
+sync step during training.
+
+No GPU, no cluster, no packages required — just Python 3.
 """
 
 NVLINK_BW_GBps   = 600  # NVIDIA NVLink 4.0, bidirectional per GPU pair
