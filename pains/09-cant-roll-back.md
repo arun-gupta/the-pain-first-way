@@ -4,7 +4,7 @@
 
 ## The pattern
 
-Before Kubernetes, this was SSH, `scp` new weights, restart the process, and hope nothing is half-deployed. On Kubernetes the mechanism exists — Deployments, rollout history, `kubectl rollout undo` — but without a readiness probe, the platform has no signal to distinguish a healthy rollout from a broken one. The rollout completes. Traffic shifts. The bad model serves.
+Before Kubernetes, this was SSH, `scp` new weights, restart the process, and hope nothing is half-deployed. More disciplined teams versioned weights on shared storage and swapped a config path, but rollback was still manual: find the right version, edit the config, restart the process, and absorb downtime while the model loaded. On Kubernetes the mechanism exists — Deployments, rollout history, `kubectl rollout undo` — but without a readiness probe, the platform has no signal to distinguish a healthy rollout from a broken one. The rollout completes. Traffic shifts. The bad model serves.
 
 With a readiness probe, the platform gets that signal. A pod that fails its health check is never added to Service endpoints and never counted as a successful rollout step. A bad push stalls rather than completes, old pods keep serving, and rollback is a single command against tracked history.
 
