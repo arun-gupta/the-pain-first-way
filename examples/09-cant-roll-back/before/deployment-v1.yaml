@@ -1,0 +1,24 @@
+# v1 of the model server — Recreate strategy, no readiness probe.
+# The scheduler considers pods ready as soon as they are Running,
+# regardless of whether they actually serve traffic.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+spec:
+  replicas: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      containers:
+      - name: server
+        image: nginx:alpine
+        ports:
+        - containerPort: 80

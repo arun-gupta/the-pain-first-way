@@ -16,7 +16,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 6 | Cold start | [`06-cold-start/`](06-cold-start/) | Available |
 | 7 | Server image coupling | [`07-image-coupling/`](07-image-coupling/) | Available |
 | 8 | GPU underutilization | [`08-gpu-underutilized/`](08-gpu-underutilized/) | Available |
-| 9 | Can't roll back | `09-rollouts/` | Planned |
+| 9 | Can't roll back | [`09-cant-roll-back/`](09-cant-roll-back/) | Available |
 | 10 | Latency spiked | `10-observability/` | Planned |
 | 11 | Costs out of control | `11-autoscaling/` | Planned |
 | 12 | Prompt version in prod | `12-config/` | Planned |

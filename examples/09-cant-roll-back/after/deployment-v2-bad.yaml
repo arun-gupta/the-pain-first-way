@@ -1,0 +1,35 @@
+# v2-bad — same broken update as before/.
+# The container starts but never serves HTTP, so the readiness probe fails.
+# The rolling update stalls: the new pod never becomes Ready, and the old
+# pods are never replaced. Traffic continues to flow to v1.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      containers:
+      - name: server
+        image: nginx:alpine
+        command: ["sh", "-c", "sleep 3600"]
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
