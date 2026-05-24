@@ -1,8 +1,6 @@
 # Two-GPU workload — raw integer request, no topology constraints.
-#
-# On a real cluster this would be nvidia.com/gpu: 2.
-# The scheduler places this pod on any node with 2 CPUs (GPU stand-in) free.
-# It cannot tell whether the two GPUs share an NVLink domain.
+# The scheduler places this pod on any node with 2 GPUs free.
+# It cannot tell whether those GPUs share an NVLink domain.
 # If they don't, AllReduce falls back to system RAM — ~40% throughput penalty.
 apiVersion: v1
 kind: Pod
@@ -11,17 +9,14 @@ metadata:
 spec:
   containers:
   - name: training
-    image: busybox
+    image: nvcr.io/nvidia/cuda:12.6-base-ubuntu22.04
     command:
-    - sh
+    - bash
     - -c
     - |
-      echo "scheduled on node: $(cat /proc/sys/kernel/hostname)"
-      echo "no topology guarantee — could be any two GPUs"
-      sleep 3600
+      nvidia-smi topo -m
+      echo "no topology guarantee — these GPUs may be on different switches"
     resources:
-      requests:
-        cpu: "2"
       limits:
-        cpu: "2"
+        nvidia.com/gpu: "2"
   restartPolicy: Never

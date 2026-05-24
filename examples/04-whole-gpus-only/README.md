@@ -6,23 +6,20 @@ A working demonstration of [Pain 4: I asked for two GPUs and got two GPUs — bu
 
 ```
 04-whole-gpus-only/
-├── before/                         # the raw way: integer GPU count, no topology
-│   ├── kind-config.yaml            # 2-worker Kind cluster
-│   ├── pod-topology.yaml           # nvidia.com/gpu: 2 — no interconnect constraint
-│   ├── pod-affinity.yaml           # workaround: nodeAffinity on topology labels
-│   ├── pod-mig.yaml                # nvidia.com/gpu: 1 — no MIG profile constraint
-│   ├── allreduce.py                # bandwidth simulation (no GPU, no cluster needed)
+├── before/                          # integer GPU count: no topology awareness
+│   ├── pod-topology.yaml            # nvidia.com/gpu: 2 — no interconnect constraint
+│   ├── pod-mig.yaml                 # nvidia.com/gpu: 1 — no MIG profile constraint
 │   └── README.md
-└── after/                          # DRA: structured claims, scheduler-enforced topology
-    ├── device-class.yaml           # DeviceClass: defines the GPU category (cluster admin)
+└── after/                           # DRA: structured claims, scheduler-enforced topology
+    ├── device-class.yaml            # DeviceClass: defines the GPU category (cluster admin)
     ├── resource-claim-topology.yaml # ResourceClaim: 2 GPUs, same NVLink domain
-    ├── resource-claim-mig.yaml     # ResourceClaim: 3g.40gb MIG slice specifically
-    ├── pod-topology.yaml           # Pod using the topology claim
-    ├── pod-mig.yaml                # Pod using the MIG claim
+    ├── resource-claim-mig.yaml      # ResourceClaim: 3g.40gb MIG slice specifically
+    ├── pod-topology.yaml            # Pod using the topology claim
+    ├── pod-mig.yaml                 # Pod using the MIG claim
     └── README.md
 ```
 
-`before/` runs on a Kind cluster (CPU stands in for GPU slots). `after/` requires Kubernetes 1.34 with a vendor DRA driver — provided as reference YAML for real hardware.
+Both `before/` and `after/` require real GPU nodes. `before/` runs on any cluster with NVIDIA GPU nodes and a device plugin. `after/` requires Kubernetes 1.34 with a vendor DRA driver.
 
 ## The point of the diff
 
@@ -32,8 +29,10 @@ A working demonstration of [Pain 4: I asked for two GPUs and got two GPUs — bu
 
 ## Run it
 
-- [`before/README.md`](before/README.md) — observe the pain (runnable in Kind + Python simulation)
-- [`after/README.md`](after/README.md) — DRA reference YAML for real hardware
+Both scenarios require a real GPU cluster — this example has not been verified on live hardware yet.
+
+- [`before/README.md`](before/README.md) — integer model: observe silent wrong placement (requires GPU nodes + NVIDIA device plugin)
+- [`after/README.md`](after/README.md) — DRA reference YAML (requires Kubernetes 1.34 + vendor DRA driver + GPU nodes)
 
 ---
 
