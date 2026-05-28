@@ -43,6 +43,8 @@ cd before
 
 ## 2. Deploy v1
 
+This creates the initial healthy baseline: a Deployment running `model-server:v1` and a Service that sends traffic to those pods. `kubectl rollout status` waits until both replicas are up before you test traffic.
+
 ```bash
 kubectl apply -f deployment-v1.yaml
 kubectl apply -f service.yaml
