@@ -11,8 +11,7 @@ Assumes you have already completed the one-time setup in [`../before/README.md`]
 ## 1. Switch to the after scenario
 
 ```bash
-cd examples/09-cant-roll-back
-cd after
+cd examples/09-cant-roll-back/after
 ```
 
 ## 2. Deploy v1
