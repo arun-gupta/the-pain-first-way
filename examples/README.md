@@ -34,6 +34,10 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 24 | Durable agents | `24-durable-agents/` | Planned |
 | 25 | Tenant isolation | `25-tenant-isolation/` | Planned |
 | 26 | Model drift | `26-model-drift/` | Planned |
+| 27 | Sandboxed code execution | `27-agent-sandbox/` | Planned |
+| 28 | Tool and MCP fleet | `28-tool-fleet/` | Planned |
+| 29 | Agent egress control | `29-agent-egress/` | Planned |
+| 30 | Runaway-loop governance | `30-runaway-agents/` | Planned |
 
 ## Contributing an example
 

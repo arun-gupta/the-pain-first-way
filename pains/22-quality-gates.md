@@ -36,6 +36,8 @@ flowchart LR
 
 This extends [Pain 9](09-cant-roll-back.md). Pain 9 makes rollback fast and safe. This pain decides whether the rollout should advance in the first place.
 
+Where it stops: cloud native runs the eval and enforces the verdict, but it doesn't score the eval. Defining what "good" means stays with you, see [where cloud native doesn't help](../reference/where-cn-doesnt-help.md).
+
 ## Trade-offs
 
 **What you keep**: the same Deployment, rollout controller, and serving path.

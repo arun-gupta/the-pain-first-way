@@ -83,6 +83,14 @@ flowchart LR
     subgraph S7[Agent Systems]
         direction TB
         N24[24. Durable agents]
+        N27[27. Sandboxed code exec]
+        N28[28. Tool/MCP fleet]
+        N29[29. Agent egress control]
+        N30[30. Runaway-loop governance]
+        N24 ~~~ N27
+        N27 ~~~ N28
+        N28 ~~~ N29
+        N29 ~~~ N30
     end
     subgraph SHPC[Coming from HPC]
         direction TB
@@ -95,7 +103,7 @@ flowchart LR
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
     class N1,N2,N3,N5,N6,N7,N8,N9 avail;
     style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
-    linkStyle 24 stroke:#d97706,stroke-width:3px;
+    linkStyle 28 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -122,6 +130,10 @@ flowchart LR
     click N24 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/24-durable-agents.md"
     click N25 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/25-tenant-isolation.md"
     click N26 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/26-model-drift.md"
+    click N27 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/27-agent-sandbox.md"
+    click N28 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/28-tool-fleet.md"
+    click N29 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/29-agent-egress.md"
+    click N30 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/30-runaway-agents.md"
 ```
 
 **Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.

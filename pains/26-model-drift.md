@@ -37,6 +37,8 @@ flowchart LR
 
 This complements [Pain 10](10-latency-spiked.md). Pain 10 asks why the service is slow. This pain asks whether the model's behavior is still inside the envelope you intended.
 
+Where it stops: cloud native carries the signal through sampling, metrics, scheduled scoring, and alerts. It doesn't decide what counts as drift, that judgment lives in your eval layer, see [where cloud native doesn't help](../reference/where-cn-doesnt-help.md).
+
 ## Trade-offs
 
 **What you keep**: your existing metrics, logs, and traces.
@@ -45,4 +47,4 @@ This complements [Pain 10](10-latency-spiked.md). Pain 10 asks why the service i
 
 ---
 
-[← Pain 25: Tenant isolation](25-tenant-isolation.md) · [Landscape](../README.md)
+[← Pain 25: Tenant isolation](25-tenant-isolation.md) · [Landscape](../README.md) · [Pain 27: Sandboxed code execution →](27-agent-sandbox.md)

@@ -42,6 +42,8 @@ flowchart LR
 
 This connects [Pain 1](01-model-works-locally.md), [Pain 12](12-prompt-version.md), and [Pain 20](20-model-supply-chain.md). Those cover runtime reproducibility, prompt/config history, and artifact trust. This pain ties them into one answerable release record.
 
+Where it stops: cloud native pins exactly what shipped through digests, GitOps, and provenance. Reconstructing how the model was trained stays with MLflow, Weights and Biases, and DVC, see [where cloud native doesn't help](../reference/where-cn-doesnt-help.md).
+
 ## Trade-offs
 
 **What you keep**: your training and deployment flow.
