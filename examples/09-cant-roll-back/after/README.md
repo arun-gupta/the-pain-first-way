@@ -16,6 +16,8 @@ cd examples/09-cant-roll-back/after
 
 ## 2. Deploy v1
 
+This creates the initial healthy baseline: a Deployment running `model-server:v1` with a readiness probe, plus a Service that sends traffic only to Ready pods. `kubectl rollout status` waits until both replicas are up and passing the readiness check before you test traffic.
+
 ```bash
 kubectl apply -f deployment-v1.yaml
 kubectl apply -f service.yaml
