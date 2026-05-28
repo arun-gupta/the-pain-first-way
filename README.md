@@ -72,13 +72,17 @@ flowchart LR
         direction TB
         N12[12. Prompt version in prod]
         N23[23. Reproduce shipped model]
+        N31[31. Deploy guardrails]
         N12 ~~~ N23
+        N23 ~~~ N31
     end
     subgraph S6[Compliance]
         direction TB
         N13[13. Data residency]
         N25[25. Tenant isolation]
+        N32[32. Audit evidence]
         N13 ~~~ N25
+        N25 ~~~ N32
     end
     subgraph S7[Agent Systems]
         direction TB
@@ -103,7 +107,7 @@ flowchart LR
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
     class N1,N2,N3,N5,N6,N7,N8,N9 avail;
     style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
-    linkStyle 28 stroke:#d97706,stroke-width:3px;
+    linkStyle 30 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -134,6 +138,8 @@ flowchart LR
     click N28 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/28-tool-fleet.md"
     click N29 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/29-agent-egress.md"
     click N30 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/30-runaway-agents.md"
+    click N31 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/31-deploy-guardrails.md"
+    click N32 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/32-audit-evidence.md"
 ```
 
 **Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.

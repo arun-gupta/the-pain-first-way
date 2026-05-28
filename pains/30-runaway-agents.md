@@ -41,4 +41,4 @@ This is the enforcement side of cost. Cloud native can't pick the cost and quali
 
 ---
 
-[← Pain 29: Agent egress control](29-agent-egress.md) · [Landscape](../README.md)
+[← Pain 29: Agent egress control](29-agent-egress.md) · [Landscape](../README.md) · [Pain 31: Deploy guardrails →](31-deploy-guardrails.md)
