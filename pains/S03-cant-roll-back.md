@@ -108,7 +108,7 @@ graph LR
 
 ## Try it
 
-A working demonstration lives in [`examples/09-cant-roll-back/`](../examples/09-cant-roll-back/). [`before/`](../examples/09-cant-roll-back/before/README.md) is Stage 4 — a `RollingUpdate` Deployment with no readiness probe: observe the rollout complete successfully while the new pods serve nothing, with no warning from Kubernetes. [`after/`](../examples/09-cant-roll-back/after/README.md) is Stage 5 — the same Deployment with a readiness probe: the bad push stalls, v1 keeps serving, and `kubectl rollout undo` restores the previous version in one command. Both run on a local Kind cluster with no GPU required.
+A working demonstration lives in [`examples/S03-cant-roll-back/`](../examples/S03-cant-roll-back/). [`before/`](../examples/S03-cant-roll-back/before/README.md) is Stage 4 — a `RollingUpdate` Deployment with no readiness probe: observe the rollout complete successfully while the new pods serve nothing, with no warning from Kubernetes. [`after/`](../examples/S03-cant-roll-back/after/README.md) is Stage 5 — the same Deployment with a readiness probe: the bad push stalls, v1 keeps serving, and `kubectl rollout undo` restores the previous version in one command. Both run on a local Kind cluster with no GPU required.
 
 ---
 

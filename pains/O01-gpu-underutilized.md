@@ -20,7 +20,7 @@ flowchart LR
     S1["Step 1\nA · B · C"] -->|"A finishes → D joins"| S2["Step 2\nB · C · D"] -->|"B finishes → E joins"| S3["Step 3\nC · D · E"] --> S4[...]
 ```
 
-This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change. ML practitioners follow this with quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — each reducing what the GPU has to do per request or how efficiently it does it. The runnable walkthrough for both Mac (ollama) and GPU (vLLM) paths is in [`examples/08-gpu-underutilized/before/`](../examples/08-gpu-underutilized/before/).
+This alone typically moves utilization from ~30% to ~70–80% on the same hardware, before any infrastructure change. ML practitioners follow this with quantization, prefix caching, speculative decoding, sequence packing, and prefill/decode disaggregation — each reducing what the GPU has to do per request or how efficiently it does it. The runnable walkthrough for both Mac (ollama) and GPU (vLLM) paths is in [`examples/O01-gpu-underutilized/before/`](../examples/O01-gpu-underutilized/before/).
 
 The problem re-emerges at the infrastructure layer when traffic grows and more capacity is needed.
 
@@ -86,7 +86,7 @@ The alternative — running three or four underutilized replicas — is also com
 
 ## Try it
 
-A working demonstration lives in [`examples/08-gpu-underutilized/`](../examples/08-gpu-underutilized/). [`before/`](../examples/08-gpu-underutilized/before/) shows the sequential server and the full pre-CN optimization path — continuous batching, quantization, prefix caching, and the vLLM production flags — with a Mac (ollama) track runnable without a GPU. [`after/`](../examples/08-gpu-underutilized/after/) covers the CN layers: observe the CPU HPA miss the signal under load, then apply KEDA to scale on `inference_requests_in_flight` instead (Step 1); review the GPU Operator MIG config for GPU sharing (Step 2, informational — requires a real GPU node). No GPU required for Step 1.
+A working demonstration lives in [`examples/O01-gpu-underutilized/`](../examples/O01-gpu-underutilized/). [`before/`](../examples/O01-gpu-underutilized/before/) shows the sequential server and the full pre-CN optimization path — continuous batching, quantization, prefix caching, and the vLLM production flags — with a Mac (ollama) track runnable without a GPU. [`after/`](../examples/O01-gpu-underutilized/after/) covers the CN layers: observe the CPU HPA miss the signal under load, then apply KEDA to scale on `inference_requests_in_flight` instead (Step 1); review the GPU Operator MIG config for GPU sharing (Step 2, informational — requires a real GPU node). No GPU required for Step 1.
 
 ---
 

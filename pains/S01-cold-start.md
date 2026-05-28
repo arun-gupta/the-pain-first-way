@@ -59,7 +59,7 @@ flowchart LR
 
 ## Try it
 
-A working demonstration lives in [`examples/06-cold-start/`](../examples/06-cold-start/). The before case shows a simulated model server that downloads weights on startup, blocking the server from accepting requests until the download finishes. The after case uses an init container to stage weights into a shared volume before the server process starts; the server is ready to serve as soon as it launches. Runnable on a Mac with a local Kind cluster and no GPU required.
+A working demonstration lives in [`examples/S01-cold-start/`](../examples/S01-cold-start/). The before case shows a simulated model server that downloads weights on startup, blocking the server from accepting requests until the download finishes. The after case uses an init container to stage weights into a shared volume before the server process starts; the server is ready to serve as soon as it launches. Runnable on a Mac with a local Kind cluster and no GPU required.
 
 ---
 
