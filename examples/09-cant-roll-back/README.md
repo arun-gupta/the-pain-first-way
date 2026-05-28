@@ -6,13 +6,15 @@ A working demonstration of [Pain 9: I can't roll back a bad model without downti
 
 ```
 09-cant-roll-back/
-├── before/                      # Recreate strategy, no readiness probe
+├── before/                      # RollingUpdate, no readiness probe
 │   ├── deployment-v1.yaml       # v1: nginx serving normally
 │   ├── deployment-v2-bad.yaml   # v2: starts but never serves HTTP
+│   ├── service.yaml             # stable Service for traffic checks
 │   └── README.md
 └── after/                       # RollingUpdate + readiness probe
     ├── deployment-v1.yaml       # v1: nginx with readiness gate
     ├── deployment-v2-bad.yaml   # v2: same bad update — now caught by the probe
+    ├── service.yaml             # stable Service for traffic checks
     └── README.md
 ```
 
@@ -20,7 +22,7 @@ Both scenarios run on a local Kind cluster. No GPU required.
 
 ## The point of the diff
 
-`before/` terminates all v1 pods before starting v2 (Recreate). Without a readiness probe, the Deployment reports success even though the new pods serve nothing. Rolling back requires manually re-applying the previous manifest.
+`before/` uses the default `RollingUpdate` strategy with no readiness probe. The Deployment reports success even though the new pods serve nothing, and the Service starts routing traffic to broken pods because Kubernetes has no health signal to stop it.
 
 `after/` starts new pods before touching old ones (RollingUpdate). The readiness probe fails on v2-bad — the rolling update stalls, v1 keeps serving, and `kubectl rollout undo` reverts to the tracked previous revision in one command.
 

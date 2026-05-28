@@ -8,13 +8,14 @@ The default `RollingUpdate` strategy replaces pods in batches. Without a readine
 
 ```bash
 kubectl apply -f deployment-v1.yaml
+kubectl apply -f service.yaml
 kubectl rollout status deployment/model-server
 ```
 
 Verify it serves traffic:
 
 ```bash
-kubectl port-forward deployment/model-server 8080:80 &
+kubectl port-forward service/model-server 8080:80 &
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 ```
 
@@ -61,6 +62,7 @@ kubectl rollout status deployment/model-server
 
 ```bash
 kill %1  # stop port-forward
+kubectl delete -f service.yaml
 kubectl delete -f deployment-v1.yaml
 ```
 
