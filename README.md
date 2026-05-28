@@ -22,13 +22,13 @@ A growing catalog of pains across two on-ramps, notebook and HPC, and the produc
 
 ```mermaid
 flowchart LR
-    subgraph S1[Foundation]
+    subgraph S1["Foundation (F)"]
         direction TB
         N1[✓ F.01 Model breaks in prod]
         N20[F.02 Model supply chain]
         N1 ~~~ N20
     end
-    subgraph S2[Compute]
+    subgraph S2["Compute (C)"]
         direction TB
         N2[✓ C.01 GPU job crashed]
         N3[✓ C.02 Can't get a GPU]
@@ -40,7 +40,7 @@ flowchart LR
         N4 ~~~ N5
         N5 ~~~ N19
     end
-    subgraph S3[Serving]
+    subgraph S3["Serving (S)"]
         direction TB
         N6[✓ S.01 Cold start]
         N7[✓ S.02 Server image coupling]
@@ -56,7 +56,7 @@ flowchart LR
         N16 ~~~ N17
         N17 ~~~ N18
     end
-    subgraph S4[Operations]
+    subgraph S4["Operations (O)"]
         direction TB
         N8[✓ O.01 GPU at 30 percent]
         N10[O.02 Latency spiked]
@@ -68,7 +68,7 @@ flowchart LR
         N26 ~~~ N11
         N11 ~~~ N21
     end
-    subgraph S5[Governance]
+    subgraph S5["Governance (G)"]
         direction TB
         N12[G.01 Prompt version in prod]
         N23[G.02 Reproduce shipped model]
@@ -76,7 +76,7 @@ flowchart LR
         N12 ~~~ N23
         N23 ~~~ N31
     end
-    subgraph S6[Compliance]
+    subgraph S6["Compliance (R)"]
         direction TB
         N13[R.01 Data residency]
         N25[R.02 Tenant isolation]
@@ -84,7 +84,7 @@ flowchart LR
         N13 ~~~ N25
         N25 ~~~ N32
     end
-    subgraph S7[Agent Systems]
+    subgraph S7["Agent Systems (A)"]
         direction TB
         N24[A.01 Durable agents]
         N27[A.02 Sandboxed code exec]
@@ -96,7 +96,7 @@ flowchart LR
         N28 ~~~ N29
         N29 ~~~ N30
     end
-    subgraph SHPC[Coming from HPC]
+    subgraph SHPC["Coming from HPC (H)"]
         direction TB
         N14[H.01 SLURM rewrite]
         N15[H.02 SLURM bridge]
