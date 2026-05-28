@@ -2,11 +2,37 @@
 
 The default `RollingUpdate` strategy replaces pods in batches. Without a readiness probe, Kubernetes has no signal to distinguish a healthy pod from a broken one — any pod that starts counts as a successful rollout step. A bad push completes silently and bad pods receive traffic.
 
-Assumes you have already completed the shared setup in [`../README.md`](../README.md):
+## 0. Shared setup
 
-- prerequisites installed
-- Kind cluster created
-- `./build.sh` already run from `examples/09-cant-roll-back/`
+Run these once before trying either `before/` or `after/`.
+
+### Prerequisites
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Docker](https://docs.docker.com/get-docker/)
+
+### Navigate to this directory
+
+```bash
+cd examples/09-cant-roll-back
+```
+
+### Create a Kind cluster
+
+If you already have a Kind cluster named `kind` from a previous example, you can skip this step.
+
+```bash
+kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
+```
+
+### Build and load the demo images
+
+```bash
+./build.sh
+```
+
+This builds `model-server:v1` and `model-server:v2-bad`, then loads both into your Kind cluster. No registry needed.
 
 ## 1. Switch to the before scenario
 

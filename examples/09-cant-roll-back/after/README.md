@@ -2,7 +2,7 @@
 
 With `RollingUpdate` and a readiness probe, a bad push stalls before it becomes live. Old pods keep serving until new ones pass their health check. `kubectl rollout undo` reverts to the tracked previous revision.
 
-Assumes you have already completed the shared setup in [`../README.md`](../README.md):
+Assumes you have already completed the one-time setup in [`../before/README.md`](../before/README.md):
 
 - prerequisites installed
 - Kind cluster created
