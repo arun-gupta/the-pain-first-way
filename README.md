@@ -25,6 +25,8 @@ flowchart LR
     subgraph S1[Foundation]
         direction TB
         N1[✓ 1. Model breaks in prod]
+        N20[20. Model supply chain]
+        N1 ~~~ N20
     end
     subgraph S2[Compute]
         direction TB
@@ -32,9 +34,11 @@ flowchart LR
         N3[✓ 3. Can't get a GPU]
         N4[4. Can't express GPU config]
         N5[✓ 5. Multi-node falling over]
+        N19[19. GPUs starve for data]
         N2 ~~~ N3
         N3 ~~~ N4
         N4 ~~~ N5
+        N5 ~~~ N19
     end
     subgraph S3[Serving]
         direction TB
@@ -55,8 +59,10 @@ flowchart LR
         N8[✓ 8. GPU at 30 percent]
         N10[10. Latency spiked]
         N11[11. Costs out of control]
+        N21[21. GPU device health]
         N8 ~~~ N10
         N10 ~~~ N11
+        N11 ~~~ N21
     end
     subgraph S5[Governance]
         direction TB
@@ -77,7 +83,7 @@ flowchart LR
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
     class N1,N2,N3,N5,N6,N7,N8,N9 avail;
     style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
-    linkStyle 16 stroke:#d97706,stroke-width:3px;
+    linkStyle 19 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -96,6 +102,9 @@ flowchart LR
     click N16 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/16-inference-routing.md"
     click N17 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/17-serving-many-models.md"
     click N18 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/18-weight-stampede.md"
+    click N19 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/19-data-starvation.md"
+    click N20 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/20-model-supply-chain.md"
+    click N21 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/21-device-health.md"
 ```
 
 **Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.

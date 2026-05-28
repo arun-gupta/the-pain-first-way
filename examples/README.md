@@ -26,6 +26,9 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 16 | Smart inference routing | `16-inference-routing/` | Planned |
 | 17 | Serving many models | `17-serving-many-models/` | Planned |
 | 18 | Weight-download stampede | `18-weight-stampede/` | Planned |
+| 19 | GPUs starve for data | `19-data-starvation/` | Planned |
+| 20 | Model supply chain | `20-model-supply-chain/` | Planned |
+| 21 | GPU device health | `21-device-health/` | Planned |
 
 ## Contributing an example
 
