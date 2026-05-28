@@ -91,6 +91,8 @@ The pods are Running, the rollout reported success, and the service is broken. K
 
 If you stop and restart the port-forward after this step, that fresh connection may fail with `connection refused`. That is still the same failure mode: the Service now points only at broken pods, so there is nothing healthy listening on port 80 behind it.
 
+Why the port-forward can break: `kubectl port-forward` still has to connect to a real pod port behind the Service. After `kubectl set image` replaces `model-server:v1` with `model-server:v2-bad`, the new pods are `Running` but only executing `sleep 3600` — nothing is listening on port 80. An existing port-forward can die when its old v1 pod disappears, and a new port-forward can fail immediately when it lands on a v2-bad pod that refuses the connection.
+
 ## 6. Roll back
 
 ```bash
