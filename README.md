@@ -40,23 +40,23 @@ flowchart LR
         direction TB
         N6[6. Cold start]
         N7[7. Server image coupling]
-        N8[8. GPU at 30 percent]
         N9[9. Can't roll back]
-        N10[10. Latency spiked]
         N16[16. Inference routing]
         N17[17. Serving many models]
         N18[18. Weight stampede]
         N6 ~~~ N7
-        N7 ~~~ N8
-        N8 ~~~ N9
-        N9 ~~~ N10
-        N10 ~~~ N16
+        N7 ~~~ N9
+        N9 ~~~ N16
         N16 ~~~ N17
         N17 ~~~ N18
     end
     subgraph S4[Operations]
         direction TB
+        N8[8. GPU at 30 percent]
+        N10[10. Latency spiked]
         N11[11. Costs out of control]
+        N8 ~~~ N10
+        N10 ~~~ N11
     end
     subgraph S5[Governance]
         direction TB
