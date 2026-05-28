@@ -79,8 +79,12 @@ The rollout completed. Check the service:
 curl http://localhost:8080
 ```
 
+Expected result: the request fails. Depending on whether your existing port-forward is still attached to a broken pod or has already exited, you may see either of these:
+
 ```
 curl: (52) Empty reply from server
+
+curl: (7) Failed to connect to localhost port 8080 after 0 ms: Couldn't connect to server
 ```
 
 The pods are Running, the rollout reported success, and the service is broken. Kubernetes gave no warning.
