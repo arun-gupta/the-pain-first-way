@@ -1,6 +1,6 @@
-# Pain 2 example: the same training job, two fates
+# Pain C.01 example: the same training job, two fates
 
-A working demonstration of [Pain 2: GPU job crashed at hour 14](../../pains/02-gpu-job-crashed.md). Same Python training code, two deployment styles. The Kubernetes manifests are the only thing that changes. And that changes everything.
+A working demonstration of [Pain C.01: GPU job crashed at hour 14](../../pains/C01-gpu-job-crashed.md). Same Python training code, two deployment styles. The Kubernetes manifests are the only thing that changes. And that changes everything.
 
 ## What's here
 
@@ -36,4 +36,4 @@ Kill the pod at epoch 12. The replacement pod starts at epoch 13.
 
 ---
 
-[← Back to Pain 2](../../pains/02-gpu-job-crashed.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.01](../../pains/C01-gpu-job-crashed.md) · [Landscape](../../README.md) · [Examples index](../README.md)

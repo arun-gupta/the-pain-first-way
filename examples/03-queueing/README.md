@@ -1,6 +1,6 @@
-# Pain 3 example: GPU queueing with Kueue
+# Pain C.02 example: GPU queueing with Kueue
 
-A working demonstration of [Pain 3: Can't get a GPU when I need one](../../pains/03-cant-get-a-gpu.md). Same training job, two submission styles. The Kubernetes manifests are the only thing that changes.
+A working demonstration of [Pain C.02: Can't get a GPU when I need one](../../pains/C02-cant-get-a-gpu.md). Same training job, two submission styles. The Kubernetes manifests are the only thing that changes.
 
 ## What's here
 
@@ -38,4 +38,4 @@ No GPU required. CPU resources stand in for GPU slots; the scheduling mechanics 
 
 ---
 
-[← Back to Pain 3](../../pains/03-cant-get-a-gpu.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.02](../../pains/C02-cant-get-a-gpu.md) · [Landscape](../../README.md) · [Examples index](../README.md)

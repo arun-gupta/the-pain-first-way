@@ -41,7 +41,7 @@ kubectl rollout status deployment/kueue-controller-manager -n kueue-system
 
 This builds `training-job:latest` and loads it into your Kind cluster. No registry needed.
 
-> **Already did Pain 2?** The same image is used. Skip this step if `training-job:latest` is already loaded.
+> **Already did Pain C.01?** The same image is used. Skip this step if `training-job:latest` is already loaded.
 
 ## 4. Apply the queue resources
 
@@ -209,4 +209,4 @@ labels:
 
 ---
 
-[← Back to Pain 3](../../pains/03-cant-get-a-gpu.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.02](../../pains/C02-cant-get-a-gpu.md) · [Landscape](../../README.md) · [Examples index](../README.md)

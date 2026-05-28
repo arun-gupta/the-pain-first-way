@@ -1,6 +1,6 @@
-# Pain 8 example: the same traffic, two layers of improvement
+# Pain O.01 example: the same traffic, two layers of improvement
 
-A working demonstration of [Pain 8: My GPU sits at 30% but my bill says 100%](../../pains/08-gpu-underutilized.md). Same inference server, same simulated workload: pre-CN serving-engine optimizations in `before/`, then two independent CN layers in `after/`. No GPU required.
+A working demonstration of [Pain O.01: My GPU sits at 30% but my bill says 100%](../../pains/O01-gpu-underutilized.md). Same inference server, same simulated workload: pre-CN serving-engine optimizations in `before/`, then two independent CN layers in `after/`. No GPU required.
 
 ## What's here
 
@@ -39,4 +39,4 @@ Each layer is independent. The serving-engine optimizations in `before/` need no
 
 ---
 
-[← Back to Pain 8](../../pains/08-gpu-underutilized.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain O.01](../../pains/O01-gpu-underutilized.md) · [Landscape](../../README.md) · [Examples index](../README.md)

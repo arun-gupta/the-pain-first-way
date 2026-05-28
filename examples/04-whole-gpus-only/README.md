@@ -1,6 +1,6 @@
-# Pain 4 example: topology-aware GPU placement with DRA
+# Pain C.03 example: topology-aware GPU placement with DRA
 
-A working demonstration of [Pain 4: I asked for two GPUs and got two GPUs — but they can't talk to each other](../../pains/04-whole-gpus-only.md). Two scenarios, two manifest sets. The scheduler is the only thing that changes.
+A working demonstration of [Pain C.03: I asked for two GPUs and got two GPUs — but they can't talk to each other](../../pains/C03-whole-gpus-only.md). Two scenarios, two manifest sets. The scheduler is the only thing that changes.
 
 ## What's here
 
@@ -36,4 +36,4 @@ Both scenarios require a real GPU cluster — this example has not been verified
 
 ---
 
-[← Back to Pain 4](../../pains/04-whole-gpus-only.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.03](../../pains/C03-whole-gpus-only.md) · [Landscape](../../README.md) · [Examples index](../README.md)

@@ -1,6 +1,6 @@
-# Pain 6 example: the same model server, two approaches to weight loading
+# Pain S.01 example: the same model server, two approaches to weight loading
 
-A working demonstration of [Pain 6: Cold start for my 70B model takes 4 minutes](../../pains/06-cold-start.md). Same inference server code, two deployment styles. The init container pattern is the only thing that changes. And that changes everything about portability.
+A working demonstration of [Pain S.01: Cold start for my 70B model takes 4 minutes](../../pains/S01-cold-start.md). Same inference server code, two deployment styles. The init container pattern is the only thing that changes. And that changes everything about portability.
 
 ## What's here
 
@@ -35,4 +35,4 @@ No GPU required. The "model" is a tiny text file. The cloud native concepts are 
 
 ---
 
-[← Back to Pain 6](../../pains/06-cold-start.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain S.01](../../pains/S01-cold-start.md) · [Landscape](../../README.md) · [Examples index](../README.md)

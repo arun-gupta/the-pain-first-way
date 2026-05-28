@@ -253,4 +253,4 @@ The server container spec has no `env` entries at all. It cannot read the creden
 
 ---
 
-[← Back to Pain 7](../../pains/07-server-image-coupling.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain S.02](../../pains/S02-server-image-coupling.md) · [Landscape](../../README.md) · [Examples index](../README.md)

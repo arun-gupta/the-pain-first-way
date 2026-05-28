@@ -97,10 +97,10 @@ The image is the boundary. Inside, everything is declared. Outside no longer aff
 |---|---|
 | `python:3.11-slim` base | CUDA base image (`nvcr.io/nvidia/pytorch:24.05-py3`) |
 | `sentence-transformers/all-MiniLM-L6-v2` (22 MB) | 7B–70B model (7 GB–140 GB) |
-| Model baked at build time | Model staged via init container at runtime (see [Pain 6](../../pains/06-cold-start.md)) |
+| Model baked at build time | Model staged via init container at runtime (see [Pain S.01](../../pains/S01-cold-start.md)) |
 | `libgomp1` | CUDA toolkit, cuDNN, NCCL baked into GPU base image |
 | `docker run -p 8000:8000` | Kubernetes Deployment with N replicas and GPU resource requests |
 
 ---
 
-[← Back to Pain 1](../../pains/01-model-works-locally.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain F.01](../../pains/F01-model-works-locally.md) · [Landscape](../../README.md) · [Examples index](../README.md)

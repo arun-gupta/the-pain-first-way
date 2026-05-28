@@ -1,6 +1,6 @@
-# Pain 5 example: Multi-node training with PyTorchJob
+# Pain C.04 example: Multi-node training with PyTorchJob
 
-A working demonstration of [Pain 5: Multi-node training keeps falling over](../../pains/05-multi-node-training.md). Same distributed training simulation, two submission styles. The Kubernetes manifests are the only thing that changes.
+A working demonstration of [Pain C.04: Multi-node training keeps falling over](../../pains/C04-multi-node-training.md). Same distributed training simulation, two submission styles. The Kubernetes manifests are the only thing that changes.
 
 ## What's here
 
@@ -45,4 +45,4 @@ distributed-job level. Rendezvous succeeds. Training completes across two nodes.
 
 ---
 
-[← Back to Pain 5](../../pains/05-multi-node-training.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.04](../../pains/C04-multi-node-training.md) · [Landscape](../../README.md) · [Examples index](../README.md)

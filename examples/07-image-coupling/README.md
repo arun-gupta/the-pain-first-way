@@ -1,6 +1,6 @@
 # Example 07: Server image coupling
 
-A working demonstration of [Pain 7: My server image is coupled to its config and secrets](../../pains/07-server-image-coupling.md).
+A working demonstration of [Pain S.02: My server image is coupled to its config and secrets](../../pains/S02-server-image-coupling.md).
 
 ## The point of the diff
 
@@ -33,4 +33,4 @@ after/
 
 ---
 
-[← Back to Pain 7](../../pains/07-server-image-coupling.md) · [Examples index](../README.md)
+[← Back to Pain S.02](../../pains/S02-server-image-coupling.md) · [Examples index](../README.md)

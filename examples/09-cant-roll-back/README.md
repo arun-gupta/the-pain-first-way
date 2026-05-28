@@ -1,6 +1,6 @@
-# Pain 9 example: zero-downtime rollout and rollback
+# Pain S.03 example: zero-downtime rollout and rollback
 
-A working demonstration of [Pain 9: I can't roll back a bad model without downtime](../../pains/09-cant-roll-back.md). Both scenarios use the same bad image update — the only difference is the rollout strategy and the presence of a readiness probe.
+A working demonstration of [Pain S.03: I can't roll back a bad model without downtime](../../pains/S03-cant-roll-back.md). Both scenarios use the same bad image update — the only difference is the rollout strategy and the presence of a readiness probe.
 
 ## What's here
 
@@ -35,4 +35,4 @@ Both scenarios run on a local Kind cluster. No GPU required. The bad rollout is 
 
 ---
 
-[← Back to Pain 9](../../pains/09-cant-roll-back.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain S.03](../../pains/S03-cant-roll-back.md) · [Landscape](../../README.md) · [Examples index](../README.md)

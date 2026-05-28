@@ -133,4 +133,4 @@ The `train.py` in this folder is byte-for-byte identical to `before/train.py` ex
 
 ---
 
-[← Back to Pain 2](../../pains/02-gpu-job-crashed.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.01](../../pains/C01-gpu-job-crashed.md) · [Landscape](../../README.md) · [Examples index](../README.md)

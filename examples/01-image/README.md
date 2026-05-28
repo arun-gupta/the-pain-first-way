@@ -1,6 +1,6 @@
-# Pain 1 example: the same model, two deployments
+# Pain F.01 example: the same model, two deployments
 
-A working demonstration of [Pain 1: Model works locally, breaks in prod](../../pains/01-model-works-locally.md). Same Python code, two deployment styles. The Dockerfile is the only thing that changes. And it changes everything.
+A working demonstration of [Pain F.01: Model works locally, breaks in prod](../../pains/F01-model-works-locally.md). Same Python code, two deployment styles. The Dockerfile is the only thing that changes. And it changes everything.
 
 ## What's here
 
@@ -53,4 +53,4 @@ Both serve at `localhost:8000/embed`. Same curl, same response. The difference i
 
 ---
 
-[← Back to Pain 1](../../pains/01-model-works-locally.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain F.01](../../pains/F01-model-works-locally.md) · [Landscape](../../README.md) · [Examples index](../README.md)

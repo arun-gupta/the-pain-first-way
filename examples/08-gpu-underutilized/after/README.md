@@ -215,4 +215,4 @@ Note: claiming a specific MIG slice from a pod requires DRA (Dynamic Resource Al
 
 ---
 
-[← Back to Pain 8](../../pains/08-gpu-underutilized.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain O.01](../../pains/O01-gpu-underutilized.md) · [Landscape](../../README.md) · [Examples index](../README.md)
