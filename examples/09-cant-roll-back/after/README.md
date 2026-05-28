@@ -61,6 +61,8 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 
 ## 5. Push v2-bad
 
+This is the real deployment action the pain is about: update the Deployment to point at a new image tag. `kubectl set image` patches the live Deployment in-place and records a new rollout revision. Here the new image is `model-server:v2-bad` — it starts a container, but that container never serves HTTP, so the readiness probe becomes the gate that protects traffic.
+
 ```bash
 kubectl set image deployment/model-server server=model-server:v2-bad
 kubectl get pods -w
