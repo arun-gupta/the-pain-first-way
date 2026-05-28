@@ -32,8 +32,9 @@ kubectl rollout status deployment/model-server
 Verify it serves traffic:
 
 ```bash
-kubectl port-forward service/model-server 8080:80 &
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
+kubectl port-forward service/model-server 8080:80 >/tmp/model-server-port-forward.log 2>&1 &
+until curl -s -o /dev/null http://localhost:8080; do sleep 1; done
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 ```
 
 ```
