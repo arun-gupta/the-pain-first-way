@@ -85,6 +85,8 @@ curl: (52) Empty reply from server
 
 The pods are Running, the rollout reported success, and the service is broken. Kubernetes gave no warning.
 
+If you stop and restart the port-forward after this step, that fresh connection may fail with `connection refused`. That is still the same failure mode: the Service now points only at broken pods, so there is nothing healthy listening on port 80 behind it.
+
 ## 6. Roll back
 
 ```bash
@@ -93,6 +95,24 @@ kubectl rollout status deployment/model-server
 ```
 
 `kubectl rollout undo` works here — but most teams don't know about it until after the first incident. The more common instinct is to dig through CI logs for the previous image tag and re-apply the old manifest.
+
+After the rollback finishes, start the port-forward again:
+
+```bash
+kubectl port-forward service/model-server 8080:80
+```
+
+In another terminal:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
+```
+
+Expected output:
+
+```
+200
+```
 
 ## Clean up
 
