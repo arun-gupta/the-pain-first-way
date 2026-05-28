@@ -18,39 +18,45 @@ Not the target audience: researchers who live in notebooks, data analysts, or ML
 
 ## The pains
 
-Thirteen pains, sequenced from foundation to compliance. Click any pain to jump to it.
+A growing catalog of pains across two on-ramps, notebook and HPC, and the production lifecycle from foundation to compliance. Click any pain to jump to it.
 
 ```mermaid
 flowchart LR
     subgraph S1[Foundation]
         direction TB
-        N1[1. Model breaks in prod]
+        N1[✓ 1. Model breaks in prod]
     end
     subgraph S2[Compute]
         direction TB
-        N2[2. GPU job crashed]
-        N3[3. Can't get a GPU]
+        N2[✓ 2. GPU job crashed]
+        N3[✓ 3. Can't get a GPU]
         N4[4. Can't express GPU config]
-        N5[5. Multi-node falling over]
+        N5[✓ 5. Multi-node falling over]
         N2 ~~~ N3
         N3 ~~~ N4
         N4 ~~~ N5
     end
     subgraph S3[Serving]
         direction TB
-        N6[6. Cold start]
-        N7[7. Server image coupling]
-        N8[8. GPU at 30 percent]
-        N9[9. Can't roll back]
-        N10[10. Latency spiked]
+        N6[✓ 6. Cold start]
+        N7[✓ 7. Server image coupling]
+        N9[✓ 9. Can't roll back]
+        N16[16. Inference routing]
+        N17[17. Serving many models]
+        N18[18. Weight stampede]
         N6 ~~~ N7
-        N7 ~~~ N8
-        N8 ~~~ N9
-        N9 ~~~ N10
+        N7 ~~~ N9
+        N9 ~~~ N16
+        N16 ~~~ N17
+        N17 ~~~ N18
     end
     subgraph S4[Operations]
         direction TB
+        N8[✓ 8. GPU at 30 percent]
+        N10[10. Latency spiked]
         N11[11. Costs out of control]
+        N8 ~~~ N10
+        N10 ~~~ N11
     end
     subgraph S5[Governance]
         direction TB
@@ -60,7 +66,18 @@ flowchart LR
         direction TB
         N13[13. Data residency]
     end
+    subgraph SHPC[Coming from HPC]
+        direction TB
+        N14[14. SLURM rewrite]
+        N15[15. SLURM bridge]
+        N14 ~~~ N15
+    end
     S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    SHPC ==> S2
+    classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
+    class N1,N2,N3,N5,N6,N7,N8,N9 avail;
+    style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    linkStyle 16 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -74,7 +91,14 @@ flowchart LR
     click N11 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/11-costs-out-of-control.md"
     click N12 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/12-prompt-version.md"
     click N13 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/13-data-residency.md"
+    click N14 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/14-slurm-migration.md"
+    click N15 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/15-slurm-bridge.md"
+    click N16 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/16-inference-routing.md"
+    click N17 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/17-serving-many-models.md"
+    click N18 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/18-weight-stampede.md"
 ```
+
+**Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.
 
 ## How to use this guide
 

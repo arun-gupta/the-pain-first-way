@@ -19,7 +19,7 @@ graph LR
     Q -->|"yes"| RB["scp back\nrestart again\nmore downtime"]
 ```
 
-**What it solves**: nothing — this is the starting point.  
+**What it solves**: nothing — this is the starting point.
 **What it can't do**: no deployment record, no revision history, no atomic switchover. Rollback depends on whether the old file still exists on disk.
 
 ---
@@ -34,7 +34,7 @@ graph LR
     LIVE -->|"bad results"| RB["edit config\nVERSION=v1\nrestart again\nmore downtime"]
 ```
 
-**What it solves**: the old version is always available; rollback is deterministic.  
+**What it solves**: the old version is always available; rollback is deterministic.
 **What it can't do**: still manual, still requires a process restart, still has a downtime window. No health gate — the process coming up does not mean the model is producing valid predictions.
 
 ---
@@ -51,7 +51,7 @@ graph LR
     LB -.->|"rollback:\nswitch back"| ASG1["ASG v1\nstill running\n(costly)"]
 ```
 
-**What it solves**: atomic traffic switchover; rollback does not require a restart.  
+**What it solves**: atomic traffic switchover; rollback does not require a restart.
 **What it can't do**: multi-minute bake times per model version, enormous image sizes, and model version coupled to infrastructure version. Updating a dependency means rebaking the whole image. Keeping both ASGs running doubles cost during the switchover window.
 
 ---
@@ -67,7 +67,7 @@ graph LR
     B --> D["bad responses\nno warning from Kubernetes"]
 ```
 
-**What it solves**: no bake step, no manual SSH, rollout history tracked automatically, `kubectl rollout undo` exists.  
+**What it solves**: no bake step, no manual SSH, rollout history tracked automatically, `kubectl rollout undo` exists.
 **What it can't do**: without a readiness probe, the platform cannot detect a bad rollout. The rollout reports success regardless of whether the pods serve correct responses.
 
 ---
@@ -83,7 +83,7 @@ graph LR
     S -->|"kubectl rollout undo"| R["v1 restored\nzero downtime"]
 ```
 
-**What it solves**: health-gated rollout, zero downtime, single-command rollback against tracked history.  
+**What it solves**: health-gated rollout, zero downtime, single-command rollback against tracked history.
 **What it can't do**: a readiness probe that always passes gives no protection — the probe must reflect actual model readiness, not just process liveness.
 
 ---
