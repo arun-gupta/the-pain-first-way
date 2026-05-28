@@ -106,7 +106,7 @@ flowchart LR
     SHPC ==> S2
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
     class N1,N2,N3,N5,N6,N7,N8,N9 avail;
-    style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1f2937;
     linkStyle 30 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/F01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C01-gpu-job-crashed.md"
