@@ -38,6 +38,8 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 28 | Tool and MCP fleet | `28-tool-fleet/` | Planned |
 | 29 | Agent egress control | `29-agent-egress/` | Planned |
 | 30 | Runaway-loop governance | `30-runaway-agents/` | Planned |
+| 31 | Deploy guardrails | `31-deploy-guardrails/` | Planned |
+| 32 | Audit evidence | `32-audit-evidence/` | Planned |
 
 ## Contributing an example
 
