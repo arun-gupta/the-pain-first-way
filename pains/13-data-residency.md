@@ -22,4 +22,4 @@ When data locality is a hard requirement, workloads run in the region where the 
 
 ---
 
-[← Pain 12: Prompt version in prod](12-prompt-version.md) · [Landscape](../README.md)
+[← Pain 12: Prompt version in prod](12-prompt-version.md) · [Landscape](../README.md) · [Pain 14: SLURM rewrite →](14-slurm-migration.md)

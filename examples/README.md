@@ -21,6 +21,11 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 11 | Costs out of control | `11-autoscaling/` | Planned |
 | 12 | Prompt version in prod | `12-config/` | Planned |
 | 13 | Data residency | `13-multi-cluster/` | Planned |
+| 14 | SLURM to Kubernetes (rewrite) | `14-slurm-migration/` | Planned |
+| 15 | SLURM bridge (Slinky) | `15-slurm-bridge/` | Planned |
+| 16 | Smart inference routing | `16-inference-routing/` | Planned |
+| 17 | Serving many models | `17-serving-many-models/` | Planned |
+| 18 | Weight-download stampede | `18-weight-stampede/` | Planned |
 
 ## Contributing an example
 

@@ -18,7 +18,7 @@ Not the target audience: researchers who live in notebooks, data analysts, or ML
 
 ## The pains
 
-Thirteen pains, sequenced from foundation to compliance. Click any pain to jump to it.
+A growing catalog of pains, sequenced from foundation to compliance, plus newer pains not yet placed in the sequence. Click any pain to jump to it.
 
 ```mermaid
 flowchart LR
@@ -60,7 +60,19 @@ flowchart LR
         direction TB
         N13[13. Data residency]
     end
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    subgraph S7[Recently added · clustering pending]
+        direction TB
+        N14[14. SLURM rewrite]
+        N15[15. SLURM bridge]
+        N16[16. Inference routing]
+        N17[17. Serving many models]
+        N18[18. Weight stampede]
+        N14 ~~~ N15
+        N15 ~~~ N16
+        N16 ~~~ N17
+        N17 ~~~ N18
+    end
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -74,6 +86,11 @@ flowchart LR
     click N11 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/11-costs-out-of-control.md"
     click N12 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/12-prompt-version.md"
     click N13 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/13-data-residency.md"
+    click N14 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/14-slurm-migration.md"
+    click N15 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/15-slurm-bridge.md"
+    click N16 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/16-inference-routing.md"
+    click N17 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/17-serving-many-models.md"
+    click N18 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/18-weight-stampede.md"
 ```
 
 ## How to use this guide
