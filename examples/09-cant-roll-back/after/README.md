@@ -5,7 +5,7 @@ With `RollingUpdate` and a readiness probe, a bad push stalls before it becomes 
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/09-cant-roll-back/after
+cd examples/09-cant-roll-back
 ```
 
 ## Prerequisites
@@ -21,7 +21,21 @@ If you already have a Kind cluster named `kind` from a previous example, you can
 kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
 ```
 
-## 2. Deploy v1
+## 2. Build and load the demo images
+
+```bash
+./build.sh
+```
+
+This builds `model-server:v1` and `model-server:v2-bad`, then loads both into your Kind cluster. No registry needed.
+
+## 3. Switch to the after scenario
+
+```bash
+cd after
+```
+
+## 4. Deploy v1
 
 ```bash
 kubectl apply -f deployment-v1.yaml
@@ -45,10 +59,10 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 200
 ```
 
-## 3. Push v2-bad
+## 5. Push v2-bad
 
 ```bash
-kubectl apply -f deployment-v2-bad.yaml
+kubectl set image deployment/model-server server=model-server:v2-bad
 kubectl get pods -w
 ```
 
@@ -79,7 +93,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 200
 ```
 
-## 4. Roll back
+## 6. Roll back
 
 ```bash
 kubectl rollout undo deployment/model-server

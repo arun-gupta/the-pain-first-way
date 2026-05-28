@@ -5,7 +5,7 @@ The default `RollingUpdate` strategy replaces pods in batches. Without a readine
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/09-cant-roll-back/before
+cd examples/09-cant-roll-back
 ```
 
 ## Prerequisites
@@ -21,7 +21,21 @@ If you already have a Kind cluster named `kind` from a previous example, you can
 kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
 ```
 
-## 2. Deploy v1
+## 2. Build and load the demo images
+
+```bash
+./build.sh
+```
+
+This builds `model-server:v1` and `model-server:v2-bad`, then loads both into your Kind cluster. No registry needed.
+
+## 3. Switch to the before scenario
+
+```bash
+cd before
+```
+
+## 4. Deploy v1
 
 ```bash
 kubectl apply -f deployment-v1.yaml
@@ -45,12 +59,10 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 200
 ```
 
-## 3. Push v2-bad
-
-In practice this would be `kubectl set image deployment/model-server server=myrepo/model:v3`. Here we apply a new manifest to simulate the same effect:
+## 5. Push v2-bad
 
 ```bash
-kubectl apply -f deployment-v2-bad.yaml
+kubectl set image deployment/model-server server=model-server:v2-bad
 kubectl rollout status deployment/model-server
 ```
 
@@ -71,7 +83,7 @@ curl: (52) Empty reply from server
 
 The pods are Running, the rollout reported success, and the service is broken. Kubernetes gave no warning.
 
-## 4. Roll back
+## 6. Roll back
 
 ```bash
 kubectl rollout undo deployment/model-server

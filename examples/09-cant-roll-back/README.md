@@ -6,19 +6,21 @@ A working demonstration of [Pain 9: I can't roll back a bad model without downti
 
 ```
 09-cant-roll-back/
+├── build.sh                     # builds model-server:v1 and model-server:v2-bad, loads both into Kind
 ├── before/                      # RollingUpdate, no readiness probe
-│   ├── deployment-v1.yaml       # v1: nginx serving normally
-│   ├── deployment-v2-bad.yaml   # v2: starts but never serves HTTP
+│   ├── deployment-v1.yaml       # v1 Deployment using model-server:v1
 │   ├── service.yaml             # stable Service for traffic checks
 │   └── README.md
+├── images/
+│   ├── v1/Dockerfile            # good image: nginx serves normally
+│   └── v2-bad/Dockerfile        # bad image: container starts, never serves HTTP
 └── after/                       # RollingUpdate + readiness probe
-    ├── deployment-v1.yaml       # v1: nginx with readiness gate
-    ├── deployment-v2-bad.yaml   # v2: same bad update — now caught by the probe
+    ├── deployment-v1.yaml       # v1 Deployment with readiness gate
     ├── service.yaml             # stable Service for traffic checks
     └── README.md
 ```
 
-Both scenarios run on a local Kind cluster. No GPU required.
+Both scenarios run on a local Kind cluster. No GPU required. The bad rollout is triggered the same way teams usually do it in practice: `kubectl set image deployment/model-server server=model-server:v2-bad`.
 
 ## The point of the diff
 
