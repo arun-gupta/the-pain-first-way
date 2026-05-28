@@ -18,7 +18,7 @@ Not the target audience: researchers who live in notebooks, data analysts, or ML
 
 ## The pains
 
-A growing catalog of pains, sequenced from foundation to compliance, plus newer pains not yet placed in the sequence. Click any pain to jump to it.
+A growing catalog of pains across two on-ramps, notebook and HPC, and the production lifecycle from foundation to compliance. Click any pain to jump to it.
 
 ```mermaid
 flowchart LR
@@ -43,10 +43,16 @@ flowchart LR
         N8[8. GPU at 30 percent]
         N9[9. Can't roll back]
         N10[10. Latency spiked]
+        N16[16. Inference routing]
+        N17[17. Serving many models]
+        N18[18. Weight stampede]
         N6 ~~~ N7
         N7 ~~~ N8
         N8 ~~~ N9
         N9 ~~~ N10
+        N10 ~~~ N16
+        N16 ~~~ N17
+        N17 ~~~ N18
     end
     subgraph S4[Operations]
         direction TB
@@ -60,19 +66,18 @@ flowchart LR
         direction TB
         N13[13. Data residency]
     end
-    subgraph S7[Recently added · clustering pending]
+    subgraph SHPC[Coming from HPC]
         direction TB
         N14[14. SLURM rewrite]
         N15[15. SLURM bridge]
-        N16[16. Inference routing]
-        N17[17. Serving many models]
-        N18[18. Weight stampede]
         N14 ~~~ N15
-        N15 ~~~ N16
-        N16 ~~~ N17
-        N17 ~~~ N18
     end
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    SHPC ==> S2
+    classDef hpc fill:#fde68a,stroke:#d97706,stroke-width:2px,color:#1f2937;
+    class N14,N15 hpc;
+    style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    linkStyle 16 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
