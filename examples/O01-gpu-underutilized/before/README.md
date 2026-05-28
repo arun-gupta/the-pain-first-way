@@ -7,7 +7,7 @@ This is the pattern that produces ~30% GPU utilization at p50 load: the GPU is o
 ## Run the sequential server
 
 ```bash
-cd examples/08-gpu-underutilized/before
+cd examples/O01-gpu-underutilized/before
 python3 server.py
 ```
 

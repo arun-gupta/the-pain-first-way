@@ -5,7 +5,7 @@
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/06-cold-start/after
+cd examples/S01-cold-start/after
 ```
 
 ## Prerequisites
@@ -161,4 +161,4 @@ The key is the shared PVC and the ordering guarantee:
 
 ---
 
-[← Back to Pain S.01](../../pains/S01-cold-start.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain S.01](../../../pains/S01-cold-start.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

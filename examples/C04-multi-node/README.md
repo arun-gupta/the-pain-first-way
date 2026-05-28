@@ -5,7 +5,7 @@ A working demonstration of [Pain C.04: Multi-node training keeps falling over](.
 ## What's here
 
 ```
-05-multi-node/
+C04-multi-node/
 ├── before/        # the naive way: two bare Jobs racing to find each other
 │   ├── train.py
 │   ├── Dockerfile

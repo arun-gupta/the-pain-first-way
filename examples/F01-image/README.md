@@ -5,7 +5,7 @@ A working demonstration of [Pain F.01: Model works locally, breaks in prod](../.
 ## What's here
 
 ```
-01-image/
+F01-image/
 ├── before/        # the typical Python-script-on-a-VM way
 │   ├── app.py
 │   ├── requirements.txt

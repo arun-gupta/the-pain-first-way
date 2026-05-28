@@ -5,12 +5,12 @@ A working demonstration of [Pain C.02: Can't get a GPU when I need one](../../pa
 ## What's here
 
 ```
-03-queueing/
+C02-queueing/
 ├── before/        # the typical way: raw Jobs competing for resources, no ordering
 │   ├── jobs.yaml
 │   └── README.md
 └── after/         # the cloud native way
-    ├── train.py              # the training workload (identical to 02-jobs/after)
+    ├── train.py              # the training workload (identical to C01-jobs/after)
     ├── Dockerfile
     ├── .dockerignore
     ├── build.sh

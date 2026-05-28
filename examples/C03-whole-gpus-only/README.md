@@ -5,7 +5,7 @@ A working demonstration of [Pain C.03: I asked for two GPUs and got two GPUs —
 ## What's here
 
 ```
-04-whole-gpus-only/
+C03-whole-gpus-only/
 ├── before/                          # integer GPU count: no topology awareness
 │   ├── pod-topology.yaml            # nvidia.com/gpu: 2 — no interconnect constraint
 │   ├── pod-mig.yaml                 # nvidia.com/gpu: 1 — no MIG profile constraint

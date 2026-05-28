@@ -5,7 +5,7 @@ A working demonstration of [Pain C.01: GPU job crashed at hour 14](../../pains/C
 ## What's here
 
 ```
-02-jobs/
+C01-jobs/
 ├── before/        # the typical way: python train.py, no safety net
 │   ├── train.py
 │   └── README.md

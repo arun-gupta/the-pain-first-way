@@ -9,7 +9,7 @@ The problem is where those env vars come from. The natural next step when contai
 Copy the example env file, fill in the demo values, and run:
 
 ```bash
-cd examples/07-image-coupling/before
+cd examples/S02-image-coupling/before
 cp .env.example .env
 ```
 

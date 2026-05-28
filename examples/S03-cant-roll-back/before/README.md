@@ -15,7 +15,7 @@ Run these once before trying either `before/` or `after/`.
 ### Navigate to this directory
 
 ```bash
-cd examples/09-cant-roll-back
+cd examples/S03-cant-roll-back
 ```
 
 ### Create a Kind cluster
@@ -37,7 +37,7 @@ This builds `model-server:v1` and `model-server:v2-bad`, then loads both into yo
 ## 1. Switch to the before scenario
 
 ```bash
-cd examples/09-cant-roll-back
+cd examples/S03-cant-roll-back
 cd before
 ```
 

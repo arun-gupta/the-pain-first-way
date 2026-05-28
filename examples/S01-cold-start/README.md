@@ -5,7 +5,7 @@ A working demonstration of [Pain S.01: Cold start for my 70B model takes 4 minut
 ## What's here
 
 ```
-06-cold-start/
+S01-cold-start/
 ├── before/        # the typical way: download logic baked into the server
 │   ├── server.py
 │   └── README.md

@@ -5,7 +5,7 @@ The CN steps here (KEDA autoscaling, GPU partitioning) require a batching-aware 
 ## Setup — Run the batching server
 
 ```bash
-cd examples/08-gpu-underutilized/after
+cd examples/O01-gpu-underutilized/after
 python3 server.py
 ```
 
@@ -215,4 +215,4 @@ Note: claiming a specific MIG slice from a pod requires DRA (Dynamic Resource Al
 
 ---
 
-[← Back to Pain O.01](../../pains/O01-gpu-underutilized.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain O.01](../../../pains/O01-gpu-underutilized.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

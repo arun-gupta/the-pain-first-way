@@ -7,7 +7,7 @@ Kill the pod mid-run. The Job restarts it. It resumes from the last checkpoint, 
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/02-jobs/after
+cd examples/C01-jobs/after
 ```
 
 ## Prerequisites
@@ -133,4 +133,4 @@ The `train.py` in this folder is byte-for-byte identical to `before/train.py` ex
 
 ---
 
-[← Back to Pain C.01](../../pains/C01-gpu-job-crashed.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.01](../../../pains/C01-gpu-job-crashed.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

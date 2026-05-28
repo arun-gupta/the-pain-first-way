@@ -5,7 +5,7 @@ A working demonstration of [Pain O.01: My GPU sits at 30% but my bill says 100%]
 ## What's here
 
 ```
-08-gpu-underutilized/
+O01-gpu-underutilized/
 ├── before/
 │   ├── server.py    # naive sequential server — the problem
 │   └── README.md    # sequential server demo + full pre-CN optimization path (ollama & vLLM)

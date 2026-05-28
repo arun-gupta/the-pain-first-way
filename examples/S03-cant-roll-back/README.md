@@ -5,7 +5,7 @@ A working demonstration of [Pain S.03: I can't roll back a bad model without dow
 ## What's here
 
 ```
-09-cant-roll-back/
+S03-cant-roll-back/
 ├── build.sh                     # builds model-server:v1 and model-server:v2-bad, loads both into Kind
 ├── before/                      # RollingUpdate, no readiness probe
 │   ├── deployment-v1.yaml       # v1 Deployment using model-server:v1

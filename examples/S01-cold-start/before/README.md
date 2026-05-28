@@ -9,7 +9,7 @@ The demo uses a local file copy to simulate the download (no network required). 
 ## Run it
 
 ```bash
-cd examples/06-cold-start/before
+cd examples/S01-cold-start/before
 ```
 
 No dependencies beyond the standard library.
@@ -23,7 +23,7 @@ python3 server.py
 Startup:
 
 ```
-[startup] Downloading weights from .../examples/06-cold-start/after/weights.txt ...
+[startup] Downloading weights from .../examples/S01-cold-start/after/weights.txt ...
 [startup] Weights downloaded in 0.00s -> /tmp/weights.txt
 [startup] Model loaded. Weights preview: these are fake model weights...
 [ready] Inference server listening on port 8080

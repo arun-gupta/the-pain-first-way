@@ -4,7 +4,7 @@
 
 > These manifests have not been verified on live hardware. If you have access to GPU nodes with a DRA driver, contributions welcome — see [issue #24](https://github.com/arun-gupta/the-pain-first-way/issues/24).
 
-This is the same situation as MIG configuration in [Pain O.01's after example](../../08-gpu-underutilized/after/README.md): the manifests are the artefact; a simulated cluster cannot exercise them.
+This is the same situation as MIG configuration in [Pain O.01's after example](../../O01-gpu-underutilized/after/README.md): the manifests are the artefact; a simulated cluster cannot exercise them.
 
 ## What changes
 
@@ -163,4 +163,4 @@ The workload author writes `ResourceClaim` objects describing what they need. Th
 
 ---
 
-[← Back to Pain C.03](../../pains/C03-whole-gpus-only.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.03](../../../pains/C03-whole-gpus-only.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

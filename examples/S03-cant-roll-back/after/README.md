@@ -6,12 +6,12 @@ Assumes you have already completed the one-time setup in [`../before/README.md`]
 
 - prerequisites installed
 - Kind cluster created
-- `./build.sh` already run from `examples/09-cant-roll-back/`
+- `./build.sh` already run from `examples/S03-cant-roll-back/`
 
 ## 1. Switch to the after scenario
 
 ```bash
-cd examples/09-cant-roll-back/after
+cd examples/S03-cant-roll-back/after
 ```
 
 ## 2. Deploy v1
@@ -112,4 +112,4 @@ kubectl delete -f deployment-v1.yaml
 
 ---
 
-[← Back to Pain S.03](../../pains/S03-cant-roll-back.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain S.03](../../../pains/S03-cant-roll-back.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

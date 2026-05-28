@@ -5,7 +5,7 @@ Same training job, submitted through [Kueue](https://kueue.sigs.k8s.io/). The qu
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/03-queueing/after
+cd examples/C02-queueing/after
 ```
 
 ## Prerequisites
@@ -209,4 +209,4 @@ labels:
 
 ---
 
-[← Back to Pain C.02](../../pains/C02-cant-get-a-gpu.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.02](../../../pains/C02-cant-get-a-gpu.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)

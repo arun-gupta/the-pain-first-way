@@ -21,7 +21,7 @@ rendezvous succeeds. Training completes across two separate Kind nodes.
 ## 0. Navigate to this directory
 
 ```bash
-cd examples/05-multi-node/after
+cd examples/C04-multi-node/after
 ```
 
 ## Prerequisites
@@ -364,9 +364,9 @@ every container automatically. **The training code doesn't change.**
 | `restartPolicy: OnFailure` | Same — one bad node restarts without losing the other 31 |
 
 For true gang scheduling (all-or-nothing pod admission), combine PyTorchJob with
-[Kueue](https://kueue.sigs.k8s.io/) — the same tool from [Pain C.02](../../pains/C02-cant-get-a-gpu.md).
+[Kueue](https://kueue.sigs.k8s.io/) — the same tool from [Pain C.02](../../../pains/C02-cant-get-a-gpu.md).
 PyTorchJob integrates natively with Kueue's `LocalQueue` labels.
 
 ---
 
-[← Back to Pain C.04](../../pains/C04-multi-node-training.md) · [Landscape](../../README.md) · [Examples index](../README.md)
+[← Back to Pain C.04](../../../pains/C04-multi-node-training.md) · [Landscape](../../../README.md) · [Examples index](../../README.md)
