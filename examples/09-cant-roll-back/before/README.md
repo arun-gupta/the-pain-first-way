@@ -32,8 +32,12 @@ kubectl rollout status deployment/model-server
 Verify it serves traffic:
 
 ```bash
-kubectl port-forward service/model-server 8080:80 >/tmp/model-server-port-forward.log 2>&1 &
-until curl -s -o /dev/null http://localhost:8080; do sleep 1; done
+kubectl port-forward service/model-server 8080:80
+```
+
+In another terminal:
+
+```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 ```
 
@@ -79,7 +83,6 @@ kubectl rollout status deployment/model-server
 ## Clean up
 
 ```bash
-kill %1  # stop port-forward
 kubectl delete -f service.yaml
 kubectl delete -f deployment-v1.yaml
 ```
