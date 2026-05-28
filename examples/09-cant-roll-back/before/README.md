@@ -75,6 +75,8 @@ Why the port-forward can break: `kubectl port-forward` still has to connect to a
 
 ## 4. Roll back
 
+This reverts the Deployment to its previous rollout revision. Kubernetes updates the live Deployment spec back to `model-server:v1` and replaces the broken pods with the last known-good version.
+
 ```bash
 kubectl rollout undo deployment/model-server
 kubectl rollout status deployment/model-server

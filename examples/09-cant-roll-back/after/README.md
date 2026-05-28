@@ -77,6 +77,8 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 
 ## 4. Roll back
 
+This reverts the Deployment to its previous rollout revision. Kubernetes updates the live Deployment spec back to `model-server:v1` and replaces the failed `v2-bad` attempt with the last known-good version.
+
 ```bash
 kubectl rollout undo deployment/model-server
 kubectl rollout status deployment/model-server
