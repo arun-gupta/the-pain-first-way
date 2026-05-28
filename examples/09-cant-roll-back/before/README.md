@@ -76,7 +76,7 @@ deployment "model-server" successfully rolled out
 The rollout completed. Check the service:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
+curl http://localhost:8080
 ```
 
 ```
