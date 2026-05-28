@@ -45,12 +45,14 @@ flowchart LR
         N6[✓ 6. Cold start]
         N7[✓ 7. Server image coupling]
         N9[✓ 9. Can't roll back]
+        N22[22. Quality gates]
         N16[16. Inference routing]
         N17[17. Serving many models]
         N18[18. Weight stampede]
         N6 ~~~ N7
         N7 ~~~ N9
-        N9 ~~~ N16
+        N9 ~~~ N22
+        N22 ~~~ N16
         N16 ~~~ N17
         N17 ~~~ N18
     end
@@ -58,19 +60,29 @@ flowchart LR
         direction TB
         N8[✓ 8. GPU at 30 percent]
         N10[10. Latency spiked]
+        N26[26. Model drift]
         N11[11. Costs out of control]
         N21[21. GPU device health]
         N8 ~~~ N10
-        N10 ~~~ N11
+        N10 ~~~ N26
+        N26 ~~~ N11
         N11 ~~~ N21
     end
     subgraph S5[Governance]
         direction TB
         N12[12. Prompt version in prod]
+        N23[23. Reproduce shipped model]
+        N12 ~~~ N23
     end
     subgraph S6[Compliance]
         direction TB
         N13[13. Data residency]
+        N25[25. Tenant isolation]
+        N13 ~~~ N25
+    end
+    subgraph S7[Agent Systems]
+        direction TB
+        N24[24. Durable agents]
     end
     subgraph SHPC[Coming from HPC]
         direction TB
@@ -78,12 +90,12 @@ flowchart LR
         N15[15. SLURM bridge]
         N14 ~~~ N15
     end
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
     SHPC ==> S2
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
     class N1,N2,N3,N5,N6,N7,N8,N9 avail;
     style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
-    linkStyle 19 stroke:#d97706,stroke-width:3px;
+    linkStyle 24 stroke:#d97706,stroke-width:3px;
     click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
     click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
     click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
@@ -105,6 +117,11 @@ flowchart LR
     click N19 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/19-data-starvation.md"
     click N20 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/20-model-supply-chain.md"
     click N21 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/21-device-health.md"
+    click N22 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/22-quality-gates.md"
+    click N23 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/23-model-reproducibility.md"
+    click N24 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/24-durable-agents.md"
+    click N25 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/25-tenant-isolation.md"
+    click N26 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/26-model-drift.md"
 ```
 
 **Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.

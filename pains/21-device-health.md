@@ -39,4 +39,4 @@ This is distinct from [Pain 2](02-gpu-job-crashed.md), recovering a crashed job 
 
 ---
 
-[← Pain 20: Untrusted model supply chain](20-model-supply-chain.md) · [Landscape](../README.md)
+[← Pain 20: Untrusted model supply chain](20-model-supply-chain.md) · [Landscape](../README.md) · [Pain 22: Quality gates →](22-quality-gates.md)

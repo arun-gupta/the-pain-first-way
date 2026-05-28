@@ -29,6 +29,11 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | 19 | GPUs starve for data | `19-data-starvation/` | Planned |
 | 20 | Model supply chain | `20-model-supply-chain/` | Planned |
 | 21 | GPU device health | `21-device-health/` | Planned |
+| 22 | Quality gates | `22-quality-gates/` | Planned |
+| 23 | Model reproducibility | `23-model-reproducibility/` | Planned |
+| 24 | Durable agents | `24-durable-agents/` | Planned |
+| 25 | Tenant isolation | `25-tenant-isolation/` | Planned |
+| 26 | Model drift | `26-model-drift/` | Planned |
 
 ## Contributing an example
 
