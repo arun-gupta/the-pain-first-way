@@ -1,0 +1,35 @@
+# v1 of the model server — RollingUpdate strategy with a readiness probe.
+# maxUnavailable: 0 ensures no old pod is removed until a new one is Ready.
+# The readiness probe gates promotion: a pod that fails it is never counted
+# as a successful rollout step and never receives traffic.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      containers:
+      - name: server
+        image: model-server:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5

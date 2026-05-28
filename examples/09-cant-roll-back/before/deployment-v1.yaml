@@ -1,0 +1,23 @@
+# v1 of the model server — default RollingUpdate strategy, no readiness probe.
+# Without a readiness probe, Kubernetes has no signal to distinguish a healthy
+# pod from a broken one. Any pod that starts counts as a successful rollout step.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      containers:
+      - name: server
+        image: model-server:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
