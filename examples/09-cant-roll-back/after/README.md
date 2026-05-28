@@ -1,10 +1,27 @@
 # After: RollingUpdate strategy with readiness probe
 
-**Prerequisites**: a Kubernetes cluster (Kind works fine — `kind create cluster`).
-
 With `RollingUpdate` and a readiness probe, a bad push stalls before it becomes live. Old pods keep serving until new ones pass their health check. `kubectl rollout undo` reverts to the tracked previous revision.
 
-## 1. Deploy v1
+## 0. Navigate to this directory
+
+```bash
+cd examples/09-cant-roll-back/after
+```
+
+## Prerequisites
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+
+## 1. Create a Kind cluster
+
+If you already have a Kind cluster named `kind` from a previous example, you can skip this step.
+
+```bash
+kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
+```
+
+## 2. Deploy v1
 
 ```bash
 kubectl apply -f deployment-v1.yaml
@@ -23,7 +40,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 200
 ```
 
-## 2. Push v2-bad
+## 3. Push v2-bad
 
 ```bash
 kubectl apply -f deployment-v2-bad.yaml
@@ -57,7 +74,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 200
 ```
 
-## 3. Roll back
+## 4. Roll back
 
 ```bash
 kubectl rollout undo deployment/model-server

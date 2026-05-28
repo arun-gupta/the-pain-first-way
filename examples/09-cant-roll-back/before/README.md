@@ -1,10 +1,27 @@
 # Before: RollingUpdate with no readiness probe
 
-**Prerequisites**: a Kubernetes cluster (Kind works fine — `kind create cluster`).
-
 The default `RollingUpdate` strategy replaces pods in batches. Without a readiness probe, Kubernetes has no signal to distinguish a healthy pod from a broken one — any pod that starts counts as a successful rollout step. A bad push completes silently and bad pods receive traffic.
 
-## 1. Deploy v1
+## 0. Navigate to this directory
+
+```bash
+cd examples/09-cant-roll-back/before
+```
+
+## Prerequisites
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+
+## 1. Create a Kind cluster
+
+If you already have a Kind cluster named `kind` from a previous example, you can skip this step.
+
+```bash
+kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
+```
+
+## 2. Deploy v1
 
 ```bash
 kubectl apply -f deployment-v1.yaml
@@ -23,7 +40,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 200
 ```
 
-## 2. Push v2-bad
+## 3. Push v2-bad
 
 In practice this would be `kubectl set image deployment/model-server server=myrepo/model:v3`. Here we apply a new manifest to simulate the same effect:
 
@@ -49,7 +66,7 @@ curl: (52) Empty reply from server
 
 The pods are Running, the rollout reported success, and the service is broken. Kubernetes gave no warning.
 
-## 3. Roll back
+## 4. Roll back
 
 ```bash
 kubectl rollout undo deployment/model-server
