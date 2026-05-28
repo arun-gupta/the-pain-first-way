@@ -22,6 +22,38 @@ A working demonstration of [Pain 9: I can't roll back a bad model without downti
 
 Both scenarios run on a local Kind cluster. No GPU required. The bad rollout is triggered the same way teams usually do it in practice: `kubectl set image deployment/model-server server=model-server:v2-bad`.
 
+## Shared setup
+
+Run these once from `examples/09-cant-roll-back/` before trying either scenario.
+
+### Prerequisites
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Docker](https://docs.docker.com/get-docker/)
+
+### 1. Navigate to this directory
+
+```bash
+cd examples/09-cant-roll-back
+```
+
+### 2. Create a Kind cluster
+
+If you already have a Kind cluster named `kind` from a previous example, you can skip this step.
+
+```bash
+kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
+```
+
+### 3. Build and load the demo images
+
+```bash
+./build.sh
+```
+
+This builds `model-server:v1` and `model-server:v2-bad`, then loads both into your Kind cluster. No registry needed.
+
 ## The point of the diff
 
 `before/` uses the default `RollingUpdate` strategy with no readiness probe. The Deployment reports success even though the new pods serve nothing, and the Service starts routing traffic to broken pods because Kubernetes has no health signal to stop it.
@@ -30,8 +62,8 @@ Both scenarios run on a local Kind cluster. No GPU required. The bad rollout is 
 
 ## Run it
 
-- [`before/README.md`](before/README.md) — observe the downtime and false success report
-- [`after/README.md`](after/README.md) — observe the stall, confirmed service continuity, and clean rollback
+- [`before/README.md`](before/README.md) — after completing shared setup, observe the false success report and broken traffic
+- [`after/README.md`](after/README.md) — using the same cluster and demo images, observe the stalled rollout and clean rollback
 
 ---
 

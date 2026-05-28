@@ -2,40 +2,20 @@
 
 With `RollingUpdate` and a readiness probe, a bad push stalls before it becomes live. Old pods keep serving until new ones pass their health check. `kubectl rollout undo` reverts to the tracked previous revision.
 
-## 0. Navigate to this directory
+Assumes you have already completed the shared setup in [`../README.md`](../README.md):
+
+- prerequisites installed
+- Kind cluster created
+- `./build.sh` already run from `examples/09-cant-roll-back/`
+
+## 1. Switch to the after scenario
 
 ```bash
 cd examples/09-cant-roll-back
-```
-
-## Prerequisites
-
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [kind CLI](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-
-## 1. Create a Kind cluster
-
-If you already have a Kind cluster named `kind` from a previous example, you can skip this step.
-
-```bash
-kind create cluster --name kind 2>/dev/null || echo "Cluster already exists, reusing it."
-```
-
-## 2. Build and load the demo images
-
-```bash
-./build.sh
-```
-
-This builds `model-server:v1` and `model-server:v2-bad`, then loads both into your Kind cluster. No registry needed.
-
-## 3. Switch to the after scenario
-
-```bash
 cd after
 ```
 
-## 4. Deploy v1
+## 2. Deploy v1
 
 ```bash
 kubectl apply -f deployment-v1.yaml
@@ -59,7 +39,7 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080
 200
 ```
 
-## 5. Push v2-bad
+## 3. Push v2-bad
 
 This is the real deployment action the pain is about: update the Deployment to point at a new image tag. `kubectl set image` patches the live Deployment in-place and records a new rollout revision. Here the new image is `model-server:v2-bad` — it starts a container, but that container never serves HTTP, so the readiness probe becomes the gate that protects traffic.
 
@@ -95,7 +75,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8080
 200
 ```
 
-## 6. Roll back
+## 4. Roll back
 
 ```bash
 kubectl rollout undo deployment/model-server
