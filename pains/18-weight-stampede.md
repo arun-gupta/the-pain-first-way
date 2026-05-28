@@ -42,4 +42,4 @@ flowchart TB
 
 ---
 
-[← Pain 17: Serving many models](17-serving-many-models.md) · [Landscape](../README.md)
+[← Pain 17: Serving many models](17-serving-many-models.md) · [Landscape](../README.md) · [Pain 19: GPUs sit idle waiting for data →](19-data-starvation.md)
