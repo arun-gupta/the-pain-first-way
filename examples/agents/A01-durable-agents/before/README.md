@@ -60,11 +60,16 @@ kubectl apply -f agent.yaml
 
 ## Step 1: let the task finish, confirm one charge
 
-Follow the log until the task completes:
+Wait for the pod to be running, then follow the log until the task completes:
 
 ```bash
+kubectl rollout status deploy/payments-agent
 kubectl logs -f deploy/payments-agent
 ```
+
+> If `kubectl logs` prints `... waiting to start: ContainerCreating`, the pod is still
+> starting; the `rollout status` line above waits for that. If you skip it and hit the
+> error, just wait a few seconds and re-run `kubectl logs -f`.
 
 ```
 [agent] task user-task-1: resuming, already done = nothing
@@ -100,9 +105,10 @@ happens when a node fails or the agent is redeployed mid-task:
 kubectl delete pod -l app=payments-agent
 ```
 
-Follow the new pod in the same terminal:
+Wait for the replacement pod to start, then follow it in the same terminal:
 
 ```bash
+kubectl get pods -l app=payments-agent   # re-run until the new pod shows Running
 kubectl logs -f deploy/payments-agent
 ```
 

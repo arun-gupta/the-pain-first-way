@@ -47,8 +47,14 @@ kubectl create configmap agent-code \
   --from-file=main.py --from-file=../shared/agent_task.py \
   --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f agent.yaml
+kubectl rollout status deploy/payments-agent
 kubectl logs -f deploy/payments-agent
 ```
+
+> If `kubectl logs` prints `... waiting to start: ContainerCreating`, the pod is still
+> starting; the `rollout status` line waits for that. After a `kubectl delete pod`
+> later, re-run `kubectl get pods -l app=payments-agent` until the new pod shows Running
+> before tailing logs.
 
 The container pip-installs the `pg8000` driver on start (a few seconds), then:
 
