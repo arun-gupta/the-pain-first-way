@@ -78,7 +78,7 @@ The resulting split:
 
 ## Try it
 
-A working demonstration lives in [`examples/serving/S02-image-coupling/`](../../examples/serving/S02-image-coupling/). The before case runs without Docker or Kubernetes and shows the hardcoded source URL and credentials printed on every startup. The after case uses an init container, a ConfigMap, and a Secret to decouple them from the image; the walkthrough includes steps to simulate a key rotation and a source change without rebuilding. Runnable on a Mac with a local Kind cluster and no GPU required.
+A working demonstration lives in [`examples/S02-image-coupling/`](../../examples/serving/S02-image-coupling/). The before case runs without Docker or Kubernetes and shows the hardcoded source URL and credentials printed on every startup. The after case uses an init container, a ConfigMap, and a Secret to decouple them from the image; the walkthrough includes steps to simulate a key rotation and a source change without rebuilding. Runnable on a Mac with a local Kind cluster and no GPU required.
 
 ---
 

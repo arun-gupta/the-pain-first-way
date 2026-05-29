@@ -1,0 +1,12 @@
+# Prompt v2 -- the change shipped "two weeks later" that dropped the ticket-link
+# instruction. This is the regression the customer reported. Because it is a
+# committed config change with a version, you can point at it exactly, and revert it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-prompt
+  labels:
+    app: prompt-server
+data:
+  version: "2025-08-15-v2"
+  system_prompt: "You are a terse support assistant. Answer in one sentence."

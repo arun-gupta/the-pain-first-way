@@ -60,7 +60,7 @@ The production job jumped the queue. The waiting jobs have a known position. Eve
 
 ## Try it
 
-A working demonstration lives in [`examples/compute/C02-queueing/`](../../examples/compute/C02-queueing/). Three experiment jobs compete for two slots; a fourth production job preempts one and is admitted immediately. Runnable on a Mac with a local Kind cluster and no GPU required. The only change to a Job manifest is two lines.
+A working demonstration lives in [`examples/C02-queueing/`](../../examples/compute/C02-queueing/). Three experiment jobs compete for two slots; a fourth production job preempts one and is admitted immediately. Runnable on a Mac with a local Kind cluster and no GPU required. The only change to a Job manifest is two lines.
 
 ---
 

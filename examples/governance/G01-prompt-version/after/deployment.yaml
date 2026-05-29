@@ -1,0 +1,40 @@
+# The server image is constant. The prompt is mounted from the system-prompt
+# ConfigMap as files under /etc/prompt. Swapping the ConfigMap and restarting the
+# rollout produces a new Deployment revision, so `kubectl rollout history` becomes
+# a record of which prompt version was live and when.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prompt-server
+  labels:
+    app: prompt-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prompt-server
+  template:
+    metadata:
+      labels:
+        app: prompt-server
+    spec:
+      containers:
+        - name: server
+          image: prompt-server:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 1
+            periodSeconds: 5
+          volumeMounts:
+            - name: prompt
+              mountPath: /etc/prompt
+              readOnly: true
+      volumes:
+        - name: prompt
+          configMap:
+            name: system-prompt
