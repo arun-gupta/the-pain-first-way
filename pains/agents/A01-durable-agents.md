@@ -27,13 +27,21 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  USER[user request] --> WF[workflow run]
-  WF --> LOG[step state + tool results]
-  LOG --> T1[tool call 1]
-  T1 --> LOG
-  LOG --> T2[tool call 2]
-  T2 --> LOG
-  LOG --> RESUME[resume after restart]
+  USER[user request] --> WF[agent loop]
+  WF --> STEP
+  STEP --> STORE
+  STORE --> WF
+  RST((process restart)) --> RESUME
+  RESUME --> STORE
+  subgraph P2 ["part 2: idempotent side effects"]
+    STEP["tool call + side effect<br/>(idempotency key)"]
+  end
+  subgraph P1 ["part 1: state store"]
+    STORE[(step state + results)]
+  end
+  subgraph P3 ["part 3: resume point"]
+    RESUME[resume from last completed step]
+  end
 ```
 
 ## The primitives
