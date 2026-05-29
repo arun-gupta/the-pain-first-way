@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain S.02: My server image is coupled to its config and secrets](../../pains/S02-server-image-coupling.md).
 
+**Demonstrates:** ConfigMap · Secret · init container
+
 ## The point of the diff
 
 `before/server.py` hardcodes the weights source URL and credentials as constants. Any operational change -- rotating a key, moving to a new bucket, switching environments -- means editing the file and rebuilding the image.

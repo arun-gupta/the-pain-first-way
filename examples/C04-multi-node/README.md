@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain C.04: Multi-node training keeps falling over](../../pains/C04-multi-node-training.md). Same distributed training simulation, two submission styles. The Kubernetes manifests are the only thing that changes.
 
+**Demonstrates:** PyTorchJob (Kubeflow Training Operator) · gang scheduling
+
 ## What's here
 
 ```

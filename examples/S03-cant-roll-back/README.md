@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain S.03: I can't roll back a bad model without downtime](../../pains/S03-cant-roll-back.md). Both scenarios use the same bad image update — the only difference is the rollout strategy and the presence of a readiness probe.
 
+**Demonstrates:** Deployment (RollingUpdate) · readiness probe · kubectl rollout undo
+
 ## What's here
 
 ```

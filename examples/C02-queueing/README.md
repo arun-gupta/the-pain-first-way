@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain C.02: Can't get a GPU when I need one](../../pains/C02-cant-get-a-gpu.md). Same training job, two submission styles. The Kubernetes manifests are the only thing that changes.
 
+**Demonstrates:** Kueue (ClusterQueue / LocalQueue / ResourceFlavor) · PriorityClass · preemption
+
 ## What's here
 
 ```

@@ -14,7 +14,10 @@ A tool got deprecated, a better one emerged, or the recommendation is off. Open 
 
 ### Add a runnable example
 
-The `examples/` directory is filling in pain-by-pain. If you have a working manifest, Helm chart, or script that demonstrates a primitive from one of the pains, open a PR adding it under `examples/<pain-number>-<short-name>/` with a short README explaining what it shows and how to run it.
+The `examples/` directory is filling in pain-by-pain. If you have a working manifest, Helm chart, or script that demonstrates a primitive from one of the pains, open a PR adding it under `examples/<pain-id>-<short-name>/`, matching the pain's cluster ID (for example `examples/C01-jobs/` for Pain C.01). The README must:
+
+- Open with a one-line **Demonstrates:** entry listing the cloud native technologies it shows, separated by middots, for example `**Demonstrates:** Kubernetes Job · PersistentVolumeClaim · checkpoint + auto-restart`. Keep it consistent with the [master technology list](https://github.com/arun-gupta/the-pain-first-way/issues/31).
+- Explain what it shows and how to run it, ideally on a local Kind cluster with no GPU.
 
 ### Correct something
 
