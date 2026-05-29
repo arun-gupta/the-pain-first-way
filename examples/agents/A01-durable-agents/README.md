@@ -12,17 +12,6 @@ the last completed step with no duplicate.
 > listed as Available in the catalog until all three afters are verified on a live
 > cluster.
 
-## Run it
-
-All variants share one `before/` and one [`shared/`](shared/) harness (the task, the
-idempotent sink, the charge check), so only the durability mechanism changes.
-
-- [`before/README.md`](before/README.md) -- in-memory agent; crash it mid-task and the
-  customer is charged twice. Sets up the cluster and sink the afters reuse.
-- [`after-postgres/README.md`](after-postgres/README.md) -- option B; the same crash,
-  but step state in Postgres lets it resume and charge once.
-- `after-queue/` (option C) and `after-argo/` (option D) -- coming next, same crash test.
-
 ## The three swappable parts
 
 Durability is not one tool. As the pain describes, it is three parts you can assemble
@@ -167,6 +156,17 @@ A and E stay as reference points in the matrix above rather than runnable varian
 (hand-rolled PVC loop) is the same shape as B with a file in place of the database, and
 E (Temporal) is a heavier engine whose instruction-level replay is hard to show
 honestly without a full Temporal deployment.
+
+## Run it
+
+Run the variants in order; `before/` sets up the Kind cluster and the sink that the
+rest reuse.
+
+1. [`before/`](before/README.md) -- watch the in-memory agent charge twice after a crash.
+2. [`after-postgres/`](after-postgres/README.md) -- the same crash, resumed from Postgres,
+   charged once.
+
+`after-queue/` (C) and `after-argo/` (D) follow the same two-step shape once built.
 
 ---
 
