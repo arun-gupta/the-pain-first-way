@@ -15,6 +15,12 @@ No Docker or image build is needed: the agent and the sink run on the stock
 Kind cluster and sink are reused by the `after-*` variants, so set them up
 once here.
 
+> **If you ran the [G.03 example](../../../governance/G03-deploy-guardrails/) on this
+> cluster**, its Kyverno admission policy is still enforcing and will block these
+> workloads (a `docker.io` image, no governance labels). Remove it with
+> `kubectl delete clusterpolicy deploy-guardrails`, or run this example on a fresh Kind
+> cluster.
+
 ## Create a Kind cluster
 
 If you already have a Kind cluster named `kind`, skip this.
