@@ -38,7 +38,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | A.03 | Tool and MCP fleet | `agents/A03-tool-fleet/` | Planned |
 | A.04 | Agent egress control | `agents/A04-agent-egress/` | Planned |
 | A.05 | Runaway-loop governance | `agents/A05-runaway-agents/` | Planned |
-| G.03 | Deploy guardrails | `governance/G03-deploy-guardrails/` | Planned |
+| G.03 | Deploy guardrails | [`governance/G03-deploy-guardrails/`](governance/G03-deploy-guardrails/) | Available |
 | R.03 | Audit evidence | `compliance/R03-audit-evidence/` | Planned |
 
 ## Contributing an example
