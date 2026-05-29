@@ -71,7 +71,7 @@ When the Dockerfile pattern is applied to a model server:
 
 ## Try it
 
-A working demonstration lives in [`examples/F01-image/`](../../examples/foundation/F01-image/). Same Python code shipped two ways (with and without a Dockerfile), plus a diagnostic command that surfaces your own laptop's accumulated state before you read the Dockerfile section.
+A working demonstration lives in [`examples/foundation/F01-image/`](../../examples/foundation/F01-image/). Same Python code shipped two ways (with and without a Dockerfile), plus a diagnostic command that surfaces your own laptop's accumulated state before you read the Dockerfile section.
 
 ---
 

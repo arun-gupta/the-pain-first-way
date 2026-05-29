@@ -68,7 +68,7 @@ sequenceDiagram
 
 ## Try it
 
-A working demonstration lives in [`examples/C04-multi-node/`](../../examples/compute/C04-multi-node/). Same distributed training simulation submitted two ways (bare Jobs vs PyTorchJob), runnable on a Mac with a local Kind cluster and no GPU required. The before case shows the rendezvous timeout and hang; the after case shows the operator coordinating all pods together and recovering a crashed worker without restarting the master.
+A working demonstration lives in [`examples/compute/C04-multi-node/`](../../examples/compute/C04-multi-node/). Same distributed training simulation submitted two ways (bare Jobs vs PyTorchJob), runnable on a Mac with a local Kind cluster and no GPU required. The before case shows the rendezvous timeout and hang; the after case shows the operator coordinating all pods together and recovering a crashed worker without restarting the master.
 
 ---
 
