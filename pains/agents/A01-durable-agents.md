@@ -54,6 +54,8 @@ Each of the three parts has a range of implementations, from hand-rolled to a ma
 
 Whichever mechanism you pick, timeouts, retries, and compensation steps become part of the workflow definition rather than surprises in a stack trace. Queues and workers are worth calling out as a packaging: the queue holds part 1 (the work item) and provides part 3 (redelivery), leaving you to supply part 2.
 
+The [example design doc](../../examples/agents/A01-durable-agents/) compares five ways to assemble these three parts (PVC, Postgres, durable queue, Argo, Temporal), with a diagram for each and a side-by-side matrix.
+
 This is related to [Pain C.01](../compute/C01-gpu-job-crashed.md), but the state is not only a training checkpoint. It is a sequence of tool calls and side effects that must remain coherent for the user.
 
 ## Trade-offs
