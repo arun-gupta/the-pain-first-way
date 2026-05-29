@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain C.03: I asked for two GPUs and got two GPUs — but they can't talk to each other](../../pains/C03-whole-gpus-only.md). Two scenarios, two manifest sets. The scheduler is the only thing that changes.
 
+**Demonstrates:** Dynamic Resource Allocation (DeviceClass, ResourceClaim) · topology-aware scheduling
+
 ## What's here
 
 ```

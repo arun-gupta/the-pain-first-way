@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain C.01: GPU job crashed at hour 14](../../pains/C01-gpu-job-crashed.md). Same Python training code, two deployment styles. The Kubernetes manifests are the only thing that changes. And that changes everything.
 
+**Demonstrates:** Kubernetes Job · PersistentVolumeClaim · checkpoint + auto-restart
+
 ## What's here
 
 ```

@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain S.01: Cold start for my 70B model takes 4 minutes](../../pains/S01-cold-start.md). Same inference server code, two deployment styles. The init container pattern is the only thing that changes. And that changes everything about portability.
 
+**Demonstrates:** init container · shared volume (weight staging)
+
 ## What's here
 
 ```

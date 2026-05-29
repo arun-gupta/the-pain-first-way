@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain F.01: Model works locally, breaks in prod](../../pains/F01-model-works-locally.md). Same Python code, two deployment styles. The Dockerfile is the only thing that changes. And it changes everything.
 
+**Demonstrates:** Dockerfile · container image · image registry (digest-addressable)
+
 ## What's here
 
 ```

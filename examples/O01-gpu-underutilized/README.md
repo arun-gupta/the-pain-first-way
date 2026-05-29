@@ -2,6 +2,8 @@
 
 A working demonstration of [Pain O.01: My GPU sits at 30% but my bill says 100%](../../pains/O01-gpu-underutilized.md). Same inference server, same simulated workload: pre-CN serving-engine optimizations in `before/`, then two independent CN layers in `after/`. No GPU required.
 
+**Demonstrates:** KEDA (custom-metric autoscaling) · Prometheus · GPU Operator MIG
+
 ## What's here
 
 ```

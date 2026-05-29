@@ -47,6 +47,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md). Examples should be:
 
 - **Minimal**: smallest manifest that demonstrates the pattern
 - **Self-contained**: a folder per example, with its own README explaining what it shows and how to run it
+- **Explicit about tech**: open the README with a `**Demonstrates:**` line naming the cloud native technologies it shows (see the [master list](https://github.com/arun-gupta/the-pain-first-way/issues/31))
 - **Honest about limitations**: real-world deployments will need more
 
 ---
