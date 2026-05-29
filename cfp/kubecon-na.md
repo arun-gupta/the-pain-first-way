@@ -25,3 +25,33 @@ This talk closes the gap from the AI developer's side, and it does it with patte
 Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA, KServe and the Gateway API Inference Extension, Kyverno) with no product pitch. It also serves two audiences the ecosystem is actively courting: ML engineers moving from notebooks to production, and HPC teams migrating off SLURM.
 
 Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, a durable resource the community can extend long after the talk: https://github.com/arun-gupta/the-pain-first-way
+
+## CNCF-hosted software
+
+Projects referenced or demonstrated in the talk that are hosted by CNCF (or are Kubernetes SIG subprojects):
+
+- Kubernetes (Jobs, Deployments, ConfigMaps, Secrets, PVCs, DRA)
+- Kueue (Kubernetes SIG-Scheduling) for gang scheduling and quotas
+- KServe for model serving
+- Kyverno for admission guardrails
+- KEDA for event-driven autoscaling
+- Prometheus for inference and GPU observability
+- Volcano for batch and gang scheduling
+- Fluid for training-data orchestration
+- Argo (Argo CD) for GitOps rollout and history
+- Gateway API and the Gateway API Inference Extension (Kubernetes SIG-Network)
+- Knative for scale-to-zero serving
+- node-problem-detector (Kubernetes SIG) for node and device health
+
+## Open source projects
+
+Non-CNCF open source projects referenced:
+
+- vLLM (inference server)
+- Slurm and Slinky (HPC scheduler and its Kubernetes bridge, SchedMD)
+- NVIDIA GPU Operator and DCGM (GPU management and health)
+- Ray and KubeRay (distributed compute)
+- Sigstore / cosign (model supply-chain signing, OpenSSF)
+- llm-d (KV-cache-aware inference routing)
+- JuiceFS and Alluxio (data caching and acceleration)
+- Spegel (peer-to-peer image and weight distribution)
