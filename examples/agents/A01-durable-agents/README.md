@@ -23,6 +23,21 @@ independently:
 The options below all provide the same three parts. They differ in what you build by
 hand versus what an engine supplies, and in how finely they resume.
 
+## The five options at a glance
+
+| Option | State store (part 1) | Idempotency (part 2) | Resume (part 3) | Resume granularity |
+|---|---|---|---|---|
+| **A** PVC + hand-rolled loop | PVC file | hand-coded key check | your checkpoint-and-resume loop | wherever you checkpoint |
+| **B** Postgres + checkpointer | Postgres table | `INSERT ... ON CONFLICT` (visible) | your loop / saver reads last committed step | per committed step |
+| **C** durable queue + worker | the queue message *is* the state | hand-coded key check | queue redelivers the unacked message | whole work item (coarsest) |
+| **D** Argo Workflows | K8s API status + artifact repo | your keys; engine re-runs whole step | Argo skips finished DAG steps on retry | per step |
+| **E** Temporal | Temporal's event history datastore | wanted; replay shrinks the window | Temporal replays history to rebuild state | per instruction (finest) |
+
+A, B, and C are "you assemble all three parts." D and E are "the engine owns part 3
+and brings its own part 1." Part 2 effort scales inversely with resume granularity:
+the coarser the resume, the harder idempotency has to work. Each option is detailed
+below with its own diagram.
+
 ## The options
 
 ### Option A: PVC + hand-rolled loop
@@ -119,20 +134,6 @@ flowchart LR
   RESTART((worker dies)) -.-> EH
   EH -.replay history, rebuild state.-> TW
 ```
-
-## Comparison
-
-| Option | State store (part 1) | Idempotency (part 2) | Resume (part 3) | Resume granularity |
-|---|---|---|---|---|
-| **A** PVC + hand-rolled loop | PVC file | hand-coded key check | your checkpoint-and-resume loop | wherever you checkpoint |
-| **B** Postgres + checkpointer | Postgres table | `INSERT ... ON CONFLICT` (visible) | your loop / saver reads last committed step | per committed step |
-| **C** durable queue + worker | the queue message *is* the state | hand-coded key check | queue redelivers the unacked message | whole work item (coarsest) |
-| **D** Argo Workflows | K8s API status + artifact repo | your keys; engine re-runs whole step | Argo skips finished DAG steps on retry | per step |
-| **E** Temporal | Temporal's event history datastore | wanted; replay shrinks the window | Temporal replays history to rebuild state | per instruction (finest) |
-
-A, B, and C are "you assemble all three parts." D and E are "the engine owns part 3
-and brings its own part 1." Part 2 effort scales inversely with resume granularity:
-the coarser the resume, the harder idempotency has to work.
 
 ## Leaning
 
