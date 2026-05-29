@@ -50,21 +50,9 @@ Each of the three parts has a range of implementations, from hand-rolled to a ma
 
 - **A state store (part 1).** The conversation, tool outputs, approvals, and per-step checkpoints have to live somewhere a fresh process can read: a PVC, a database, object storage, or the payload of a durable queue message. The choice is about sharing and transactionality, not about whether it counts as durable.
 - **Idempotency keys (part 2).** Every external action carries a key, so a retry after a crash is a no-op instead of a second charge or a duplicate email. This is the one part no engine can supply for you: an engine can re-run a step, but only your code can make re-running safe. The coarser the resume granularity, the more this part has to carry.
-- **A resume mechanism (part 3).** On restart, something has to read the recorded state and continue from the last completed step. You can hand-roll a checkpoint-and-resume loop; use a durable-execution engine like Temporal that replays an event history to rebuild in-process state; use a step-level workflow engine like Argo Workflows that records which steps in a DAG finished and skips them on retry; let a durable queue (NATS JetStream, Kafka, SQS) redeliver an unacknowledged message to a new worker; or use an agent framework's checkpointer, such as LangGraph's Postgres or SQLite savers. These differ mainly in how finely they resume: Temporal to the instruction, Argo to the step, a queue to the whole work item, which is why coarser engines lean harder on part 2.
+- **A resume mechanism (part 3).** On restart, something has to read the recorded state and continue from the last completed step. You can hand-roll a checkpoint-and-resume loop; use a durable-execution engine like Temporal that replays an event history to rebuild in-process state; use a step-level workflow engine like Argo Workflows that records which steps in a DAG finished and skips them on retry; let a durable queue (NATS JetStream, Kafka via Strimzi, RabbitMQ, Pulsar, Redis Streams) redeliver an unacknowledged message to a new worker; or use an agent framework's checkpointer, such as LangGraph's Postgres or SQLite savers. These differ mainly in how finely they resume: Temporal to the instruction, Argo to the step, a queue to the whole work item, which is why coarser engines lean harder on part 2.
 
 Whichever mechanism you pick, timeouts, retries, and compensation steps become part of the workflow definition rather than surprises in a stack trace. Queues and workers are worth calling out as a packaging: the queue holds part 1 (the work item) and provides part 3 (redelivery), leaving you to supply part 2.
-
-Five common ways to assemble the three parts, from hand-rolled to managed engine:
-
-| Option | State store (part 1) | Idempotency (part 2) | Resume (part 3) | Resume granularity |
-|---|---|---|---|---|
-| **A** PVC + hand-rolled loop | PVC file | hand-coded key check | your checkpoint-and-resume loop | wherever you checkpoint |
-| **B** Postgres + checkpointer | Postgres table | `INSERT ... ON CONFLICT` (visible) | your loop or saver reads last committed step | per committed step |
-| **C** durable queue + worker | the queue message *is* the state | hand-coded key check | queue redelivers the unacked message | whole work item (coarsest) |
-| **D** Argo Workflows | K8s API status + artifact repo | your keys; engine re-runs whole step | Argo skips finished DAG steps on retry | per step |
-| **E** Temporal | Temporal's event history datastore | wanted; replay shrinks the window | Temporal replays history to rebuild state | per instruction (finest) |
-
-A, B, and C are "you assemble all three parts." D and E are "the engine owns part 3 and brings its own part 1." Part 2 effort scales inversely with resume granularity: the coarser the resume, the harder idempotency has to work.
 
 This is related to [Pain C.01](../compute/C01-gpu-job-crashed.md), but the state is not only a training checkpoint. It is a sequence of tool calls and side effects that must remain coherent for the user.
 

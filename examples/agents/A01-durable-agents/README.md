@@ -58,16 +58,33 @@ flowchart LR
 
 The queue holds the work item (part 1) and redelivers it if the worker dies before
 acking (part 3). You still supply idempotency (part 2). Coarsest resume: the whole
-work item is reprocessed.
+work item is reprocessed. The queue itself is swappable; several cloud native backends
+give the same ack-or-redeliver guarantee:
+
+- **NATS JetStream** (CNCF): durable streams with explicit ack and redelivery.
+- **Apache Kafka via Strimzi** (Strimzi is a CNCF project): durable log, consumer offsets.
+- **RabbitMQ** (cluster operator): ack and requeue on the channel.
+- **Apache Pulsar**: durable topics with negative-ack and redelivery.
+- **Redis Streams**: consumer groups with `XACK` / `XCLAIM` for redelivery.
+
+KEDA (CNCF) pairs with any of them to scale the worker pool on queue depth.
 
 ```mermaid
 flowchart LR
-  Q[(durable queue)] --> W[worker pulls message]
+  subgraph QUEUE ["durable queue: pick a CN backend"]
+    direction TB
+    NATS[NATS JetStream]
+    KAFKA[Kafka via Strimzi]
+    RMQ[RabbitMQ]
+    PULSAR[Pulsar]
+    REDIS[Redis Streams]
+  end
+  QUEUE --> W[worker pulls message]
   W --> STEP["step + side effect<br/>(idempotency key)"]
   STEP --> ACK[ack on success]
-  ACK --> Q
-  RESTART((worker dies, no ack)) -.-> Q
-  Q -.redeliver to new worker.-> W
+  ACK --> QUEUE
+  RST((worker dies, no ack)) -.-> QUEUE
+  QUEUE -.redeliver to new worker.-> W
 ```
 
 ### Option D: Argo Workflows
