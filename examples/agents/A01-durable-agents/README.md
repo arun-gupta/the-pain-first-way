@@ -147,14 +147,26 @@ flowchart LR
   EH -.replay history, rebuild state.-> TW
 ```
 
-## Leaning
+## What this example implements
 
-Build **B (Postgres + checkpointer)** as the core `after/`: it is the most honest
-representation of how real agents are made durable, it makes idempotency a visible
-unique constraint rather than a toy check, and it runs on a plain Kind cluster with no
-CNI requirement. `before/` is the identical loop holding state in process memory.
-Reference D, E, C, and LangGraph savers in a "Beyond this" section rather than building
-each one.
+Three of the five options get a runnable `after-*` variant. All share the same
+`before/` and the same [`shared/`](shared/) harness, so the crash test is identical and
+only the durability mechanism differs:
+
+- **B -- Postgres + checkpointer** ([`after-postgres/`](after-postgres/README.md),
+  built): the honest core, where state (part 1) and idempotency (part 2) are visible as
+  plain SQL on a plain Kind cluster.
+- **C -- durable queue + worker** (`after-queue/`, next): NATS JetStream holds the work
+  item and redelivers it to a new worker on crash.
+- **D -- Argo Workflows** (`after-argo/`, next): the engine owns part 3, resuming at
+  step granularity.
+
+Build order is B then C then D, each verified on a live cluster before the next.
+
+A and E stay as reference points in the matrix above rather than runnable variants: A
+(hand-rolled PVC loop) is the same shape as B with a file in place of the database, and
+E (Temporal) is a heavier engine whose instruction-level replay is hard to show
+honestly without a full Temporal deployment.
 
 ---
 
