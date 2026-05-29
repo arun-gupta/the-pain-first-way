@@ -4,9 +4,9 @@
 
 ## The pattern
 
-Two gaps, one cause: deploys aren't governed. Without a policy gate, any workload that parses can reach prod, compliant or not. Without an enforced approval step, "who signed off?" is a question nobody can answer after the fact. Cloud native closes both at the same chokepoint: admission control rejects what violates policy, and a reviewed change path is the only way in, with identity and approval attached. Cloud native can enforce the rules and record the gate; it cannot decide what the rules should be.
+A deploy reaches prod without passing through anyone. With no policy gate, any workload that is valid YAML is admitted, compliant or not, so an unapproved registry, a mutable `:latest` tag, or a missing residency label all wave through. With no enforced approval, when an auditor later asks who signed off, the honest answer is that nothing required that anyone did. It is one gap seen twice: the cluster accepts whatever it is handed and keeps no record of who decided it should. The fix is to route every change through one chokepoint, a policy gate that rejects what breaks the rules and a reviewed change path that is the only way in, so each deploy carries an identity and an approval.
 
-**Without a gate, anything reaches prod unaccountably:**
+**Without cloud native (no gate, anything reaches prod unaccountably)**
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,7 @@ flowchart LR
   BAD --> Q["who approved it? unknown"]
 ```
 
-**With a gate, only compliant changes pass, with an owner:**
+**With cloud native (a gate, only compliant changes pass, with an owner)**
 
 ```mermaid
 flowchart LR
@@ -41,6 +41,10 @@ This builds on [Pain F.02](../foundation/F02-model-supply-chain.md) and [Pain G.
 **What you keep**: your deploy flow, now with a gate in front of it.
 
 **What you give up**: ad hoc deploys and implicit trust. Every change passes a policy check and carries a recorded approval.
+
+## Try it
+
+A working demonstration lives in [`examples/governance/G03-deploy-guardrails/`](../../examples/governance/G03-deploy-guardrails/). [`before/`](../../examples/governance/G03-deploy-guardrails/before/README.md) deploys a non-compliant workload (unapproved registry, a mutable `:latest` tag, no `owner` or `data-residency` label) into an ungoverned cluster and nothing stops it. [`after/`](../../examples/governance/G03-deploy-guardrails/after/README.md) installs [Kyverno](https://kyverno.io/) and applies one `ClusterPolicy` with three Enforce-mode rules: the same manifest is now rejected at admission with the rejection naming every rule it broke, only a compliant Deployment passes, and the pass is recorded as a PolicyReport. Runnable on a local Kind cluster with no GPU required. This covers the admission-control half of the pain; the reviewed-merge approval path is described above, not scripted.
 
 ---
 

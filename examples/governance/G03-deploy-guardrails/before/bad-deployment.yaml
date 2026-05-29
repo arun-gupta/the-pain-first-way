@@ -1,0 +1,26 @@
+# The deploy nobody gated.
+#
+# Three things are wrong with it, and in an ungoverned cluster none of them stop it:
+#   1. the image comes from an unapproved registry (docker.io, implied by a bare name)
+#   2. it uses a mutable ':latest' tag, so "what exactly ran" drifts over time
+#   3. it carries no 'owner' and no 'data-residency' label
+#
+# It still reaches prod. Later, "who approved this, and was it compliant?" has no answer.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  # no owner label, no data-residency label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      containers:
+        - name: app
+          image: nginx:latest

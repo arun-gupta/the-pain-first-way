@@ -1,0 +1,57 @@
+# Three deploy guardrails, enforced at admission.
+#
+# A Deployment that violates any rule is rejected before it is ever created: the
+# cluster will not hold a non-compliant workload, and the rejection names every
+# rule that failed. failureAction: Enforce is what makes it a gate rather than a
+# warning -- switch it to Audit and violations are recorded but still admitted.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: deploy-guardrails
+spec:
+  background: true
+  rules:
+    - name: require-approved-registry
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        failureAction: Enforce
+        message: "Images must come from the approved registry 'registry.k8s.io'."
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: "registry.k8s.io/*"
+    - name: disallow-latest-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        failureAction: Enforce
+        message: "A mutable ':latest' tag is not allowed; pin an immutable version."
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: "!*:latest"
+    - name: require-governance-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        failureAction: Enforce
+        message: "Deployments must carry 'owner' and 'data-residency' labels."
+        pattern:
+          metadata:
+            labels:
+              owner: "?*"
+              data-residency: "?*"

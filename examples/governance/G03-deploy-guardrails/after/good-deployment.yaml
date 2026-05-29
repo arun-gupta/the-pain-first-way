@@ -1,0 +1,27 @@
+# The same kind of workload, done compliantly.
+#
+#   1. the image comes from the approved registry (registry.k8s.io)
+#   2. the tag is pinned to an immutable version, not ':latest'
+#   3. it carries both required governance labels: 'owner' and 'data-residency'
+#
+# This is what the gate lets through.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  labels:
+    owner: payments-team
+    data-residency: eu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      containers:
+        - name: app
+          image: registry.k8s.io/pause:3.10
