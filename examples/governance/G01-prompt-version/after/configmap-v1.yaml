@@ -1,0 +1,12 @@
+# Prompt v1 -- the known-good prompt. Versioned in git, owned, reviewable.
+# To change the prompt, you edit this file and open a PR. The git log of this
+# file is the audit trail: "what prompt was running on August 1st" is answerable.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-prompt
+  labels:
+    app: prompt-server
+data:
+  version: "2025-08-01-v1"
+  system_prompt: "You are a helpful support assistant. End every answer with a ticket link."

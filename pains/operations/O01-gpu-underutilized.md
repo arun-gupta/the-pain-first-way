@@ -86,7 +86,7 @@ The alternative — running three or four underutilized replicas — is also com
 
 ## Try it
 
-A working demonstration lives in [`examples/operations/O01-gpu-underutilized/`](../../examples/operations/O01-gpu-underutilized/). [`before/`](../../examples/operations/O01-gpu-underutilized/before/) shows the sequential server and the full pre-CN optimization path — continuous batching, quantization, prefix caching, and the vLLM production flags — with a Mac (ollama) track runnable without a GPU. [`after/`](../../examples/operations/O01-gpu-underutilized/after/) covers the CN layers: observe the CPU HPA miss the signal under load, then apply KEDA to scale on `inference_requests_in_flight` instead (Step 1); review the GPU Operator MIG config for GPU sharing (Step 2, informational — requires a real GPU node). No GPU required for Step 1.
+A working demonstration lives in [`examples/O01-gpu-underutilized/`](../../examples/operations/O01-gpu-underutilized/). [`before/`](../../examples/operations/O01-gpu-underutilized/before/) shows the sequential server and the full pre-CN optimization path — continuous batching, quantization, prefix caching, and the vLLM production flags — with a Mac (ollama) track runnable without a GPU. [`after/`](../../examples/operations/O01-gpu-underutilized/after/) covers the CN layers: observe the CPU HPA miss the signal under load, then apply KEDA to scale on `inference_requests_in_flight` instead (Step 1); review the GPU Operator MIG config for GPU sharing (Step 2, informational — requires a real GPU node). No GPU required for Step 1.
 
 ---
 

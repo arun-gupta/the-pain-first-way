@@ -19,7 +19,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | S.03 | Can't roll back | [`serving/S03-cant-roll-back/`](serving/S03-cant-roll-back/) | Available |
 | O.02 | Latency spiked | `operations/O02-observability/` | Planned |
 | O.04 | Costs out of control | `operations/O04-autoscaling/` | Planned |
-| G.01 | Prompt version in prod | `governance/G01-config/` | Planned |
+| G.01 | Prompt version in prod | [`governance/G01-prompt-version/`](governance/G01-prompt-version/) | Available |
 | R.01 | Data residency | `compliance/R01-multi-cluster/` | Planned |
 | H.01 | SLURM to Kubernetes (rewrite) | `hpc/H01-slurm-migration/` | Planned |
 | H.02 | SLURM bridge (Slinky) | `hpc/H02-slurm-bridge/` | Planned |
