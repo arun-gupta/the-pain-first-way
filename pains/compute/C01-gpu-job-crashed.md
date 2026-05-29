@@ -41,7 +41,7 @@ In cloud native, long-running compute is declared rather than invoked. You descr
 
 ## Try it
 
-A working demonstration lives in [`examples/C01-jobs/`](../../examples/compute/C01-jobs/). Same Python training loop shipped two ways (bare script vs Kubernetes Job + PVC), runnable on a Mac with a local Kind cluster and no GPU required. Kill the pod mid-run, watch the replacement resume from the last checkpoint.
+A working demonstration lives in [`examples/compute/C01-jobs/`](../../examples/compute/C01-jobs/). Same Python training loop shipped two ways (bare script vs Kubernetes Job + PVC), runnable on a Mac with a local Kind cluster and no GPU required. Kill the pod mid-run, watch the replacement resume from the last checkpoint.
 
 ---
 
