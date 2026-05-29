@@ -27,7 +27,7 @@ spec:
       containers:
         - name: agent
           image: python:3.12-slim
-          command: ["sh", "-c", "pip install --quiet pg8000 && python /app/main.py"]
+          command: ["sh", "-c", "pip install --quiet --root-user-action=ignore --disable-pip-version-check pg8000 && python /app/main.py"]
           env:
             - name: SINK_URL
               value: "http://sink"

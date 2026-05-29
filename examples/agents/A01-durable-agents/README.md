@@ -8,9 +8,9 @@ side effects. `after/` makes the run durable, so killing the pod mid-task resume
 the last completed step with no duplicate.
 
 > **Status: in progress.** `before/` and `after-postgres/` (option B) are built and
-> runnable. `after-queue/` (C) and `after-argo/` (D) are next. The example is not yet
-> listed as Available in the catalog until all three afters are verified on a live
-> cluster.
+> verified on a live Kind cluster. `after-queue/` (C) and `after-argo/` (D) are next.
+> The example is not yet listed as Available in the catalog until all three afters are
+> done.
 
 ## The three swappable parts
 
