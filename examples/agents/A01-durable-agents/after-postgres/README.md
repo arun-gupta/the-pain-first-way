@@ -23,7 +23,11 @@ kubectl apply -f ../shared/sink/sink.yaml
 kubectl rollout status deploy/sink
 ```
 
-Reset the sink so charges start from zero:
+## Reset the sink
+
+Do this whether or not you ran `before/`: the sink still holds `before/`'s
+charges, so reset it to zero before this run, or the count will mix the two
+variants.
 
 ```bash
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
