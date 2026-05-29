@@ -1,0 +1,48 @@
+# The idempotent side-effect sink. Reused by before/ and every after-* variant.
+# Create its code ConfigMap first (from this directory):
+#   kubectl create configmap sink-code --from-file=sink.py \
+#     --dry-run=client -o yaml | kubectl apply -f -
+# then: kubectl apply -f sink.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sink
+  labels:
+    app: sink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sink
+  template:
+    metadata:
+      labels:
+        app: sink
+    spec:
+      containers:
+        - name: sink
+          image: python:3.12-slim
+          command: ["python", "/app/sink.py"]
+          env:
+            - name: PORT
+              value: "8080"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: code
+              mountPath: /app
+      volumes:
+        - name: code
+          configMap:
+            name: sink-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sink
+spec:
+  selector:
+    app: sink
+  ports:
+    - port: 80
+      targetPort: 8080

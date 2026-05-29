@@ -1,0 +1,39 @@
+# The non-durable agent. Mount its code from a ConfigMap (run from before/):
+#   kubectl create configmap agent-code \
+#     --from-file=main.py --from-file=../shared/agent_task.py \
+#     --dry-run=client -o yaml | kubectl apply -f -
+# then: kubectl apply -f agent.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-agent
+  labels:
+    app: payments-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-agent
+  template:
+    metadata:
+      labels:
+        app: payments-agent
+    spec:
+      containers:
+        - name: agent
+          image: python:3.12-slim
+          command: ["python", "/app/main.py"]
+          env:
+            - name: SINK_URL
+              value: "http://sink"
+            - name: TASK_ID
+              value: "user-task-1"
+            - name: STEP_DELAY
+              value: "5"
+          volumeMounts:
+            - name: code
+              mountPath: /app
+      volumes:
+        - name: code
+          configMap:
+            name: agent-code

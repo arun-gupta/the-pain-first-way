@@ -7,9 +7,21 @@ process memory, so killing the pod mid-task loses state and a retry duplicates t
 side effects. `after/` makes the run durable, so killing the pod mid-task resumes from
 the last completed step with no duplicate.
 
-> **Status: design in progress.** This README captures the durability options under
-> consideration. `before/` and `after/` are not built yet, so this example is not
-> listed as Available in the catalog.
+> **Status: in progress.** `before/` and `after-postgres/` (option B) are built and
+> runnable. `after-queue/` (C) and `after-argo/` (D) are next. The example is not yet
+> listed as Available in the catalog until all three afters are verified on a live
+> cluster.
+
+## Run it
+
+All variants share one `before/` and one [`shared/`](shared/) harness (the task, the
+idempotent sink, the charge check), so only the durability mechanism changes.
+
+- [`before/README.md`](before/README.md) -- in-memory agent; crash it mid-task and the
+  customer is charged twice. Sets up the cluster and sink the afters reuse.
+- [`after-postgres/README.md`](after-postgres/README.md) -- option B; the same crash,
+  but step state in Postgres lets it resume and charge once.
+- `after-queue/` (option C) and `after-argo/` (option D) -- coming next, same crash test.
 
 ## The three swappable parts
 
