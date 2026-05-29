@@ -8,38 +8,38 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 
 | # | Pain | Folder | Status |
 |---|------|--------|--------|
-| 1 | Model works locally, breaks in prod | [`01-image/`](01-image/) | Available |
-| 2 | GPU job crashed at hour 14 | [`02-jobs/`](02-jobs/) | Available |
-| 3 | Can't get a GPU | [`03-queueing/`](03-queueing/) | Available |
-| 4 | Can't express GPU requirements (DRA) | [`04-whole-gpus-only/`](04-whole-gpus-only/) | Planned |
-| 5 | Multi-node training | [`05-multi-node/`](05-multi-node/) | Available |
-| 6 | Cold start | [`06-cold-start/`](06-cold-start/) | Available |
-| 7 | Server image coupling | [`07-image-coupling/`](07-image-coupling/) | Available |
-| 8 | GPU underutilization | [`08-gpu-underutilized/`](08-gpu-underutilized/) | Available |
-| 9 | Can't roll back | [`09-cant-roll-back/`](09-cant-roll-back/) | Available |
-| 10 | Latency spiked | `10-observability/` | Planned |
-| 11 | Costs out of control | `11-autoscaling/` | Planned |
-| 12 | Prompt version in prod | `12-config/` | Planned |
-| 13 | Data residency | `13-multi-cluster/` | Planned |
-| 14 | SLURM to Kubernetes (rewrite) | `14-slurm-migration/` | Planned |
-| 15 | SLURM bridge (Slinky) | `15-slurm-bridge/` | Planned |
-| 16 | Smart inference routing | `16-inference-routing/` | Planned |
-| 17 | Serving many models | `17-serving-many-models/` | Planned |
-| 18 | Weight-download stampede | `18-weight-stampede/` | Planned |
-| 19 | GPUs starve for data | `19-data-starvation/` | Planned |
-| 20 | Model supply chain | `20-model-supply-chain/` | Planned |
-| 21 | GPU device health | `21-device-health/` | Planned |
-| 22 | Quality gates | `22-quality-gates/` | Planned |
-| 23 | Model reproducibility | `23-model-reproducibility/` | Planned |
-| 24 | Durable agents | `24-durable-agents/` | Planned |
-| 25 | Tenant isolation | `25-tenant-isolation/` | Planned |
-| 26 | Model drift | `26-model-drift/` | Planned |
-| 27 | Sandboxed code execution | `27-agent-sandbox/` | Planned |
-| 28 | Tool and MCP fleet | `28-tool-fleet/` | Planned |
-| 29 | Agent egress control | `29-agent-egress/` | Planned |
-| 30 | Runaway-loop governance | `30-runaway-agents/` | Planned |
-| 31 | Deploy guardrails | `31-deploy-guardrails/` | Planned |
-| 32 | Audit evidence | `32-audit-evidence/` | Planned |
+| F.01 | Model works locally, breaks in prod | [`F01-image/`](F01-image/) | Available |
+| C.01 | GPU job crashed at hour 14 | [`C01-jobs/`](C01-jobs/) | Available |
+| C.02 | Can't get a GPU | [`C02-queueing/`](C02-queueing/) | Available |
+| C.03 | Can't express GPU requirements (DRA) | [`C03-whole-gpus-only/`](C03-whole-gpus-only/) | Planned |
+| C.04 | Multi-node training | [`C04-multi-node/`](C04-multi-node/) | Available |
+| S.01 | Cold start | [`S01-cold-start/`](S01-cold-start/) | Available |
+| S.02 | Server image coupling | [`S02-image-coupling/`](S02-image-coupling/) | Available |
+| O.01 | GPU underutilization | [`O01-gpu-underutilized/`](O01-gpu-underutilized/) | Available |
+| S.03 | Can't roll back | [`S03-cant-roll-back/`](S03-cant-roll-back/) | Available |
+| O.02 | Latency spiked | `O02-observability/` | Planned |
+| O.04 | Costs out of control | `O04-autoscaling/` | Planned |
+| G.01 | Prompt version in prod | `G01-config/` | Planned |
+| R.01 | Data residency | `R01-multi-cluster/` | Planned |
+| H.01 | SLURM to Kubernetes (rewrite) | `H01-slurm-migration/` | Planned |
+| H.02 | SLURM bridge (Slinky) | `H02-slurm-bridge/` | Planned |
+| S.05 | Smart inference routing | `S05-inference-routing/` | Planned |
+| S.06 | Serving many models | `S06-serving-many-models/` | Planned |
+| S.07 | Weight-download stampede | `S07-weight-stampede/` | Planned |
+| C.05 | GPUs starve for data | `C05-data-starvation/` | Planned |
+| F.02 | Model supply chain | `F02-model-supply-chain/` | Planned |
+| O.05 | GPU device health | `O05-device-health/` | Planned |
+| S.04 | Quality gates | `S04-quality-gates/` | Planned |
+| G.02 | Model reproducibility | `G02-model-reproducibility/` | Planned |
+| A.01 | Durable agents | `A01-durable-agents/` | Planned |
+| R.02 | Tenant isolation | `R02-tenant-isolation/` | Planned |
+| O.03 | Model drift | `O03-model-drift/` | Planned |
+| A.02 | Sandboxed code execution | `A02-agent-sandbox/` | Planned |
+| A.03 | Tool and MCP fleet | `A03-tool-fleet/` | Planned |
+| A.04 | Agent egress control | `A04-agent-egress/` | Planned |
+| A.05 | Runaway-loop governance | `A05-runaway-agents/` | Planned |
+| G.03 | Deploy guardrails | `G03-deploy-guardrails/` | Planned |
+| R.03 | Audit evidence | `R03-audit-evidence/` | Planned |
 
 ## Contributing an example
 

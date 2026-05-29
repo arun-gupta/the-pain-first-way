@@ -1,0 +1,64 @@
+# Pain C.03: I asked for two GPUs and got two GPUs — but they can't talk to each other
+
+> *Your workload needs two GPUs on the same high-speed interconnect for peer-to-peer memory transfers. You get two GPUs — but they're on different switches. Peer-to-peer transfers fall back to system RAM for inference; collective operations take the same hit during training. Throughput drops 40%. You patch it with placement hints. It works until someone adds a node.*
+
+## The pattern
+
+The extended resource model treats all GPUs as interchangeable integers: `nvidia.com/gpu: 1` means "give me one GPU." That was sufficient when every workload needed one whole device. It breaks when you need a specific configuration:
+
+- A partition of a GPU (a specific slice profile) rather than a whole device — for example, an NVIDIA MIG slice (`1g.10gb` vs `3g.40gb`) rather than a whole H100
+- A GPU co-located with a specific network adapter on the same PCI switch, for high-bandwidth collective communication
+- Two GPUs connected by a high-speed fabric for peer-to-peer memory transfers (NVLink on NVIDIA, Infinity Fabric on AMD)
+- A fractional GPU for a small inference workload sharing a card with another tenant
+
+The workaround is placement hints and custom labels that approximate what the scheduler should understand natively. Workloads land on the wrong topology. Partitioned GPU slices go unscheduled because the scheduler cannot express "give me this specific partition." The scheduler isn't wrong; the resource API never gave it the vocabulary to distinguish topology.
+
+With the integer model, a pod requesting two GPUs can land on a node where those GPUs are on separate PCI switches:
+
+```mermaid
+graph LR
+    W1["Pod\nnvidia.com/gpu: 2"] -->|schedules on| N1
+    subgraph N1["Node"]
+        G1["GPU 0\nSwitch A"] -. "P2P via system RAM\n40% throughput drop" .- G2["GPU 1\nSwitch B"]
+    end
+```
+
+## The primitives
+
+**[Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: GA since Kubernetes 1.34 ([KEP-3063](https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/3063-dynamic-resource-allocation)), replaces the integer GPU count model with structured resource claims. A workload declares what it needs (`ResourceClaim`); a driver publishes what devices are available (`ResourceSlice`); the scheduler matches them with full topology awareness.
+
+With DRA, the pod declares its interconnect requirement and the scheduler guarantees placement on a matching node:
+
+```mermaid
+graph LR
+    W2["Pod\nResourceClaim: 2 GPUs\nsame interconnect domain"] -->|schedules on| N2
+    subgraph N2["Node (ResourceSlice published)"]
+        G3["GPU 0\nSwitch A"] == "NVLink / Infinity Fabric" === G4["GPU 1\nSwitch A"]
+    end
+```
+
+**[ResourceClaim](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)**: a namespaced object a workload creates to request a specific device configuration. Replaces the `resources.limits` integer counter. The workload describes *what* it needs — a GPU partition of a particular profile, a GPU co-located with a specific NIC — not *which* device it wants.
+
+**[DeviceClass](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#deviceclass)**: a cluster-scoped object a cluster admin writes that defines a category of devices and any default configuration. A `ResourceClaim` references a `DeviceClass` to say "I need something from this category." Analogous to `StorageClass` for volumes.
+
+**[ResourceSlice](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/#resourceslice)**: published by a vendor DRA driver (one per node) to advertise what devices are available. Contains structured attributes — slice profile, interconnect domain, PCI topology — that the scheduler can match against `ResourceClaim` constraints.
+
+**A vendor DRA driver**: reads the physical GPU topology from the node (interconnect domains, partition profiles, PCI switch layout) and publishes it as `ResourceSlice` objects. Replaces the device plugin for clusters that need topology-aware placement. A pod that needs two interconnect-connected GPUs describes this in a `ResourceClaim`; the scheduler finds a node whose `ResourceSlice` contains two GPUs in the same interconnect domain and places the pod there. NVIDIA, AMD, and Intel each ship a DRA driver for their hardware.
+
+**Migration path**: device plugins and DRA coexist. Existing workloads using integer GPU resources continue to work via the device plugin. New workloads that need topology-aware placement or GPU partitioning use DRA. Migration is per-workload, not cluster-wide.
+
+## Trade-offs
+
+**What you gain**: the scheduler understands your topology requirements natively instead of approximating them with labels and affinity rules. GPU partitions are first-class resources. Workloads land on the right hardware.
+
+**What you give up**: operational simplicity. DRA requires Kubernetes 1.34 and a DRA-aware driver from your GPU vendor. Driver maturity varies across vendors — NVIDIA's driver covers MIG and NVLink topology; AMD and Intel drivers are earlier in their lifecycle. Debugging misplaced workloads shifts from "why didn't my placement hint match" to "why did the scheduler not find a matching ResourceSlice."
+
+**Related**: [Pain C.02](C02-cant-get-a-gpu.md) covers scheduling fairness — getting *any* GPU when the cluster is contended. [Pain O.01](O01-gpu-underutilized.md) covers GPU *utilization* — making efficient use of the GPU once you have it. DRA is the scheduling primitive that makes Pain C.02's priority classes and Pain O.01's GPU partitioning work correctly at scale: you can queue and prioritize any GPU (Pain C.02), but without DRA you cannot guarantee that partitioned GPUs (Pain O.01) are claimed by the right workloads.
+
+## Try it
+
+Reference manifests live in [`examples/C03-whole-gpus-only/`](../examples/C03-whole-gpus-only/). The DRA primitives — `ResourceClaim`, `DeviceClass`, `ResourceSlice` — are vendor-neutral; the examples use NVIDIA-specific attribute names (`nvlinkDomain`, `migProfile`) because that driver is the most mature, but AMD and Intel DRA drivers expose the same structured attributes for Infinity Fabric topology and XMX partitioning respectively. Both sets require a real GPU cluster and have not yet been verified on live hardware. [`before/`](../examples/C03-whole-gpus-only/before/README.md) shows `nvidia.com/gpu: 2` and `nvidia.com/gpu: 1` — the integer model that places pods without topology awareness, landing workloads on the wrong NVLink domain or the wrong MIG profile with no scheduling error. [`after/`](../examples/C03-whole-gpus-only/after/README.md) replaces those with a `ResourceClaim` carrying an NVLink domain constraint and a second with a MIG profile CEL selector — the scheduler either guarantees correct placement or gives a clear `Pending` error when no matching node exists (requires Kubernetes 1.34 and a vendor DRA driver).
+
+---
+
+[← Pain C.02: Can't get a GPU](C02-cant-get-a-gpu.md) · [Landscape](../README.md) · [Pain C.04: Multi-node falling over →](C04-multi-node-training.md)

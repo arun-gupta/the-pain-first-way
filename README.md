@@ -22,124 +22,124 @@ A growing catalog of pains across two on-ramps, notebook and HPC, and the produc
 
 ```mermaid
 flowchart LR
-    subgraph S1[Foundation]
+    subgraph F["Foundation (F)"]
         direction TB
-        N1[✓ 1. Model breaks in prod]
-        N20[20. Model supply chain]
-        N1 ~~~ N20
+        F01[✓ F.01 Model breaks in prod]
+        F02[F.02 Model supply chain]
+        F01 ~~~ F02
     end
-    subgraph S2[Compute]
+    subgraph C["Compute (C)"]
         direction TB
-        N2[✓ 2. GPU job crashed]
-        N3[✓ 3. Can't get a GPU]
-        N4[4. Can't express GPU config]
-        N5[✓ 5. Multi-node falling over]
-        N19[19. GPUs starve for data]
-        N2 ~~~ N3
-        N3 ~~~ N4
-        N4 ~~~ N5
-        N5 ~~~ N19
+        C01[✓ C.01 GPU job crashed]
+        C02[✓ C.02 Can't get a GPU]
+        C03[C.03 Can't express GPU config]
+        C04[✓ C.04 Multi-node falling over]
+        C05[C.05 GPUs starve for data]
+        C01 ~~~ C02
+        C02 ~~~ C03
+        C03 ~~~ C04
+        C04 ~~~ C05
     end
-    subgraph S3[Serving]
+    subgraph S["Serving (S)"]
         direction TB
-        N6[✓ 6. Cold start]
-        N7[✓ 7. Server image coupling]
-        N9[✓ 9. Can't roll back]
-        N22[22. Quality gates]
-        N16[16. Inference routing]
-        N17[17. Serving many models]
-        N18[18. Weight stampede]
-        N6 ~~~ N7
-        N7 ~~~ N9
-        N9 ~~~ N22
-        N22 ~~~ N16
-        N16 ~~~ N17
-        N17 ~~~ N18
+        S01[✓ S.01 Cold start]
+        S02[✓ S.02 Server image coupling]
+        S03[✓ S.03 Can't roll back]
+        S04[S.04 Quality gates]
+        S05[S.05 Inference routing]
+        S06[S.06 Serving many models]
+        S07[S.07 Weight stampede]
+        S01 ~~~ S02
+        S02 ~~~ S03
+        S03 ~~~ S04
+        S04 ~~~ S05
+        S05 ~~~ S06
+        S06 ~~~ S07
     end
-    subgraph S4[Operations]
+    subgraph O["Operations (O)"]
         direction TB
-        N8[✓ 8. GPU at 30 percent]
-        N10[10. Latency spiked]
-        N26[26. Model drift]
-        N11[11. Costs out of control]
-        N21[21. GPU device health]
-        N8 ~~~ N10
-        N10 ~~~ N26
-        N26 ~~~ N11
-        N11 ~~~ N21
+        O01[✓ O.01 GPU at 30 percent]
+        O02[O.02 Latency spiked]
+        O03[O.03 Model drift]
+        O04[O.04 Costs out of control]
+        O05[O.05 GPU device health]
+        O01 ~~~ O02
+        O02 ~~~ O03
+        O03 ~~~ O04
+        O04 ~~~ O05
     end
-    subgraph S5[Governance]
+    subgraph G["Governance (G)"]
         direction TB
-        N12[12. Prompt version in prod]
-        N23[23. Reproduce shipped model]
-        N31[31. Deploy guardrails]
-        N12 ~~~ N23
-        N23 ~~~ N31
+        G01[G.01 Prompt version in prod]
+        G02[G.02 Reproduce shipped model]
+        G03[G.03 Deploy guardrails]
+        G01 ~~~ G02
+        G02 ~~~ G03
     end
-    subgraph S6[Compliance]
+    subgraph R["Compliance (R)"]
         direction TB
-        N13[13. Data residency]
-        N25[25. Tenant isolation]
-        N32[32. Audit evidence]
-        N13 ~~~ N25
-        N25 ~~~ N32
+        R01[R.01 Data residency]
+        R02[R.02 Tenant isolation]
+        R03[R.03 Audit evidence]
+        R01 ~~~ R02
+        R02 ~~~ R03
     end
-    subgraph S7[Agent Systems]
+    subgraph A["Agent Systems (A)"]
         direction TB
-        N24[24. Durable agents]
-        N27[27. Sandboxed code exec]
-        N28[28. Tool/MCP fleet]
-        N29[29. Agent egress control]
-        N30[30. Runaway-loop governance]
-        N24 ~~~ N27
-        N27 ~~~ N28
-        N28 ~~~ N29
-        N29 ~~~ N30
+        A01[A.01 Durable agents]
+        A02[A.02 Sandboxed code exec]
+        A03[A.03 Tool/MCP fleet]
+        A04[A.04 Agent egress control]
+        A05[A.05 Runaway-loop governance]
+        A01 ~~~ A02
+        A02 ~~~ A03
+        A03 ~~~ A04
+        A04 ~~~ A05
     end
-    subgraph SHPC[Coming from HPC]
+    subgraph H["Coming from HPC (H)"]
         direction TB
-        N14[14. SLURM rewrite]
-        N15[15. SLURM bridge]
-        N14 ~~~ N15
+        H01[H.01 SLURM rewrite]
+        H02[H.02 SLURM bridge]
+        H01 ~~~ H02
     end
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
-    SHPC ==> S2
+    F --> C --> S --> O --> G --> R --> A
+    H ==> C
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
-    class N1,N2,N3,N5,N6,N7,N8,N9 avail;
-    style SHPC fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+    class F01,C01,C02,C04,S01,S02,O01,S03 avail;
+    style H fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1f2937;
     linkStyle 30 stroke:#d97706,stroke-width:3px;
-    click N1 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/01-model-works-locally.md"
-    click N2 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/02-gpu-job-crashed.md"
-    click N3 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/03-cant-get-a-gpu.md"
-    click N4 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/04-whole-gpus-only.md"
-    click N5 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/05-multi-node-training.md"
-    click N6 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/06-cold-start.md"
-    click N7 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/07-server-image-coupling.md"
-    click N8 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/08-gpu-underutilized.md"
-    click N9 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/09-cant-roll-back.md"
-    click N10 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/10-latency-spiked.md"
-    click N11 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/11-costs-out-of-control.md"
-    click N12 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/12-prompt-version.md"
-    click N13 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/13-data-residency.md"
-    click N14 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/14-slurm-migration.md"
-    click N15 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/15-slurm-bridge.md"
-    click N16 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/16-inference-routing.md"
-    click N17 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/17-serving-many-models.md"
-    click N18 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/18-weight-stampede.md"
-    click N19 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/19-data-starvation.md"
-    click N20 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/20-model-supply-chain.md"
-    click N21 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/21-device-health.md"
-    click N22 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/22-quality-gates.md"
-    click N23 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/23-model-reproducibility.md"
-    click N24 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/24-durable-agents.md"
-    click N25 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/25-tenant-isolation.md"
-    click N26 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/26-model-drift.md"
-    click N27 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/27-agent-sandbox.md"
-    click N28 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/28-tool-fleet.md"
-    click N29 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/29-agent-egress.md"
-    click N30 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/30-runaway-agents.md"
-    click N31 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/31-deploy-guardrails.md"
-    click N32 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/32-audit-evidence.md"
+    click F01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/F01-model-works-locally.md"
+    click C01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C01-gpu-job-crashed.md"
+    click C02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C02-cant-get-a-gpu.md"
+    click C03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C03-whole-gpus-only.md"
+    click C04 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C04-multi-node-training.md"
+    click S01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S01-cold-start.md"
+    click S02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S02-server-image-coupling.md"
+    click O01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/O01-gpu-underutilized.md"
+    click S03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S03-cant-roll-back.md"
+    click O02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/O02-latency-spiked.md"
+    click O04 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/O04-costs-out-of-control.md"
+    click G01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/G01-prompt-version.md"
+    click R01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/R01-data-residency.md"
+    click H01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/H01-slurm-migration.md"
+    click H02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/H02-slurm-bridge.md"
+    click S05 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S05-inference-routing.md"
+    click S06 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S06-serving-many-models.md"
+    click S07 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S07-weight-stampede.md"
+    click C05 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/C05-data-starvation.md"
+    click F02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/F02-model-supply-chain.md"
+    click O05 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/O05-device-health.md"
+    click S04 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/S04-quality-gates.md"
+    click G02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/G02-model-reproducibility.md"
+    click A01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/A01-durable-agents.md"
+    click R02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/R02-tenant-isolation.md"
+    click O03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/O03-model-drift.md"
+    click A02 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/A02-agent-sandbox.md"
+    click A03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/A03-tool-fleet.md"
+    click A04 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/A04-agent-egress.md"
+    click A05 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/A05-runaway-agents.md"
+    click G03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/G03-deploy-guardrails.md"
+    click R03 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/R03-audit-evidence.md"
 ```
 
 **Legend:** ✓ (green) = a runnable before/after example exists today; unmarked = planned. The amber **Coming from HPC** path is an alternate on-ramp into Compute for teams migrating off SLURM.
