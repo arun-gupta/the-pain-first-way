@@ -29,8 +29,9 @@ The sink is a small stand-in for the external systems the agent calls (a
 payment API, an email service). It records each side effect and counts how many
 charges it received, so the demo can show whether a crash caused a duplicate.
 It also deduplicates by idempotency key, the way a real payment API does. Bring
-it up once; `before/` and every `after-*` variant reuse the same sink. From this
-`before/` directory:
+it up once and leave it running: `before/` uses it now, and `after-postgres/`
+reuses it (as will `after-queue/` and `after-argo/` once built), so every variant
+charges the same external system. From this `before/` directory:
 
 ```bash
 kubectl create configmap sink-code --from-file=../shared/sink/sink.py \
