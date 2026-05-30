@@ -153,14 +153,15 @@ kubectl exec deploy/payments-agent -- python /app/enqueue.py
 sleep 5 && kubectl delete pod -l app=payments-agent
 ```
 
-The message was never acked, so JetStream holds it. The Deployment starts a new pod;
-after the ack-wait window (~15s) it receives the task as delivery #2 and runs it again.
-**Keep the `logs -f` running** through that window: it looks idle for ~15s, then
-`delivery #2` appears. Do not Ctrl-C early, or you will miss it scroll by:
+The message was never acked, so JetStream holds it and the Deployment starts a new pod.
+The redelivery is asynchronous: it cannot arrive until the ack-wait window (~15s) passes,
+so do not watch a live log and give up when it looks idle. Instead give it time, then
+read the new pod's log after the fact (the log persists, so there is nothing to catch in
+real time):
 
 ```bash
-kubectl get pods -l app=payments-agent     # wait until the new pod is Running
-kubectl logs -f deploy/payments-agent      # sits idle ~15s, then "delivery #2" ... "acked"
+sleep 30                                   # ack-wait (~15s) + the redelivered task (~8s)
+kubectl logs deploy/payments-agent         # the delivery #2 block is sitting in the log
 ```
 
 ```
