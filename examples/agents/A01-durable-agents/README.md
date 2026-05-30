@@ -77,7 +77,7 @@ acking (part 3). You still supply idempotency (part 2). Coarsest resume: the who
 work item is reprocessed. The queue itself is swappable; several cloud native backends
 give the same ack-or-redeliver guarantee:
 
-- **NATS JetStream** (CNCF): durable streams with explicit ack and redelivery.
+- **[NATS JetStream](https://docs.nats.io/nats-concepts/jetstream)** (CNCF): durable streams with explicit ack and redelivery.
 - **Apache Kafka via Strimzi** (Strimzi is a CNCF project): durable log, consumer offsets.
 - **RabbitMQ** (cluster operator): ack and requeue on the channel.
 - **Apache Pulsar**: durable topics with negative-ack and redelivery.

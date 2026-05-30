@@ -12,8 +12,8 @@ read. The [overview](../README.md) explains the three parts and compares all fiv
 options.
 
 The same agent, the same task, the same crash. This time the durability comes from a
-queue: a NATS JetStream stream holds the task as a work item, a worker pulls it, runs
-it, and acks only on success. Kill the worker mid-task and the message is never acked,
+queue: a [NATS JetStream](https://docs.nats.io/nats-concepts/jetstream) stream holds the
+task as a work item, a worker pulls it, runs it, and acks only on success. Kill the worker mid-task and the message is never acked,
 so JetStream redelivers it to a new worker, which runs the task again.
 
 Unlike [`after-postgres/`](../after-postgres/README.md), there is **no per-step
