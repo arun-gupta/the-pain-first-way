@@ -141,7 +141,7 @@ Ctrl-C, then check the sink:
 ../shared/check-charges.sh        # charges: 1
 ```
 
-## Step 2: crash mid-task, watch the redelivery
+## Step 2: crash mid-task, confirm still one charge
 
 Start clean, enqueue a task, then delete the worker a few seconds later, while it is
 still mid-task. The `sleep` lands the `kubectl delete` during processing, before the ack:
