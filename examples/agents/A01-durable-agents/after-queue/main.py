@@ -52,9 +52,14 @@ async def main():
             task_id = msg.data.decode()
             deliveries = msg.metadata.num_delivered
             print(f"[worker] received '{task_id}' (delivery #{deliveries})", flush=True)
-            agent_task.run(QueueStore(), task_id=task_id)
-            await msg.ack()
-            print(f"[worker] acked '{task_id}'", flush=True)
+            try:
+                agent_task.run(QueueStore(), task_id=task_id)
+                await msg.ack()
+                print(f"[worker] acked '{task_id}'", flush=True)
+            except Exception as exc:
+                # Do not ack and do not crash the worker: leave the message unacked so
+                # JetStream redelivers it instead of taking the whole worker down.
+                print(f"[worker] error on '{task_id}', leaving it for redelivery: {exc}", flush=True)
 
 
 if __name__ == "__main__":
