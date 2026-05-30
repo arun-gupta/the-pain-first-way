@@ -91,13 +91,24 @@ kubectl rollout status deploy/payments-agent
 
 ## Step 1: enqueue a task, confirm one charge
 
-Clear any leftover messages and reset the sink so the count starts clean, then drop one
-task on the queue (enqueue runs inside the worker pod, which has the nats client) and
-follow the worker:
+Clear any leftover messages and reset the sink so the count starts clean:
 
 ```bash
 kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
+```
+
+Confirm both are clean before enqueuing, the stream empty and the sink at zero:
+
+```bash
+kubectl exec deploy/payments-agent -- python /app/enqueue.py status   # stream 'tasks' messages: 0
+../shared/check-charges.sh                                            # total effects: 0 | charges: 0
+```
+
+Then drop one task on the queue (enqueue runs inside the worker pod, which has the nats
+client) and follow the worker:
+
+```bash
 kubectl exec deploy/payments-agent -- python /app/enqueue.py
 kubectl logs -f deploy/payments-agent
 ```

@@ -1,7 +1,8 @@
-"""Publish one task onto the queue, or purge the stream. Run inside the worker pod,
-which already has the nats client installed:
+"""Publish one task onto the queue, purge the stream, or report its state. Run inside
+the worker pod, which already has the nats client installed:
   kubectl exec deploy/payments-agent -- python /app/enqueue.py          # publish one task
   kubectl exec deploy/payments-agent -- python /app/enqueue.py purge    # clear the stream
+  kubectl exec deploy/payments-agent -- python /app/enqueue.py status   # how many messages
 """
 import asyncio
 import os
@@ -21,6 +22,12 @@ async def main():
     if "purge" in sys.argv[1:]:
         await js.purge_stream(STREAM)
         print(f"[enqueue] purged stream '{STREAM}'")
+    elif "status" in sys.argv[1:]:
+        try:
+            info = await js.stream_info(STREAM)
+            print(f"[enqueue] stream '{STREAM}' messages: {info.state.messages}")
+        except Exception as exc:
+            print(f"[enqueue] stream '{STREAM}' not found ({exc})")
     else:
         ack = await js.publish(SUBJECT, TASK_ID.encode())
         print(f"[enqueue] published '{TASK_ID}' (stream seq {ack.seq})")
