@@ -4,11 +4,12 @@ Draft submission for the [companion guide](../README.md). Character limits per t
 
 ## Title (max 70 characters)
 
-Cloud Native, Pain-First: A Field Guide for AI Developers
+Name the Pain, Reach for the Fix: Cloud Native for AI Developers
 
 Alternates:
-- From Notebook to Production: Cloud Native for AI, Pain-First
-- Two On-Ramps to Production: A Pain-First Cloud Native Guide
+- You Know the Pain. Cloud Native Is the Fix You Can't Name.
+- From Pain to Primitive: Cloud Native for AI Developers
+- Cloud Native, Pain-First: A Field Guide for AI Developers
 
 ## Abstract (max 1000 characters)
 
