@@ -1,0 +1,52 @@
+# The durable agent (option B). Same task as before/, but its store is
+# Postgres. Mount its code from a ConfigMap (run from after-postgres/):
+#   kubectl create configmap agent-code \
+#     --from-file=main.py --from-file=../shared/agent_task.py \
+#     --dry-run=client -o yaml | kubectl apply -f -
+# then: kubectl apply -f agent.yaml
+#
+# The container pip-installs the pure-Python pg8000 driver on start, so there
+# is no image to build or load into Kind. (Swap in a prebuilt image if you
+# prefer; nothing else changes.)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-agent
+  labels:
+    app: payments-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-agent
+  template:
+    metadata:
+      labels:
+        app: payments-agent
+    spec:
+      containers:
+        - name: agent
+          image: python:3.12-slim
+          command: ["sh", "-c", "pip install --quiet --root-user-action=ignore --disable-pip-version-check pg8000 && python /app/main.py"]
+          env:
+            - name: SINK_URL
+              value: "http://sink"
+            - name: TASK_ID
+              value: "user-task-1"
+            - name: STEP_DELAY
+              value: "5"
+            - name: PGHOST
+              value: "postgres"
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "agentpw"
+            - name: PGDATABASE
+              value: "agent"
+          volumeMounts:
+            - name: code
+              mountPath: /app
+      volumes:
+        - name: code
+          configMap:
+            name: agent-code

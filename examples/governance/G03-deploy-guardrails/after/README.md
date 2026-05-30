@@ -184,6 +184,11 @@ provision.
 
 ## Cleanup
 
+This `ClusterPolicy` gates every Deployment on the cluster, not just this example's.
+If you reuse this Kind cluster for other examples, delete the policy here, or those
+workloads will be blocked too (anything from an unapproved registry or missing the
+governance labels).
+
 ```bash
 kubectl delete deployment payments-api --ignore-not-found
 kubectl delete -f deploy-guardrails.yaml

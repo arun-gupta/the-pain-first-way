@@ -1,0 +1,46 @@
+# The durable worker (option C). Same task as before/, but it is driven by the queue:
+# it pulls a task, runs it, and acks only on success. Mount its code from a ConfigMap
+# (run from after-queue/):
+#   kubectl create configmap agent-code \
+#     --from-file=main.py --from-file=enqueue.py --from-file=../shared/agent_task.py \
+#     --dry-run=client -o yaml | kubectl apply -f -
+# then: kubectl apply -f agent.yaml
+#
+# The container pip-installs the pure-Python nats client on start, so there is no image
+# to build or load into Kind.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-agent
+  labels:
+    app: payments-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-agent
+  template:
+    metadata:
+      labels:
+        app: payments-agent
+    spec:
+      containers:
+        - name: agent
+          image: python:3.12-slim
+          command: ["sh", "-c", "pip install --quiet --root-user-action=ignore --disable-pip-version-check nats-py && python /app/main.py"]
+          env:
+            - name: SINK_URL
+              value: "http://sink"
+            - name: NATS_URL
+              value: "nats://nats:4222"
+            - name: TASK_ID
+              value: "user-task-1"
+            - name: STEP_DELAY
+              value: "2"
+          volumeMounts:
+            - name: code
+              mountPath: /app
+      volumes:
+        - name: code
+          configMap:
+            name: agent-code
