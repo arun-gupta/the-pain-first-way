@@ -153,39 +153,37 @@ kubectl exec deploy/payments-agent -- python /app/enqueue.py
 sleep 5 && kubectl delete pod -l app=payments-agent
 ```
 
-The message was never acked, so JetStream holds it and the Deployment starts a new pod.
-The redelivery is asynchronous: it cannot arrive until the ack-wait window (~15s) passes,
-so do not watch a live log and give up when it looks idle. Instead give it time, then
-read the new pod's log after the fact (the log persists, so there is nothing to catch in
-real time):
+The message was never acked, so JetStream holds it and, after the ack-wait window (~15s),
+redelivers it to a new pod, which reruns the whole task. The redelivery is asynchronous
+and may be handled by a different pod than `kubectl logs` shows, so **verify by the sink,
+not the log**: the sink aggregates every effect regardless of which pod processed it.
+Give the redelivery time, then check:
 
 ```bash
-sleep 30                                   # ack-wait (~15s) + the redelivered task (~8s)
-kubectl logs deploy/payments-agent         # the delivery #2 block is sitting in the log
+sleep 30                          # ack-wait (~15s) + the redelivered task (~8s)
+../shared/check-charges.sh        # total effects: 4 | charges: 1
 ```
 
-```
-[worker] received 'user-task-1' (delivery #2)
-[agent]   reserve: ... -> sink: duplicate-ignored
-[agent]   charge:  ... -> sink: duplicate-ignored
-[agent]   email:   ... -> sink: recorded
-[agent]   confirm: ... -> sink: recorded
-[worker] acked 'user-task-1'
-```
+The task ran twice end to end (delivery #1 on the crashed pod, delivery #2 on the new
+one), yet there are exactly **4 effects** (one per step) and **1 charge**. The
+redelivered `reserve` and `charge` hit the sink's idempotency check and were dropped, so
+nothing was duplicated. If durability had failed you would see extra effects and a second
+charge, the way `before/` reaches `charges: 2`.
 
-The whole task ran again, but the re-sent steps were `duplicate-ignored` by their stable
-keys, so the charge held at one:
+To watch the redelivery happen (optional, and finicky because of the async timing and the
+possibility of a stale second pod), tail the worker through the wait and look for a
+`delivery #2` block with `duplicate-ignored` on the re-sent steps:
 
 ```bash
-../shared/check-charges.sh        # charges: 1 (unchanged)
+kubectl logs deploy/payments-agent | grep -A6 "delivery #2"   # may be on the other pod
 ```
 
 ## What to verify
 
 | After | `check-charges.sh` shows | meaning |
 |---|---|---|
-| Step 1 | `charges: 1` | the task ran once |
-| Step 2 | `charges: 1` (unchanged), worker logs `delivery #2` | the crash redelivered the whole task, but the stable key blocked the duplicate charge |
+| Step 1 | `total effects: 4 \| charges: 1` | the task ran once |
+| Step 2 | `total effects: 4 \| charges: 1` (unchanged) | the crash redelivered and reran the whole task, but the stable keys kept every effect exactly-once |
 
 `before/` jumped to 2 on the same crash. `after-queue/` reprocessed the entire task,
 yet charged once.
