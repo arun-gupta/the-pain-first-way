@@ -10,6 +10,7 @@ import asyncio
 import os
 
 import nats
+from nats.js.api import ConsumerConfig
 
 import agent_task
 
@@ -17,6 +18,10 @@ NATS_URL = os.environ.get("NATS_URL", "nats://nats:4222")
 STREAM = "tasks"
 SUBJECT = "tasks.run"
 DURABLE = "worker"
+# Redelivery happens ack_wait after a message is delivered, so this is roughly how long
+# after a crash the task is retried. It must stay larger than the task itself (~8s with
+# STEP_DELAY=2) or a healthy run would be redelivered before it finishes.
+ACK_WAIT_SECONDS = 15
 
 
 class QueueStore:
@@ -41,7 +46,7 @@ async def main():
         await js.add_stream(name=STREAM, subjects=[SUBJECT])
     except Exception:
         pass  # stream already exists from an earlier run
-    sub = await js.pull_subscribe(SUBJECT, durable=DURABLE)
+    sub = await js.pull_subscribe(SUBJECT, durable=DURABLE, config=ConsumerConfig(ack_wait=ACK_WAIT_SECONDS))
     print(f"[worker] connected to {NATS_URL}; waiting for tasks on {SUBJECT}", flush=True)
     while True:
         try:

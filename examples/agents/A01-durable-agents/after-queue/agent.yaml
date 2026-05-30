@@ -36,7 +36,7 @@ spec:
             - name: TASK_ID
               value: "user-task-1"
             - name: STEP_DELAY
-              value: "5"
+              value: "2"
           volumeMounts:
             - name: code
               mountPath: /app

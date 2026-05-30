@@ -150,15 +150,17 @@ still mid-task. The `sleep` lands the `kubectl delete` during processing, before
 kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 kubectl exec deploy/payments-agent -- python /app/enqueue.py
-sleep 10 && kubectl delete pod -l app=payments-agent
+sleep 5 && kubectl delete pod -l app=payments-agent
 ```
 
 The message was never acked, so JetStream holds it. The Deployment starts a new pod;
-after the ack-wait window (~30s) it receives the task as delivery #2 and runs it again:
+after the ack-wait window (~15s) it receives the task as delivery #2 and runs it again.
+**Keep the `logs -f` running** through that window: it looks idle for ~15s, then
+`delivery #2` appears. Do not Ctrl-C early, or you will miss it scroll by:
 
 ```bash
 kubectl get pods -l app=payments-agent     # wait until the new pod is Running
-kubectl logs -f deploy/payments-agent      # wait ~30s for "delivery #2"
+kubectl logs -f deploy/payments-agent      # sits idle ~15s, then "delivery #2" ... "acked"
 ```
 
 ```
