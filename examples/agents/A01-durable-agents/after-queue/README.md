@@ -22,6 +22,18 @@ checkpoint**: the queue knows only "acked or not", so a redelivery reprocesses t
 charge at one, which is exactly why the matrix says the coarsest resume leans hardest on
 part 2.
 
+## How it works
+
+```mermaid
+flowchart LR
+  Q[(NATS JetStream)] -->|deliver task| W[worker]
+  W -->|each step| SE["side effect<br/>(stable key)"]
+  SE --> SINK[(sink: dedupes by key)]
+  W -->|ack on success| Q
+  RST((worker dies<br/>before ack)) -.-> Q
+  Q -.redeliver whole task.-> W
+```
+
 ## Prerequisites
 
 Do the [`before/`](../before/README.md) walkthrough first; it creates the Kind cluster

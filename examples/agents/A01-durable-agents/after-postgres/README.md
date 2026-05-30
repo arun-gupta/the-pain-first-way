@@ -17,6 +17,17 @@ done, resumes, and the customer is charged once. You assemble all three parts yo
 and Postgres makes part 1 (state) and part 2 (idempotency) visible as plain SQL. The
 [overview](../README.md) explains the three parts and compares all five options.
 
+## How it works
+
+```mermaid
+flowchart LR
+  POD[agent pod] -->|each step| SE["side effect<br/>(stable key)"]
+  SE --> SINK[(sink: dedupes by key)]
+  POD -->|record done| PG[(Postgres<br/>done_steps)]
+  RST((pod restart)) -.new pod reads.-> PG
+  PG -.skip done steps.-> POD
+```
+
 ## Prerequisites
 
 Do the [`before/`](../before/README.md) walkthrough first. It creates the Kind
