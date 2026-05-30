@@ -54,8 +54,6 @@ Each of the three parts has a range of implementations, from hand-rolled to a ma
 
 Whichever mechanism you pick, timeouts, retries, and compensation steps become part of the workflow definition rather than surprises in a stack trace. Queues and workers are worth calling out as a packaging: the queue holds part 1 (the work item) and provides part 3 (redelivery), leaving you to supply part 2.
 
-The [example design doc](../../examples/agents/A01-durable-agents/) compares five ways to assemble these three parts (PVC, Postgres, durable queue, Argo, Temporal), with a diagram for each and a side-by-side matrix.
-
 This is related to [Pain C.01](../compute/C01-gpu-job-crashed.md), but the state is not only a training checkpoint. It is a sequence of tool calls and side effects that must remain coherent for the user.
 
 ## Trade-offs
@@ -63,6 +61,10 @@ This is related to [Pain C.01](../compute/C01-gpu-job-crashed.md), but the state
 **What you keep**: the agent's reasoning loop and tools.
 
 **What you give up**: assuming one process owns the whole task. The agent becomes a resumable workflow with explicit state and side-effect boundaries.
+
+## Try it
+
+A working demonstration lives in [`examples/agents/A01-durable-agents/`](../../examples/agents/A01-durable-agents/). [`before/`](../../examples/agents/A01-durable-agents/before/README.md) runs the agent with its state in process memory: kill the pod mid-task and a fresh one starts over, charging the customer twice. The [`after-postgres/`](../../examples/agents/A01-durable-agents/after-postgres/README.md) variant (option B) keeps step state in Postgres with a stable idempotency key, so the same crash resumes from the last completed step and charges once. Runnable on a local Kind cluster with no GPU. Two further variants, a durable queue (option C) and Argo Workflows (option D), are in progress; the [example overview](../../examples/agents/A01-durable-agents/README.md) compares all five durability options on a resume-granularity axis.
 
 ---
 
