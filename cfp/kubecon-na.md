@@ -33,15 +33,18 @@ Projects referenced or demonstrated in the talk that are hosted by CNCF (or are 
 - Kubernetes (Jobs, Deployments, ConfigMaps, Secrets, PVCs, DRA)
 - Kueue (Kubernetes SIG-Scheduling) for gang scheduling and quotas
 - KServe for model serving
-- Kyverno for scheduling prioritization
+- Kyverno for policy and admission control (deploy guardrails)
 - KEDA for event-driven autoscaling
 - Prometheus for inference and GPU observability
 - Volcano for batch and gang scheduling
 - Fluid for training-data orchestration
-- Argo (Argo CD) for GitOps rollout and history
+- Argo (Argo CD for GitOps rollout and history; Argo Workflows for durable agent execution)
+- NATS and NATS JetStream for durable work queues with redelivery (agent durability)
+- Strimzi for running Apache Kafka on Kubernetes (a durable-queue option)
 - Gateway API and the Gateway API Inference Extension (Kubernetes SIG-Network)
 - Knative for scale-to-zero serving
 - node-problem-detector (Kubernetes SIG) for node and device health
+- Kind (Kubernetes SIG) for running the examples locally
 - Open Telemetry
 
 ## Open source projects
@@ -56,3 +59,7 @@ Non-CNCF open source projects referenced:
 - llm-d (KV-cache-aware inference routing)
 - JuiceFS and Alluxio (data caching and acceleration)
 - Spegel (peer-to-peer image and weight distribution)
+- PostgreSQL (durable agent state and step checkpoints)
+- Temporal (durable-execution engine for agent workflows)
+- Apache Kafka, RabbitMQ, Apache Pulsar, Redis Streams (durable-queue options; Valkey is the open Redis fork)
+- LangGraph (agent-framework state checkpointers)
