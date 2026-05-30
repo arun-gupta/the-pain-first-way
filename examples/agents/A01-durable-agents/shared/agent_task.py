@@ -34,17 +34,17 @@ def _send_effect(step, key):
         return json.loads(resp.read())["status"]
 
 
-def run(store):
-    done = store.load_done(TASK_ID)
-    print(f"[agent] task {TASK_ID}: resuming, already done = {sorted(done) or 'nothing'}", flush=True)
+def run(store, task_id=TASK_ID):
+    done = store.load_done(task_id)
+    print(f"[agent] task {task_id}: resuming, already done = {sorted(done) or 'nothing'}", flush=True)
     for step in STEPS:
         if step in done:
             print(f"[agent]   {step}: skip (already done)", flush=True)
             continue
-        key = store.idempotency_key(TASK_ID, step)
+        key = store.idempotency_key(task_id, step)
         status = _send_effect(step, key)
         print(f"[agent]   {step}: side effect sent (key={key}) -> sink: {status}", flush=True)
         time.sleep(STEP_DELAY)  # <-- crash window: kill the pod here
-        store.mark_done(TASK_ID, step)
+        store.mark_done(task_id, step)
         print(f"[agent]   {step}: recorded done", flush=True)
-    print(f"[agent] task {TASK_ID}: complete", flush=True)
+    print(f"[agent] task {task_id}: complete", flush=True)

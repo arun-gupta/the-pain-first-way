@@ -7,10 +7,10 @@ process memory, so killing the pod mid-task loses state and a retry duplicates t
 side effects. `after/` makes the run durable, so killing the pod mid-task resumes from
 the last completed step with no duplicate.
 
-> **Status: option B available; C and D in progress.** `before/` and `after-postgres/`
+> **Status: option B available; C built, D next.** `before/` and `after-postgres/`
 > (option B) are built and verified on a live Kind cluster, so the example is listed as
-> Available in the catalog. `after-queue/` (C) and `after-argo/` (D) are next, each
-> adding a runnable variant of the same crash test.
+> Available in the catalog. `after-queue/` (option C) is built and pending a live
+> shakedown; `after-argo/` (option D) is next.
 
 ## The three swappable parts
 
@@ -145,8 +145,10 @@ only the durability mechanism differs:
 - **B -- Postgres + checkpointer** ([`after-postgres/`](after-postgres/README.md),
   built): the honest core, where state (part 1) and idempotency (part 2) are visible as
   plain SQL on a plain Kind cluster.
-- **C -- durable queue + worker** (`after-queue/`, next): NATS JetStream holds the work
-  item and redelivers it to a new worker on crash.
+- **C -- durable queue + worker** ([`after-queue/`](after-queue/README.md), built):
+  NATS JetStream holds the work item and redelivers it on crash; with no per-step
+  checkpoint the worker reprocesses the whole task, and the idempotency key prevents the
+  duplicate.
 - **D -- Argo Workflows** (`after-argo/`, next): the engine owns part 3, resuming at
   step granularity.
 
@@ -165,8 +167,10 @@ rest reuse.
 1. [`before/`](before/README.md) -- watch the in-memory agent charge twice after a crash.
 2. [`after-postgres/`](after-postgres/README.md) -- the same crash, resumed from Postgres,
    charged once.
+3. [`after-queue/`](after-queue/README.md) -- the same crash, redelivered by NATS
+   JetStream and reprocessed whole, still charged once.
 
-`after-queue/` (C) and `after-argo/` (D) follow the same two-step shape once built.
+`after-argo/` (D) follows the same shape once built.
 
 ---
 
