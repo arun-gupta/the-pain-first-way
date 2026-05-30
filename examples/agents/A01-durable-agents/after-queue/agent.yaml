@@ -37,11 +37,6 @@ spec:
               value: "user-task-1"
             - name: STEP_DELAY
               value: "5"
-            # Off by default. `kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT=true`
-            # makes the worker die partway through a task's first delivery, so the
-            # redelivery demo (Step 2) is deterministic instead of a race.
-            - name: CRASH_FIRST_ATTEMPT
-              value: "false"
           volumeMounts:
             - name: code
               mountPath: /app

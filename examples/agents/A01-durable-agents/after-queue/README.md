@@ -141,31 +141,25 @@ Ctrl-C, then check the sink:
 ../shared/check-charges.sh        # charges: 1
 ```
 
-## Step 2: crash before the ack, watch the redelivery
+## Step 2: crash mid-task, watch the redelivery
 
-To make the crash deterministic (no racing a `kubectl delete` against a 20-second task),
-set `CRASH_FIRST_ATTEMPT`: the worker exits partway through a task's *first* delivery, a
-stand-in for a node failure or OOM kill. Then re-run with a clean stream and sink:
+Start clean, enqueue a task, then delete the worker a few seconds later, while it is
+still mid-task. The `sleep` lands the `kubectl delete` during processing, before the ack:
 
 ```bash
-kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT=true
-kubectl rollout status deploy/payments-agent
 kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 kubectl exec deploy/payments-agent -- python /app/enqueue.py
-kubectl logs -f deploy/payments-agent
+sleep 10 && kubectl delete pod -l app=payments-agent
 ```
 
-**Delivery #1** sends `reserve` and `charge`, then the worker exits before acking, so the
-log cuts off mid-task. The container restarts in place (same pod, `RESTARTS` 1) and sits
-idle until the ack-wait window (~30s) expires and JetStream redelivers the message:
+The message was never acked, so JetStream holds it. The Deployment starts a new pod;
+after the ack-wait window (~30s) it receives the task as delivery #2 and runs it again:
 
 ```bash
-kubectl logs -f deploy/payments-agent      # wait ~30s for delivery #2
+kubectl get pods -l app=payments-agent     # wait until the new pod is Running
+kubectl logs -f deploy/payments-agent      # wait ~30s for "delivery #2"
 ```
-
-**Delivery #2** reruns the whole task. `reserve` and `charge` are re-sent with the same
-stable keys, so the sink replies `duplicate-ignored`; only `email` and `confirm` are new:
 
 ```
 [worker] received 'user-task-1' (delivery #2)
@@ -176,12 +170,11 @@ stable keys, so the sink replies `duplicate-ignored`; only `email` and `confirm`
 [worker] acked 'user-task-1'
 ```
 
-The task ran twice end to end, yet the charge held at one. Check, then turn the crash
-off:
+The whole task ran again, but the re-sent steps were `duplicate-ignored` by their stable
+keys, so the charge held at one:
 
 ```bash
 ../shared/check-charges.sh        # charges: 1 (unchanged)
-kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT-
 ```
 
 ## What to verify
@@ -203,12 +196,11 @@ outcome, coarser resume, more weight on part 2, which is the trade the matrix de
 
 ## Re-run cleanly
 
-To run the demo again from a clean slate, turn off the simulated crash, purge the
-stream, and reset the sink (a second enqueue with the same task id re-sends the same
-keys, which the sink would otherwise deduplicate against the previous run):
+To run the demo again from a clean slate, purge the stream and reset the sink (a second
+enqueue with the same task id re-sends the same keys, which the sink would otherwise
+deduplicate against the previous run):
 
 ```bash
-kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT-
 kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 ```
