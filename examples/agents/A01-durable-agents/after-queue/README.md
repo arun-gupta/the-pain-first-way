@@ -58,6 +58,12 @@ so reset it to zero or the count will mix runs.
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 ```
 
+Confirm it is empty before going on:
+
+```bash
+../shared/check-charges.sh        # total effects: 0 | charges: 0
+```
+
 ## Deploy NATS
 
 ```bash

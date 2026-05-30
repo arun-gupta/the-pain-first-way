@@ -52,6 +52,12 @@ variants.
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 ```
 
+Confirm it is empty before going on:
+
+```bash
+../shared/check-charges.sh        # total effects: 0 | charges: 0
+```
+
 ## Deploy Postgres
 
 ```bash
