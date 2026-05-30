@@ -17,21 +17,17 @@ Inference at scale, multi-agent systems, and enterprise rollouts are tearing dow
 
 This talk is that vocabulary, pain-first. Not another Kubernetes tutorial: a catalog of real production pains, each starting from a problem you've hit, the GPU job that crashed at hour 14, the model you can't roll back, the agent that won't stay alive, then the cloud native primitive that solves it. Two paths into production, notebook-to-prod and HPC/Slurm-to-cloud-native, span the lifecycle from foundation to compliance, plus a dedicated lane for agent systems. Every pattern is vendor-neutral and maps to a CNCF project, and many ship as runnable before/after code. It is honest about scope: cloud native runs and enforces, it does not decide model quality or eval. You leave able to name what's biting you, and reach for the fix.
 
-## Benefits to the Ecosystem (max 2000 characters)
+## Benefits to the Ecosystem (max 3000 characters)
 
 Most cloud native onboarding assumes you already think in pods and Deployments. AI developers don't: they arrive from notebooks, training scripts, and SLURM, fluent in models but not in the platform now expected to run them. That gap slows adoption of the exact CNCF projects built to help them.
 
 This talk closes the gap from the AI developer's side, and it does it with patterns, not slides. Each pain resolves to a reusable design pattern an attendee can apply at work the same week: a checkpoint-and-auto-restart training Job on a PersistentVolumeClaim that survives a crash at hour 14, gang scheduling with Kueue so multi-node jobs stop deadlocking, ConfigMap and Secret decoupling so one image serves every environment, rollback via Deployment revisions, and admission guardrails with Kyverno. Many ship as runnable before/after code, tested on a real GPU cluster and runnable locally on Kind, so the pattern is something you run, not just something you saw.
 
+Attendees leave with three things: a vocabulary to name the pain and the cloud native primitive that fixes it, reusable vendor-neutral patterns to apply the same week, and a clear map of where cloud native's responsibility ends, so they reach for the right layer instead of expecting the platform to solve a model problem.
+
 Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA, KServe and the Gateway API Inference Extension, Kyverno) with no product pitch. Real AI stacks are never CNCF-only, so the patterns show those projects interoperating with the open-source tools teams already run, vLLM and Ray, Slurm from HPC, PostgreSQL and Temporal behind durable agents, since no one project covers an AI stack end to end. It also serves two audiences the ecosystem is actively courting: ML engineers moving from notebooks to production, and HPC teams weighing where Slurm and Kubernetes each fit as AI workloads pull them together.
 
 Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, free to fork, extend, and reuse: https://github.com/arun-gupta/the-pain-first-way
-
-## Key Takeaways
-
-- A vocabulary for production: name the pain you're hitting and the cloud native primitive that solves it, across the lifecycle and the agent lane.
-- A pocketful of vendor-neutral, reusable patterns, checkpoint-and-restart, gang scheduling, config and secret decoupling, safe rollback, admission guardrails, durable agents, that you can apply the same week, with runnable before/after code.
-- A clear map of cloud native's boundary: what it runs and enforces versus what it does not decide (model quality, eval, prompts), so you reach for the right layer instead of expecting the platform to solve a model problem.
 
 ## Audience and level
 
