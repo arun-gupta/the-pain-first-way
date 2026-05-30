@@ -67,8 +67,7 @@ kubectl rollout status deploy/nats
 ## Deploy the worker
 
 The worker code includes `enqueue.py` (used below) alongside `main.py` and the shared
-task. The whole walkthrough runs in **one terminal** except the crash in Step 2, which
-needs a second one.
+task. The whole walkthrough runs in **one terminal**, one command at a time.
 
 ```bash
 kubectl create configmap agent-code \
@@ -84,10 +83,13 @@ kubectl rollout status deploy/payments-agent
 
 ## Step 1: enqueue a task, confirm one charge
 
-Drop a task on the queue (run inside the worker pod, which has the nats client), then
+Clear any leftover messages and reset the sink so the count starts clean, then drop one
+task on the queue (enqueue runs inside the worker pod, which has the nats client) and
 follow the worker:
 
 ```bash
+kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
+kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 kubectl exec deploy/payments-agent -- python /app/enqueue.py
 kubectl logs -f deploy/payments-agent
 ```
@@ -112,24 +114,34 @@ Ctrl-C, then check the sink:
 
 ## Step 2: crash before the ack, watch the redelivery
 
-Reset the sink, enqueue another task, and follow the worker:
+Turn on the simulated crash, then clear and re-enqueue. `CRASH_FIRST_ATTEMPT` makes the
+worker kill itself partway through a task's *first* delivery, a deterministic stand-in
+for a node failure or OOM kill, so you do not have to race a `kubectl delete` against
+the roughly 20-second task.
 
 ```bash
+kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT=true
+kubectl rollout status deploy/payments-agent
+kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
 kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 kubectl exec deploy/payments-agent -- python /app/enqueue.py
 kubectl logs -f deploy/payments-agent
 ```
 
-When the log reaches the `charge` step (delivery #1, before `acked`), delete the worker
-from a **second terminal**:
+The worker takes delivery #1, sends a couple of side effects, then exits before acking.
+The log stops abruptly:
 
-```bash
-kubectl delete pod -l app=payments-agent
+```
+[worker] received 'user-task-1' (delivery #1)
+[worker] CRASH_FIRST_ATTEMPT set: this worker will die mid-task before acking
+[agent] task user-task-1: resuming, already done = nothing
+[agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: recorded
+[agent]   charge: side effect sent (key=user-task-1:charge) -> sink: recorded
 ```
 
 The message was never acked, so after the ack-wait window (about 30 seconds by default)
-JetStream redelivers it to the replacement worker. Back in the first terminal, follow
-the new pod (it may sit idle for that window before the redelivery arrives):
+JetStream redelivers it to the replacement pod. Follow the new pod (it may sit idle for
+that window before the redelivery arrives):
 
 ```bash
 kubectl get pods -l app=payments-agent     # re-run until the new pod shows Running
@@ -147,12 +159,19 @@ kubectl logs -f deploy/payments-agent
 [worker] acked 'user-task-1'
 ```
 
-`delivery #2`: the whole task ran again. The steps that completed before the crash
-(`reserve`, `charge`) were re-sent with the same stable keys and the sink replied
-`duplicate-ignored`; only the steps that had not run yet were recorded. Check the sink:
+`delivery #2`: the whole task ran again. The steps the first attempt completed before
+crashing (`reserve`, `charge`) were re-sent with the same stable keys and the sink
+replied `duplicate-ignored`; only the steps that had not run yet were recorded. Check
+the sink:
 
 ```bash
 ../shared/check-charges.sh        # charges: 1 (unchanged)
+```
+
+Turn the simulated crash back off when you are done:
+
+```bash
+kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT-
 ```
 
 ## What to verify

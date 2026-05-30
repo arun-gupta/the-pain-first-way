@@ -8,6 +8,7 @@ idempotency key is what keeps the charge at exactly one.
 """
 import asyncio
 import os
+import threading
 
 import nats
 
@@ -17,6 +18,11 @@ NATS_URL = os.environ.get("NATS_URL", "nats://nats:4222")
 STREAM = "tasks"
 SUBJECT = "tasks.run"
 DURABLE = "worker"
+STEP_DELAY = float(os.environ.get("STEP_DELAY", "5"))
+# When set, the worker kills itself partway through its FIRST delivery of a task, a
+# deterministic stand-in for a real crash (node failure, OOM kill) so the redelivery
+# demo does not depend on winning a race to delete the pod mid-task.
+CRASH_FIRST_ATTEMPT = os.environ.get("CRASH_FIRST_ATTEMPT", "").lower() in ("1", "true", "yes")
 
 
 class QueueStore:
@@ -52,6 +58,9 @@ async def main():
             task_id = msg.data.decode()
             deliveries = msg.metadata.num_delivered
             print(f"[worker] received '{task_id}' (delivery #{deliveries})", flush=True)
+            if CRASH_FIRST_ATTEMPT and deliveries == 1:
+                print("[worker] CRASH_FIRST_ATTEMPT set: this worker will die mid-task before acking", flush=True)
+                threading.Timer(STEP_DELAY * 1.5, lambda: os._exit(1)).start()
             agent_task.run(QueueStore(), task_id=task_id)
             await msg.ack()
             print(f"[worker] acked '{task_id}'", flush=True)
