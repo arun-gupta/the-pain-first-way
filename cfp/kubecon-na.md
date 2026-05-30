@@ -23,9 +23,29 @@ Most cloud native onboarding assumes you already think in pods and Deployments. 
 
 This talk closes the gap from the AI developer's side, and it does it with patterns, not slides. Each pain resolves to a reusable design pattern an attendee can apply at work the same week: a checkpoint-and-auto-restart training Job on a PersistentVolumeClaim that survives a crash at hour 14, gang scheduling with Kueue so multi-node jobs stop deadlocking, ConfigMap and Secret decoupling so one image serves every environment, rollback via Deployment revisions, and admission guardrails with Kyverno. Many ship as runnable before/after code, tested on a real GPU cluster and runnable locally on Kind, so the pattern is something you run, not just something you saw.
 
-Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA, KServe and the Gateway API Inference Extension, Kyverno) with no product pitch. Real AI stacks are never CNCF-only, so the patterns show those projects interoperating with the open-source tools teams already run, vLLM and Ray, Slurm from HPC, PostgreSQL and Temporal behind durable agents, because the ecosystem's collective power beats any single project. It also serves two audiences the ecosystem is actively courting: ML engineers moving from notebooks to production, and HPC teams weighing where Slurm and Kubernetes each fit as AI workloads pull them together.
+Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA, KServe and the Gateway API Inference Extension, Kyverno) with no product pitch. Real AI stacks are never CNCF-only, so the patterns show those projects interoperating with the open-source tools teams already run, vLLM and Ray, Slurm from HPC, PostgreSQL and Temporal behind durable agents, since no one project covers an AI stack end to end. It also serves two audiences the ecosystem is actively courting: ML engineers moving from notebooks to production, and HPC teams weighing where Slurm and Kubernetes each fit as AI workloads pull them together.
 
-Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, a durable resource the community can extend long after the talk: https://github.com/arun-gupta/the-pain-first-way
+Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, free to fork, extend, and reuse: https://github.com/arun-gupta/the-pain-first-way
+
+## Key Takeaways
+
+- A vocabulary for production: name the pain you're hitting and the cloud native primitive that solves it, across the lifecycle and the agent lane.
+- A pocketful of vendor-neutral, reusable patterns, checkpoint-and-restart, gang scheduling, config and secret decoupling, safe rollback, admission guardrails, durable agents, that you can apply the same week, with runnable before/after code.
+- A clear map of cloud native's boundary: what it runs and enforces versus what it does not decide (model quality, eval, prompts), so you reach for the right layer instead of expecting the platform to solve a model problem.
+
+## Audience and level
+
+AI and ML developers, LLM application builders, and agent developers taking work from notebooks (or from HPC and Slurm) into production. Cloud native level: beginner to intermediate. It assumes you can build and run a container, not that you already think in controllers and Deployments.
+
+## Outline
+
+A demo-driven session built from the guide's before/after examples:
+
+1. The gap and the pain-first method: why a catalog of pains beats another Kubernetes tutorial.
+2. Representative pains as live before/after runs: the GPU job that crashed at hour 14 (checkpoint Job on a PVC), the model you can't roll back (Deployment revisions), the agent that won't stay alive (durable execution on a queue or database).
+3. The two on-ramps, notebook-to-prod and HPC/Slurm-to-cloud-native, and where each fits.
+4. The honest boundary: what cloud native does not decide.
+5. Where to take it next: the open-source guide and its runnable examples.
 
 ## CNCF-hosted software
 
