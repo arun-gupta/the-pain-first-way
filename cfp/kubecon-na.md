@@ -12,7 +12,7 @@ Alternates:
 
 ## Abstract (max 1000 characters)
 
-AI development grew up in notebooks and on rented GPU boxes, parallel to cloud native. Now inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between an experiment and a system, and on the other side is a vocabulary AI developers were never made to learn.
+AI development grew up in notebooks and on GPUs within academic research facilities, parallel to cloud-native. Now, inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between an experiment and a system, and on the other side is a vocabulary AI developers were never made to learn.
 
 This talk is that vocabulary, pain-first. Not another Kubernetes tutorial: a catalog of real production pains, each starting from a problem you've hit, the GPU job that crashed at hour 14, the model you can't roll back, the agent that won't stay alive, then pointing at the cloud native primitive that solves it. We trace two on-ramps, notebook-to-prod and HPC/SLURM-to-cloud-native, across the lifecycle: foundation, compute, serving, operations, governance, and compliance, plus a dedicated lane for agent systems. Every pattern is vendor-neutral, and many ship as runnable before/after examples tested on a real GPU cluster. You leave able to name what's biting you, and what to reach for.
 
@@ -33,7 +33,7 @@ Projects referenced or demonstrated in the talk that are hosted by CNCF (or are 
 - Kubernetes (Jobs, Deployments, ConfigMaps, Secrets, PVCs, DRA)
 - Kueue (Kubernetes SIG-Scheduling) for gang scheduling and quotas
 - KServe for model serving
-- Kyverno for admission guardrails
+- Kyverno for scheduling prioritization
 - KEDA for event-driven autoscaling
 - Prometheus for inference and GPU observability
 - Volcano for batch and gang scheduling
@@ -42,6 +42,7 @@ Projects referenced or demonstrated in the talk that are hosted by CNCF (or are 
 - Gateway API and the Gateway API Inference Extension (Kubernetes SIG-Network)
 - Knative for scale-to-zero serving
 - node-problem-detector (Kubernetes SIG) for node and device health
+- Open Telemetry
 
 ## Open source projects
 
