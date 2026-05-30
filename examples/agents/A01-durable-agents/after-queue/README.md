@@ -143,10 +143,9 @@ Ctrl-C, then check the sink:
 
 ## Step 2: crash before the ack, watch the redelivery
 
-Turn on the simulated crash, then clear and re-enqueue. `CRASH_FIRST_ATTEMPT` makes the
-worker kill itself partway through a task's *first* delivery, a deterministic stand-in
-for a node failure or OOM kill, so you do not have to race a `kubectl delete` against
-the roughly 20-second task.
+To make the crash deterministic (no racing a `kubectl delete` against a 20-second task),
+set `CRASH_FIRST_ATTEMPT`: the worker exits partway through a task's *first* delivery, a
+stand-in for a node failure or OOM kill. Then re-run with a clean stream and sink:
 
 ```bash
 kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT=true
@@ -157,56 +156,31 @@ kubectl exec deploy/payments-agent -- python /app/enqueue.py
 kubectl logs -f deploy/payments-agent
 ```
 
-The worker takes delivery #1, sends a couple of side effects, then exits before acking.
-The log stops abruptly:
-
-```
-[worker] received 'user-task-1' (delivery #1)
-[worker] CRASH_FIRST_ATTEMPT set: this worker will die mid-task before acking
-[agent] task user-task-1: resuming, already done = nothing
-[agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: recorded
-[agent]   reserve: recorded done
-[agent]   charge: side effect sent (key=user-task-1:charge) -> sink: recorded
-```
-
-(The process exits here, before `charge: recorded done` and before the ack.)
-
-The message was never acked, so after the ack-wait window (about 30 seconds by default)
-JetStream redelivers it. The crashed container restarts in place (same pod, its
-`RESTARTS` count goes to 1), reconnects, and sits idle until the redelivery arrives:
+**Delivery #1** sends `reserve` and `charge`, then the worker exits before acking, so the
+log cuts off mid-task. The container restarts in place (same pod, `RESTARTS` 1) and sits
+idle until the ack-wait window (~30s) expires and JetStream redelivers the message:
 
 ```bash
-kubectl get pods -l app=payments-agent     # wait until it is Running again (RESTARTS 1)
-kubectl logs -f deploy/payments-agent
+kubectl logs -f deploy/payments-agent      # wait ~30s for delivery #2
 ```
+
+**Delivery #2** reruns the whole task. `reserve` and `charge` are re-sent with the same
+stable keys, so the sink replies `duplicate-ignored`; only `email` and `confirm` are new:
 
 ```
 [worker] received 'user-task-1' (delivery #2)
-[agent] task user-task-1: resuming, already done = nothing
-[agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: duplicate-ignored
-[agent]   reserve: recorded done
-[agent]   charge: side effect sent (key=user-task-1:charge) -> sink: duplicate-ignored
-[agent]   charge: recorded done
-[agent]   email: side effect sent (key=user-task-1:email) -> sink: recorded
-[agent]   email: recorded done
-[agent]   confirm: side effect sent (key=user-task-1:confirm) -> sink: recorded
-[agent]   confirm: recorded done
-[agent] task user-task-1: complete
+[agent]   reserve: ... -> sink: duplicate-ignored
+[agent]   charge:  ... -> sink: duplicate-ignored
+[agent]   email:   ... -> sink: recorded
+[agent]   confirm: ... -> sink: recorded
 [worker] acked 'user-task-1'
 ```
 
-`delivery #2`: the whole task ran again. The steps the first attempt completed before
-crashing (`reserve`, `charge`) were re-sent with the same stable keys and the sink
-replied `duplicate-ignored`; only the steps that had not run yet were recorded. Check
-the sink:
+The task ran twice end to end, yet the charge held at one. Check, then turn the crash
+off:
 
 ```bash
 ../shared/check-charges.sh        # charges: 1 (unchanged)
-```
-
-Turn the simulated crash back off when you are done:
-
-```bash
 kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT-
 ```
 
