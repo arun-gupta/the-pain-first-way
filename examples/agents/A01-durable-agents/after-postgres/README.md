@@ -200,7 +200,7 @@ kubectl delete configmap agent-code
 
 The sink and cluster stay up for the other variants. Next is
 [`after-queue/`](../after-queue/README.md), which runs the identical crash test with a
-durable queue instead of a database (`after-argo/` follows once built).
+queue instead of a database as the durable store (`after-argo/` follows once built).
 
 ---
 
