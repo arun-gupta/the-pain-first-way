@@ -86,7 +86,7 @@ flowchart LR
     end
     subgraph A["Agent Systems (A)"]
         direction TB
-        A01[A.01 Durable agents]
+        A01[✓ A.01 Durable agents]
         A02[A.02 Sandboxed code exec]
         A03[A.03 Tool/MCP fleet]
         A04[A.04 Agent egress control]
@@ -105,7 +105,7 @@ flowchart LR
     F --> C --> S --> O --> G --> R --> A
     H ==> C
     classDef avail fill:#bbf7d0,stroke:#16a34a,stroke-width:1px,color:#14532d;
-    class F01,C01,C02,C04,S01,S02,O01,S03,G01,G03 avail;
+    class F01,C01,C02,C04,S01,S02,O01,S03,G01,G03,A01 avail;
     style H fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#1f2937;
     linkStyle 30 stroke:#d97706,stroke-width:3px;
     click F01 "https://github.com/arun-gupta/the-pain-first-way/blob/main/pains/foundation/F01-model-works-locally.md"

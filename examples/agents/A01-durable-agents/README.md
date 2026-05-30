@@ -7,10 +7,10 @@ process memory, so killing the pod mid-task loses state and a retry duplicates t
 side effects. `after/` makes the run durable, so killing the pod mid-task resumes from
 the last completed step with no duplicate.
 
-> **Status: in progress.** `before/` and `after-postgres/` (option B) are built and
-> verified on a live Kind cluster. `after-queue/` (C) and `after-argo/` (D) are next.
-> The example is not yet listed as Available in the catalog until all three afters are
-> done.
+> **Status: option B available; C and D in progress.** `before/` and `after-postgres/`
+> (option B) are built and verified on a live Kind cluster, so the example is listed as
+> Available in the catalog. `after-queue/` (C) and `after-argo/` (D) are next, each
+> adding a runnable variant of the same crash test.
 
 ## The three swappable parts
 

@@ -31,7 +31,7 @@ Filled in pain-by-pain as the guide evolves. The goal: when you hit a pain, you 
 | O.05 | GPU device health | `operations/O05-device-health/` | Planned |
 | S.04 | Quality gates | `serving/S04-quality-gates/` | Planned |
 | G.02 | Model reproducibility | `governance/G02-model-reproducibility/` | Planned |
-| A.01 | Durable agents | `agents/A01-durable-agents/` | Planned |
+| A.01 | Durable agents | [`agents/A01-durable-agents/`](agents/A01-durable-agents/) | Available |
 | R.02 | Tenant isolation | `compliance/R02-tenant-isolation/` | Planned |
 | O.03 | Model drift | `operations/O03-model-drift/` | Planned |
 | A.02 | Sandboxed code execution | `agents/A02-agent-sandbox/` | Planned |
