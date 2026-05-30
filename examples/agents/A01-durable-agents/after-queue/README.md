@@ -107,9 +107,13 @@ kubectl logs -f deploy/payments-agent
 [worker] received 'user-task-1' (delivery #1)
 [agent] task user-task-1: resuming, already done = nothing
 [agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: recorded
+[agent]   reserve: recorded done
 [agent]   charge: side effect sent (key=user-task-1:charge) -> sink: recorded
+[agent]   charge: recorded done
 [agent]   email: side effect sent (key=user-task-1:email) -> sink: recorded
+[agent]   email: recorded done
 [agent]   confirm: side effect sent (key=user-task-1:confirm) -> sink: recorded
+[agent]   confirm: recorded done
 [agent] task user-task-1: complete
 [worker] acked 'user-task-1'
 ```
@@ -144,15 +148,18 @@ The log stops abruptly:
 [worker] CRASH_FIRST_ATTEMPT set: this worker will die mid-task before acking
 [agent] task user-task-1: resuming, already done = nothing
 [agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: recorded
+[agent]   reserve: recorded done
 [agent]   charge: side effect sent (key=user-task-1:charge) -> sink: recorded
 ```
 
+(The process exits here, before `charge: recorded done` and before the ack.)
+
 The message was never acked, so after the ack-wait window (about 30 seconds by default)
-JetStream redelivers it to the replacement pod. Follow the new pod (it may sit idle for
-that window before the redelivery arrives):
+JetStream redelivers it. The crashed container restarts in place (same pod, its
+`RESTARTS` count goes to 1), reconnects, and sits idle until the redelivery arrives:
 
 ```bash
-kubectl get pods -l app=payments-agent     # re-run until the new pod shows Running
+kubectl get pods -l app=payments-agent     # wait until it is Running again (RESTARTS 1)
 kubectl logs -f deploy/payments-agent
 ```
 
@@ -160,9 +167,13 @@ kubectl logs -f deploy/payments-agent
 [worker] received 'user-task-1' (delivery #2)
 [agent] task user-task-1: resuming, already done = nothing
 [agent]   reserve: side effect sent (key=user-task-1:reserve) -> sink: duplicate-ignored
+[agent]   reserve: recorded done
 [agent]   charge: side effect sent (key=user-task-1:charge) -> sink: duplicate-ignored
+[agent]   charge: recorded done
 [agent]   email: side effect sent (key=user-task-1:email) -> sink: recorded
+[agent]   email: recorded done
 [agent]   confirm: side effect sent (key=user-task-1:confirm) -> sink: recorded
+[agent]   confirm: recorded done
 [agent] task user-task-1: complete
 [worker] acked 'user-task-1'
 ```
