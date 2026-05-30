@@ -29,13 +29,15 @@ Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA
 
 Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, free to fork, extend, and reuse: https://github.com/arun-gupta/the-pain-first-way
 
-## Audience and level
+## Level
 
-AI and ML developers, LLM application builders, and agent developers taking work from notebooks (or from HPC and Slurm) into production. Cloud native level: beginner to intermediate. It assumes you can build and run a container, not that you already think in controllers and Deployments.
+**Beginner** (the form's Level options are Beginner, Advanced, or Any). The talk assumes no cloud native background, you can build and run a container, not that you think in controllers and Deployments, and teaches the vocabulary pain-first. Audience: AI and ML developers, LLM app builders, and agent developers taking work from notebooks, or from HPC and Slurm, into production.
 
-## Outline
+## Additional Resources
 
-A demo-driven session built from the guide's before/after examples:
+The open-source guide and all runnable before/after examples: https://github.com/arun-gupta/the-pain-first-way
+
+Session outline (demo-driven, built from those examples):
 
 1. The gap and the pain-first method: why a catalog of pains beats another Kubernetes tutorial.
 2. Representative pains as live before/after runs: the GPU job that crashed at hour 14 (checkpoint Job on a PVC), the model you can't roll back (Deployment revisions), the agent that won't stay alive (durable execution on a queue or database).
