@@ -198,9 +198,10 @@ kubectl delete -f agent.yaml -f postgres.yaml
 kubectl delete configmap agent-code
 ```
 
-The sink and cluster stay up for the other variants (`after-queue/`,
-`after-argo/`), which run the identical crash test with a different part 3.
+The sink and cluster stay up for the other variants. Next is
+[`after-queue/`](../after-queue/README.md), which runs the identical crash test with a
+durable queue instead of a database (`after-argo/` follows once built).
 
 ---
 
-[← Example overview](../README.md) · [before/](../before/README.md)
+[← Example overview](../README.md) · [before/](../before/README.md) · [after-queue/ →](../after-queue/README.md)
