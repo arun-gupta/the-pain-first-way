@@ -12,7 +12,7 @@ Alternates:
 
 ## Abstract (max 1000 characters)
 
-AI development grew up in notebooks and on GPUs within academic research facilities, parallel to cloud-native. Now, inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between an experiment and a system, and on the other side is a vocabulary AI developers were never made to learn.
+Inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between an experiment and a system, and on the other side is a vocabulary AI developers were never made to learn.
 
 This talk is that vocabulary, pain-first. Not another Kubernetes tutorial: a catalog of real production pains, each starting from a problem you've hit, the GPU job that crashed at hour 14, the model you can't roll back, the agent that won't stay alive, then pointing at the cloud native primitive that solves it. We trace two paths into production, notebook-to-prod and the HPC/Slurm world meeting cloud native, across the lifecycle: foundation, compute, serving, operations, governance, and compliance, plus a dedicated lane for agent systems. Every pattern is vendor-neutral, and many ship as runnable before/after examples tested on a real GPU cluster. You leave able to name what's biting you, and what to reach for.
 
