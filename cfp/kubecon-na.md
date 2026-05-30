@@ -12,9 +12,9 @@ Alternates:
 
 ## Abstract (max 1000 characters)
 
-Inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between an experiment and a system, and on the other side is a vocabulary AI developers were never made to learn.
+Inference at scale, multi-agent systems, and enterprise rollouts are tearing down the wall between experiment and system. AI developers hitting these pains sense the fix is cloud native but were never taught its vocabulary, so they cannot reach for it.
 
-This talk is that vocabulary, pain-first. Not another Kubernetes tutorial: a catalog of real production pains, each starting from a problem you've hit, the GPU job that crashed at hour 14, the model you can't roll back, the agent that won't stay alive, then the cloud native primitive that solves it. Two paths into production, notebook-to-prod and HPC/Slurm-to-cloud-native, span the lifecycle: foundation, compute, serving, operations, governance, and compliance, plus a dedicated lane for agent systems. Every pattern is vendor-neutral and maps to a CNCF project, and many ship as runnable before/after code. It is honest about scope: cloud native runs and enforces, it does not decide model quality or eval. You leave able to name what's biting you, and what to reach for.
+This talk is that vocabulary, pain-first. Not another Kubernetes tutorial: a catalog of real production pains, each starting from a problem you've hit, the GPU job that crashed at hour 14, the model you can't roll back, the agent that won't stay alive, then the cloud native primitive that solves it. Two paths into production, notebook-to-prod and HPC/Slurm-to-cloud-native, span the lifecycle from foundation to compliance, plus a dedicated lane for agent systems. Every pattern is vendor-neutral and maps to a CNCF project, and many ship as runnable before/after code. It is honest about scope: cloud native runs and enforces, it does not decide model quality or eval. You leave able to name what's biting you, and reach for the fix.
 
 ## Benefits to the Ecosystem (max 2000 characters)
 
