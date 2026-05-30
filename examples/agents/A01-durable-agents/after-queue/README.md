@@ -13,8 +13,9 @@ options.
 
 The same agent, the same task, the same crash. This time the durability comes from a
 queue: a [NATS JetStream](https://docs.nats.io/nats-concepts/jetstream) stream holds the
-task as a work item, a worker pulls it, runs it, and acks only on success. Kill the worker mid-task and the message is never acked,
-so JetStream redelivers it to a new worker, which runs the task again.
+task as a work item, a worker pulls it, runs it, and acks only on success. Kill the
+worker mid-task and the message is never acked, so JetStream redelivers it to a new
+worker, which runs the task again.
 
 Unlike [`after-postgres/`](../after-postgres/README.md), there is **no per-step
 checkpoint**: the queue knows only "acked or not", so a redelivery reprocesses the
@@ -64,6 +65,9 @@ kubectl apply -f nats.yaml
 kubectl rollout status deploy/nats
 ```
 
+> If you ran this variant before on the same cluster, recreate NATS for a clean stream
+> and consumer: `kubectl delete -f nats.yaml && kubectl apply -f nats.yaml && kubectl rollout status deploy/nats`.
+
 ## Deploy the worker
 
 The worker code includes `enqueue.py` (used below) alongside `main.py` and the shared
@@ -80,6 +84,10 @@ kubectl rollout status deploy/payments-agent
 > The container pip-installs the `nats-py` client on start, so the worker takes a few
 > seconds to connect. If `kubectl logs` prints `... ContainerCreating`, the pod is
 > still starting; the `rollout status` line waits for that.
+>
+> The code is mounted from the ConfigMap, so if you edit it and re-run the two commands
+> above, also run `kubectl rollout restart deploy/payments-agent` to load the new code
+> (recreating a ConfigMap alone does not restart the pod).
 
 ## Step 1: enqueue a task, confirm one charge
 
@@ -193,11 +201,14 @@ outcome, coarser resume, more weight on part 2, which is the trade the matrix de
 
 ## Re-run cleanly
 
-A second enqueue with the same task id will re-send the same keys, which the sink
-deduplicates, so reset the sink first to see a clean count:
+To run the demo again from a clean slate, turn off the simulated crash, purge the
+stream, and reset the sink (a second enqueue with the same task id re-sends the same
+keys, which the sink would otherwise deduplicate against the previous run):
 
 ```bash
-kubectl rollout restart deploy/sink
+kubectl set env deploy/payments-agent CRASH_FIRST_ATTEMPT-
+kubectl exec deploy/payments-agent -- python /app/enqueue.py purge
+kubectl rollout restart deploy/sink && kubectl rollout status deploy/sink
 ```
 
 ## Clean up
