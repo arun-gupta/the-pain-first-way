@@ -1,25 +1,26 @@
 # after-queue/ -- a durable queue redelivers the task on crash (option C)
 
-One variant of the [Pain A.01 durable-agents example](../README.md), readable on its
-own. The scenario: an agent runs a multi-step task with real side effects (reserve,
-charge, email, confirm). If its process dies mid-task and restarts, naive code repeats
-the charge. [`before/`](../before/README.md) shows that failure, where a restart charges
-the customer twice; every durable variant survives the same crash and charges once. A
-small [sink](../shared/README.md) records each side effect and deduplicates by
-idempotency key, so the charge count (1 versus 2) is how the outcome is read. The
-[overview](../README.md) explains the three parts of durability and compares all five
-variants.
+*[A.01 durable-agents](../README.md) series:* [before](../before/README.md) -> [Postgres (B)](../after-postgres/README.md) -> **queue (C)** -> Argo (D, soon).
+
+Readable on its own. The scenario: an agent runs a multi-step task with real side
+effects (reserve, charge, email, confirm). If its process dies mid-task and restarts,
+naive code repeats the charge. [`before/`](../before/README.md) shows that failure,
+where a restart charges the customer twice; every durable variant survives the same
+crash and charges once. A small [sink](../shared/README.md) records each side effect and
+deduplicates by idempotency key, so the charge count (1 versus 2) is how the outcome is
+read. The [overview](../README.md) explains the three parts and compares all five
+options.
 
 The same agent, the same task, the same crash. This time the durability comes from a
 queue: a NATS JetStream stream holds the task as a work item, a worker pulls it, runs
 it, and acks only on success. Kill the worker mid-task and the message is never acked,
 so JetStream redelivers it to a new worker, which runs the task again.
 
-This is option C from the [overview](../README.md). Unlike `after-postgres/`, there is
-**no per-step checkpoint**: the queue knows only "acked or not", so a redelivery
-reprocesses the *whole* task from the top. The stable idempotency key is the only thing
-keeping the charge at one, which is exactly why the matrix says the coarsest resume
-leans hardest on part 2.
+Unlike [`after-postgres/`](../after-postgres/README.md), there is **no per-step
+checkpoint**: the queue knows only "acked or not", so a redelivery reprocesses the
+*whole* task from the top. The stable idempotency key is the only thing keeping the
+charge at one, which is exactly why the matrix says the coarsest resume leans hardest on
+part 2.
 
 ## Prerequisites
 

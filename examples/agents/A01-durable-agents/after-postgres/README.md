@@ -1,13 +1,21 @@
 # after-postgres/ -- step state in Postgres survives the restart (option B)
 
-The same agent, the same task, the same crash. The only change is the store:
-step state now lives in a Postgres table instead of process memory, and the
-idempotency key is derived from the durable task id. Kill the pod mid-task and
-the new one reloads what is done, resumes, and the customer is charged once.
+*[A.01 durable-agents](../README.md) series:* [before](../before/README.md) -> **Postgres (B)** -> [queue (C)](../after-queue/README.md) -> Argo (D, soon).
 
-This is option B from the [overview](../README.md): you assemble all three
-parts, and Postgres makes part 1 (state) and part 2 (idempotency) visible as
-plain SQL.
+Readable on its own. The scenario: an agent runs a multi-step task with real side
+effects (reserve, charge, email, confirm). If its process dies mid-task and restarts,
+naive code repeats the charge. [`before/`](../before/README.md) shows that failure,
+where a restart charges the customer twice; every durable variant survives the same
+crash and charges once. A small [sink](../shared/README.md) records each side effect and
+deduplicates by idempotency key, so the charge count (1 versus 2) is how the outcome is
+read.
+
+The same agent, the same task, the same crash. The only change here is the store: step
+state lives in a Postgres table instead of process memory, and the idempotency key is
+derived from the durable task id. Kill the pod mid-task and the new pod reloads what is
+done, resumes, and the customer is charged once. You assemble all three parts yourself,
+and Postgres makes part 1 (state) and part 2 (idempotency) visible as plain SQL. The
+[overview](../README.md) explains the three parts and compares all five options.
 
 ## Prerequisites
 
