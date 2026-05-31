@@ -29,6 +29,10 @@ Everything is vendor-neutral and maps to real CNCF projects (Jobs and Kueue, DRA
 
 Finally, it is honest about scope, drawing a clear line between what cloud native operates and enforces (covered) and what it does not decide, like model quality, eval, and prompts. The guide and all examples are open source under Apache-2.0, free to fork, extend, and reuse: https://github.com/arun-gupta/the-pain-first-way
 
+## Track
+
+**Cloud Native Novice.** The talk onboards AI developers who are new to cloud native, which matches the Beginner level and is the audience the whole guide serves. It spans the lifecycle rather than going deep on inference or agents alone, so it fits Novice better than the (also more crowded) AI Inference + Agentic track.
+
 ## Level
 
 **Beginner** (the form's Level options are Beginner, Advanced, or Any). The talk assumes no cloud native background, you can build and run a container, not that you think in controllers and Deployments, and teaches the vocabulary pain-first. Audience: AI and ML developers, LLM app builders, and agent developers taking work from notebooks, or from HPC and Slurm, into production.
