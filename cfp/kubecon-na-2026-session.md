@@ -1,6 +1,6 @@
-# KubeCon NA CFP Submission
+# KubeCon NA 2026 CFP, Session (~35 min)
 
-Draft submission for the [companion guide](../README.md). Character limits per the CFP form are noted on each field.
+Draft submission for the [companion guide](../README.md), as a standard session: breadth, the catalog of pains, demo-driven. A hands-on **75-minute tutorial** variant is in [kubecon-na-2026-tutorial.md](kubecon-na-2026-tutorial.md). Character limits per the CFP form are noted on each field.
 
 ## Title (max 70 characters)
 
