@@ -12,13 +12,15 @@ Alternates:
 
 ## Abstract (max 1000 characters)
 
-You hit a production pain, sense the fix is cloud native, but were never taught its vocabulary. In this tutorial you don't watch the fix, you run it. On your own laptop, a local Kind cluster with no GPU, you reproduce real pains and apply the cloud native primitive, before and after, feeling the difference yourself: an agent that charges a customer twice when it crashes mid-task, then exactly once; a deploy that sails in unchecked, then rejected at an admission gate; a bad change you roll back in one command. Each lab is a small, vendor-neutral pattern that maps to a CNCF project and pastes into your work the same week. We stay honest about scope: cloud native runs and enforces, it does not decide model quality. You leave with the patterns in muscle memory and a repo you have already run, plus the full catalog to keep working through after the room empties.
+You hit a production pain, sense the fix is cloud native, but were never taught its vocabulary. This tutorial is hands-on with the real thing: live on a local Kind cluster (no GPU), we run each pain and its cloud native fix, before and after, so you feel the difference, an agent that charges a customer twice when it crashes mid-task then exactly once; a deploy that sails in unchecked then rejected at an admission gate; a bad change rolled back in one command. Bring a laptop and run it alongside, or just watch: every step is committed, so you can reproduce it the same day. Each lab is a small, vendor-neutral pattern that maps to a CNCF project and pastes into your work the same week. We stay honest about scope: cloud native runs and enforces, it does not decide model quality. You leave with the patterns and a repo built to run: three labs taught, about two dozen more pains in the very same recipe, and a path to contribute your own.
 
 ## Benefits to the Ecosystem (max 3000 characters)
 
 Most cloud native onboarding assumes you already think in pods and Deployments. AI developers don't: they arrive from notebooks, training scripts, and SLURM, fluent in models but not in the platform now expected to run them. That gap slows adoption of the exact CNCF projects built to help them.
 
 This tutorial closes the gap by making attendees do the work, not watch it. On a local Kind cluster, with no GPU and no image builds, each attendee runs a real production pain and its cloud native fix, before and after: an agent that charges a customer twice on a crash, then once; a non-compliant deploy that an admission gate rejects; a one-command rollback. They leave with the pattern in muscle memory and a repo they have already run on their own machine, not just slides they saw.
+
+Three labs are enough to teach the recipe, name the pain, run the before, run the after, because that recipe repeats across the whole catalog: about two dozen more pains, many already shipping as runnable before/after examples and the rest open to build. Attendees leave able to keep going on their own, and the repo is set up to take their work back: bring a pain you have hit, add your own before/after, and it becomes part of the guide. That contribution path, not just consumption, is the durable ecosystem win.
 
 Every lab is vendor-neutral and maps to a real CNCF project, Deployments and Jobs, Kyverno for admission control, and a NATS JetStream queue or a database for durable agents, with no product pitch. Real AI stacks are never CNCF-only, so the labs show CNCF projects interoperating with the open-source tools teams already run, PostgreSQL behind durable agents and, in the broader guide, vLLM, Ray, Slurm, and Temporal, since no one project covers an AI stack end to end.
 
@@ -28,14 +30,11 @@ It is honest about scope, drawing a clear line between what cloud native operate
 
 ## Prerequisites
 
-Bring a laptop set up ahead of time (the repo has a pre-flight check; please run it before the session):
+The tutorial is instructor-led, so **nothing is required to attend** beyond an interest in the topic; no prior Kubernetes experience is assumed, and the labs teach the vocabulary as we go.
 
-- Docker or Podman, [kind](https://kind.sigs.k8s.io/), and kubectl installed.
-- Ability to create a local Kind cluster (one command; no GPU, no cloud account, no image builds).
-- git, to clone https://github.com/arun-gupta/the-pain-first-way.
-- Comfort with a terminal and basic kubectl. No prior Kubernetes experience assumed; the labs teach the vocabulary as you go.
+To **follow along live** (optional, encouraged), bring a laptop with Docker or Podman, [kind](https://kind.sigs.k8s.io/), kubectl, and git, and run the repo's pre-flight check beforehand. Everything runs locally: no GPU, no cloud account, no image builds.
 
-Every lab ships committed expected-output, so attendees who hit setup trouble can still follow along and finish later.
+We do not depend on the room's setup or WiFi: every lab ships committed expected-output, so watching is a first-class path and anyone can reproduce the whole thing the same day from the repo.
 
 ## Track
 
@@ -47,7 +46,7 @@ Every lab ships committed expected-output, so attendees who hit setup trouble ca
 
 ## Format and logistics
 
-A 75-minute hands-on tutorial: roughly 10 minutes to set up and verify, three before/after labs of about 18 minutes each that attendees run themselves, and a 5-minute wrap. Co-presenters or TAs circulate to unstick attendees; every lab has committed expected-output so anyone behind, or without a working cluster, can keep up. Best with a second presenter or one or two helpers for a full room.
+A 75-minute, instructor-led hands-on tutorial: roughly 10 minutes to set up and verify, three before/after labs of about 18 minutes each run live, and a 5-minute wrap. We run every step on a real Kind cluster on stage; attendees are welcome to run it alongside on a laptop, but it is not required. Committed expected-output for every lab means watching is a full experience and nothing hinges on the room's WiFi. A second presenter or a TA or two helps anyone who chooses to follow along on their own machine.
 
 ## Additional Resources
 
@@ -59,7 +58,7 @@ Lab plan (each lab is a before/after the attendee runs on their own Kind cluster
 1. The agent that won't stay alive (~18 min): run an in-memory agent, crash it mid-task, watch it charge the customer twice; then the durable variant (step state in Postgres, idempotent side effects) survives the same crash and charges once. Same crash again with a NATS JetStream queue that redelivers the work. (Pain A.01)
 2. The deploy nobody approved (~18 min): apply a non-compliant workload to an open cluster and watch it sail in; install a Kyverno admission policy and watch the same manifest get rejected, with the decision recorded as a PolicyReport. (Pain G.03)
 3. The change you can't roll back (~18 min): ship a bad version, then roll back in one command via Deployment revisions, with the history as an audit trail. (Pain S.03 / G.01)
-4. Wrap (~5 min): the full catalog, the two on-ramps, and the honest boundary, for self-study.
+4. Wrap (~5 min): the same recipe across the rest of the catalog (about two dozen more pains), the two on-ramps and the honest boundary, and how to contribute your own pain and before/after.
 
 ## CNCF-hosted software
 
